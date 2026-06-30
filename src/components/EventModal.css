@@ -1,0 +1,316 @@
+/* ==========================================================================
+   EVENT MODAL — BRUTALIST OVERLAY & PACKAGE SELECTOR
+   ========================================================================== */
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(4, 4, 4, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+.modal-container {
+  background: var(--bg-primary);
+  border: 1px solid var(--text-primary);
+  width: 100%;
+  max-width: 980px;
+  max-height: 90vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.8);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 2rem;
+  border-bottom: var(--grid-border);
+  background: var(--bg-secondary);
+}
+
+.modal-tag {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  letter-spacing: 0.15em;
+}
+
+.btn-close {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  color: var(--text-primary);
+  padding: 0.4rem 0.8rem;
+  font-size: 0.68rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-close:hover {
+  background: var(--text-primary);
+  color: var(--bg-primary);
+}
+
+.modal-body {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+}
+
+.event-specs-panel {
+  padding: 3rem;
+  border-right: var(--grid-border);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.spec-label {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  letter-spacing: 0.15em;
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.spec-val {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.modal-event-title {
+  font-size: clamp(2.2rem, 4vw, 3.2rem);
+  line-height: 0.95;
+  color: var(--text-primary);
+  margin: 1.5rem 0 2.5rem 0;
+}
+
+.spec-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  padding: 1.5rem 0;
+  border-top: var(--grid-border);
+  border-bottom: var(--grid-border);
+}
+
+.spec-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.s-label {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+}
+
+.s-val {
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.spec-atmosphere {
+  margin: 2rem 0;
+}
+
+.atmosphere-desc {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  font-weight: 300;
+  margin-top: 0.5rem;
+}
+
+.specs-disclaimer {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 0.68rem;
+  color: var(--text-secondary);
+  padding: 1rem;
+  background: var(--bg-secondary);
+  border: var(--grid-border);
+}
+
+.interest-form {
+  padding: 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  background: var(--bg-secondary);
+}
+
+.form-header {
+  font-size: 0.82rem;
+  color: var(--text-primary);
+  letter-spacing: 0.15em;
+  padding-bottom: 1rem;
+  border-bottom: var(--grid-border);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-size: 0.68rem;
+  color: var(--text-secondary);
+  letter-spacing: 0.1em;
+}
+
+.form-group input,
+.form-group select {
+  padding: 0.95rem 1rem;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-strong);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: var(--text-primary);
+}
+
+.form-group input::placeholder {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+/* Package Selection Custom Brutalist Styles */
+.package-selection-box {
+  margin-top: 0.5rem;
+}
+
+.package-label {
+  color: var(--text-primary) !important;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+
+.package-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.package-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 1rem;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-strong);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.package-card input[type="radio"] {
+  margin-top: 0.2rem;
+  accent-color: #FF2E2E;
+}
+
+.package-card:hover {
+  border-color: var(--text-secondary);
+}
+
+.package-card.package-active {
+  border-color: #FF2E2E;
+  background: rgba(255, 46, 46, 0.08);
+}
+
+.package-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.p-title {
+  font-size: 0.78rem;
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.p-sub {
+  font-size: 0.68rem;
+  color: var(--text-secondary);
+  line-height: 1.3;
+}
+
+.submit-btn {
+  margin-top: 1rem;
+  width: 100%;
+}
+
+/* Success Screen */
+.modal-success {
+  padding: 5rem 3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.success-icon {
+  margin-bottom: 2rem;
+}
+
+.success-title {
+  font-size: 2.8rem;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.success-message {
+  font-size: 1.15rem;
+  color: var(--text-secondary);
+  max-width: 480px;
+  line-height: 1.6;
+  margin-bottom: 2.5rem;
+}
+
+.success-notice {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  letter-spacing: 0.15em;
+  margin-bottom: 3rem;
+}
+
+@media (max-width: 900px) {
+  .modal-body {
+    grid-template-columns: 1fr;
+  }
+  
+  .event-specs-panel {
+    border-right: none;
+    border-bottom: var(--grid-border);
+    padding: 2rem 1.5rem;
+  }
+
+  .interest-form {
+    padding: 2rem 1.5rem;
+  }
+
+  .modal-success {
+    padding: 3.5rem 1.5rem;
+  }
+}

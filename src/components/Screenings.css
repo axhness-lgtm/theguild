@@ -1,0 +1,360 @@
+/* ==========================================================================
+   SCREENINGS SECTION — BRUTALIST TRANSITION STATES (F1 RED // FOOTBALL GREEN)
+   ========================================================================== */
+
+:root {
+  --f1-red: #FF2E2E;
+  --f1-red-muted: rgba(255, 46, 46, 0.12);
+  --fb-green: #00FF66;
+  --fb-green-muted: rgba(0, 255, 102, 0.12);
+}
+
+.screenings-section {
+  border-bottom: var(--grid-border);
+  background-color: var(--bg-primary);
+}
+
+.screenings-top-bar {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  border-bottom: var(--grid-border);
+}
+
+.screenings-title-group {
+  padding: 2.5rem;
+  border-right: var(--grid-border);
+}
+
+.category-tabs {
+  display: flex;
+  height: 100%;
+}
+
+.tab-btn {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1.75rem 3rem;
+  background: transparent;
+  border: none;
+  border-left: var(--grid-border);
+  color: var(--text-secondary);
+  font-family: var(--font-tech);
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.tab-brand-row {
+  display: flex;
+  align-items: center;
+  height: 28px;
+}
+
+.brand-asset-img {
+  object-fit: contain;
+  transition: all 0.25s ease;
+}
+
+.tab-logo-img {
+  height: 24px;
+  max-width: 130px;
+  filter: brightness(0) invert(1);
+  opacity: 0.75;
+}
+
+.tab-count {
+  font-size: 0.65rem;
+  opacity: 0.6;
+}
+
+/* F1 Tab Transition States */
+.tab-f1:hover {
+  background: var(--f1-red-muted);
+  color: var(--text-primary);
+}
+.tab-f1:hover .tab-logo-img {
+  opacity: 1;
+  filter: none; /* Show authentic F1 logo colors on hover */
+  transform: scale(1.05);
+}
+.tab-f1.active-f1 {
+  background: var(--f1-red);
+  color: #000000;
+  font-weight: 700;
+}
+.tab-f1.active-f1 .tab-logo-img {
+  opacity: 1;
+  filter: brightness(0); /* Black logo inside red active tab */
+}
+
+/* Football Tab Transition States */
+.tab-football:hover {
+  background: var(--fb-green-muted);
+  color: var(--text-primary);
+}
+.tab-football:hover .tab-logo-img {
+  opacity: 1;
+  filter: none;
+  transform: scale(1.05);
+}
+.tab-football.active-football {
+  background: var(--fb-green);
+  color: #000000;
+  font-weight: 700;
+}
+.tab-football.active-football .tab-logo-img {
+  opacity: 1;
+  filter: brightness(0); /* Black logo inside green active tab */
+}
+
+/* Banner Transition States */
+.tab-banner {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem 2.5rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  border-bottom: var(--grid-border);
+  background: var(--bg-secondary);
+  transition: border-color 0.3s ease;
+}
+
+.banner-f1 {
+  border-left: 4px solid var(--f1-red);
+}
+.banner-accent-f1 {
+  color: var(--f1-red);
+  font-weight: 600;
+}
+
+.banner-football {
+  border-left: 4px solid var(--fb-green);
+}
+.banner-accent-football {
+  color: var(--fb-green);
+  font-weight: 600;
+}
+
+/* Cards Grid */
+.screenings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.screening-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 3rem;
+  border-right: var(--grid-border);
+  border-bottom: var(--grid-border);
+  background: var(--bg-primary);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.screening-card:nth-child(2n) {
+  border-right: none;
+}
+
+/* F1 Card Hover & Transition State */
+.card-f1 {
+  border-left: 3px solid transparent;
+}
+.card-f1:hover {
+  background: #0D0D0D;
+  border-left-color: var(--f1-red);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(255, 46, 46, 0.08);
+}
+.card-f1:hover .card-logo-img {
+  filter: none;
+  opacity: 1;
+}
+.card-f1:hover .event-name {
+  color: var(--f1-red);
+}
+
+/* Football Card Hover & Transition State */
+.card-football {
+  border-left: 3px solid transparent;
+}
+.card-football:hover {
+  background: #0D0D0D;
+  border-left-color: var(--fb-green);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 255, 102, 0.08);
+}
+.card-football:hover .card-logo-img {
+  filter: none;
+  opacity: 1;
+}
+.card-football:hover .event-name {
+  color: var(--fb-green);
+}
+
+.card-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2.5rem;
+}
+
+.event-competition {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  letter-spacing: 0.12em;
+}
+
+.card-logo-img {
+  height: 20px;
+  max-width: 90px;
+  filter: brightness(0) invert(1);
+  opacity: 0.85;
+  transition: all 0.3s ease;
+}
+
+.event-name {
+  font-size: clamp(1.9rem, 3vw, 2.6rem);
+  line-height: 1.05;
+  color: var(--text-primary);
+  margin-bottom: 2rem;
+  transition: color 0.3s ease;
+}
+
+.event-metadata {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 3.5rem;
+}
+
+.meta-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.venue-row {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+/* Live Badges with Brutalist Vibe */
+.badge-live-f1 {
+  border-color: rgba(255, 46, 46, 0.5);
+  background: rgba(255, 46, 46, 0.12);
+  color: var(--f1-red);
+}
+.badge-live-f1::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background-color: var(--f1-red);
+  border-radius: 50%;
+  animation: pulse-red 1.4s infinite ease-in-out;
+}
+
+.badge-live-fb {
+  border-color: rgba(0, 255, 102, 0.5);
+  background: rgba(0, 255, 102, 0.12);
+  color: var(--fb-green);
+}
+.badge-live-fb::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background-color: var(--fb-green);
+  border-radius: 50%;
+  animation: pulse-green 1.4s infinite ease-in-out;
+}
+
+@keyframes pulse-red {
+  0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 8px var(--f1-red); }
+  50% { opacity: 0.3; transform: scale(0.8); box-shadow: none; }
+}
+
+@keyframes pulse-green {
+  0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 8px var(--fb-green); }
+  50% { opacity: 0.3; transform: scale(0.8); box-shadow: none; }
+}
+
+/* Brutalist Card Buttons */
+.card-actions {
+  display: flex;
+  width: 100%;
+}
+
+.card-btn {
+  width: 100%;
+  justify-content: space-between;
+}
+
+.btn-f1:hover {
+  background: var(--f1-red);
+  border-color: var(--f1-red);
+  color: #000000;
+}
+
+.btn-football:hover {
+  background: var(--fb-green);
+  border-color: var(--fb-green);
+  color: #000000;
+}
+
+@media (max-width: 1100px) {
+  .screenings-top-bar {
+    grid-template-columns: 1fr;
+  }
+  
+  .screenings-title-group {
+    border-right: none;
+    border-bottom: var(--grid-border);
+  }
+
+  .category-tabs {
+    width: 100%;
+  }
+
+  .tab-btn {
+    flex: 1;
+    border-left: none;
+    border-right: var(--grid-border);
+  }
+
+  .tab-btn:last-child {
+    border-right: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .screenings-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .screening-card {
+    border-right: none !important;
+    padding: 2.25rem 1.5rem;
+  }
+
+  .tab-banner {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .tab-btn {
+    padding: 1.25rem;
+  }
+}

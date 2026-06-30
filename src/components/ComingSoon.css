@@ -1,0 +1,116 @@
+/* ==========================================================================
+   COMING SOON ROADMAP — EDITORIAL LIST
+   ========================================================================== */
+
+.roadmap-section {
+  border-bottom: var(--grid-border);
+  background: var(--bg-secondary);
+}
+
+.roadmap-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2.5rem;
+  border-bottom: var(--grid-border);
+}
+
+.r-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.r-right {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+
+.roadmap-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.roadmap-row {
+  display: grid;
+  grid-template-columns: 240px 1fr 160px;
+  align-items: center;
+  padding: 2.5rem;
+  border-bottom: var(--grid-border);
+  transition: background 0.25s ease;
+}
+
+.roadmap-row:last-child {
+  border-bottom: none;
+}
+
+.roadmap-row:hover {
+  background: var(--bg-primary);
+}
+
+.row-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.row-idx {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.row-main {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.row-icon {
+  color: var(--text-secondary);
+}
+
+.roadmap-title {
+  font-size: 1.35rem;
+  color: var(--text-primary);
+  margin-bottom: 0.4rem;
+}
+
+.roadmap-desc {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  font-weight: 300;
+}
+
+.row-action {
+  text-align: right;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  letter-spacing: 0.15em;
+}
+
+@media (max-width: 900px) {
+  .roadmap-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.25rem;
+  }
+
+  .roadmap-row {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .row-meta {
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .row-action {
+    text-align: left;
+  }
+}
