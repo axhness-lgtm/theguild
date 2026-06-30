@@ -68,6 +68,14 @@
   transition: all 0.25s ease;
 }
 
+.fifa-tab-logo {
+  height: 44px;
+  max-width: 200px;
+  object-fit: contain;
+  opacity: 0.95;
+  transition: all 0.25s ease;
+}
+
 .tab-count {
   font-size: 0.65rem;
   opacity: 0.6;
@@ -89,6 +97,7 @@
 }
 .tab-f1.active-f1 .tab-logo-img {
   opacity: 1;
+  filter: brightness(0); /* Crisp black F1 logo inside active red tab */
 }
 
 /* Football Tab Transition States */
@@ -96,7 +105,7 @@
   background: var(--fb-green-muted);
   color: var(--text-primary);
 }
-.tab-football:hover .tab-logo-img {
+.tab-football:hover .fifa-tab-logo {
   opacity: 1;
   transform: scale(1.05);
 }
@@ -105,7 +114,7 @@
   color: #000000;
   font-weight: 700;
 }
-.tab-football.active-football .tab-logo-img {
+.tab-football.active-football .fifa-tab-logo {
   opacity: 1;
 }
 
@@ -214,6 +223,14 @@
 .card-logo-img {
   height: 22px;
   max-width: 100px;
+  object-fit: contain;
+  opacity: 0.95;
+  transition: all 0.3s ease;
+}
+
+.fifa-card-logo {
+  height: 38px;
+  max-width: 160px;
   object-fit: contain;
   opacity: 0.95;
   transition: all 0.3s ease;

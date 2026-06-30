@@ -46,7 +46,7 @@ export default function Screenings({ onSelectEvent }) {
               onClick={() => setActiveTab('football')}
             >
               <div className="tab-brand-row">
-                <FIFALogo className="tab-logo-img" />
+                <FIFALogo className="fifa-tab-logo" />
               </div>
               <span className="tab-count">{footballCount} EVENTS LISTED</span>
             </button>
@@ -75,7 +75,7 @@ export default function Screenings({ onSelectEvent }) {
               <article key={event.id} className={`screening-card card-${event.category}`}>
                 <div className="card-top-row">
                   <span className="event-competition font-tech">
-                    {isF1 ? <F1Logo className="card-logo-img" /> : <FIFALogo className="card-logo-img" />}
+                    {isF1 ? <F1Logo className="card-logo-img" /> : <FIFALogo className="fifa-card-logo" />}
                     <span className="comp-text">{event.competition}</span>
                   </span>
 
