@@ -61,10 +61,11 @@
 }
 
 .tab-logo-img {
-  height: 24px;
-  max-width: 130px;
-  filter: brightness(0) invert(1);
-  opacity: 0.75;
+  height: 26px;
+  max-width: 140px;
+  object-fit: contain;
+  opacity: 0.9;
+  transition: all 0.25s ease;
 }
 
 .tab-count {
@@ -79,7 +80,6 @@
 }
 .tab-f1:hover .tab-logo-img {
   opacity: 1;
-  filter: none; /* Show authentic F1 logo colors on hover */
   transform: scale(1.05);
 }
 .tab-f1.active-f1 {
@@ -89,7 +89,6 @@
 }
 .tab-f1.active-f1 .tab-logo-img {
   opacity: 1;
-  filter: brightness(0); /* Black logo inside red active tab */
 }
 
 /* Football Tab Transition States */
@@ -99,7 +98,6 @@
 }
 .tab-football:hover .tab-logo-img {
   opacity: 1;
-  filter: none;
   transform: scale(1.05);
 }
 .tab-football.active-football {
@@ -109,7 +107,6 @@
 }
 .tab-football.active-football .tab-logo-img {
   opacity: 1;
-  filter: brightness(0); /* Black logo inside green active tab */
 }
 
 /* Banner Transition States */
@@ -215,10 +212,10 @@
 }
 
 .card-logo-img {
-  height: 20px;
-  max-width: 90px;
-  filter: brightness(0) invert(1);
-  opacity: 0.85;
+  height: 22px;
+  max-width: 100px;
+  object-fit: contain;
+  opacity: 0.95;
   transition: all 0.3s ease;
 }
 
