@@ -14,8 +14,10 @@
   --border-strong: #383838;
   --accent-red: #FF2E2E; /* Reserved exclusively for LIVE / HOT events */
 
-  /* Typography System */
-  --font-editorial: 'Syne', sans-serif;
+  /* Typography System — Consistent Athletic Editorial Identity */
+  --font-editorial: 'Anton', 'Bebas Neue', sans-serif;
+  --font-impact: 'Anton', 'Bebas Neue', sans-serif;
+  --font-condensed: 'Anton', 'Bebas Neue', sans-serif;
   --font-tech: 'Space Grotesk', monospace;
   --font-body: 'Inter', sans-serif;
 
@@ -68,13 +70,20 @@ body {
   background: var(--text-secondary);
 }
 
-/* Typography Utility Classes */
-.font-editorial {
-  font-family: var(--font-editorial);
+/* Typography Utility Classes — Unified & Consistent */
+.font-editorial,
+.font-impact,
+.font-condensed {
+  font-family: var(--font-impact);
   text-transform: uppercase;
-  letter-spacing: -0.03em;
-  font-weight: 800;
-  line-height: 0.92;
+  letter-spacing: 0.02em;
+  font-weight: 400;
+  line-height: 0.9;
+}
+
+.font-outline {
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.25);
 }
 
 .font-tech {

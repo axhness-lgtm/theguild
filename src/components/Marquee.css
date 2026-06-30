@@ -1,0 +1,61 @@
+/* ==========================================================================
+   MARQUEE INFINITE SCROLL TICKER
+   ========================================================================== */
+
+.marquee-container {
+  overflow: hidden;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  padding: 1.25rem 0;
+  background-color: #FFFFFF;
+  color: #000000;
+  border-top: 1px solid #FFFFFF;
+  border-bottom: 1px solid #FFFFFF;
+  user-select: none;
+  position: relative;
+}
+
+.marquee-track {
+  display: flex;
+  gap: 3.5rem;
+  width: max-content;
+  animation: scroll-marquee 28s linear infinite;
+}
+
+.marquee-container:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+.marquee-item {
+  font-size: 0.82rem;
+  letter-spacing: 0.22em;
+  color: #222222;
+  text-transform: uppercase;
+  transition: all 0.2s ease;
+}
+
+.marquee-item:nth-child(2n) {
+  color: #000000;
+  font-weight: 800;
+}
+
+@keyframes scroll-marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-33.3333%);
+  }
+}
+
+@media (max-width: 768px) {
+  .marquee-track {
+    animation-duration: 20s;
+    gap: 2rem;
+  }
+  
+  .marquee-item {
+    font-size: 0.7rem;
+  }
+}

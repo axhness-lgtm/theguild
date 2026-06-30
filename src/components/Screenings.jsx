@@ -27,7 +27,7 @@ export default function Screenings({ onSelectEvent }) {
         <div className="screenings-top-bar">
           <div className="screenings-title-group">
             <span className="section-index font-tech">02 // CURATED CALENDAR</span>
-            <h2 className="section-title font-editorial">UPCOMING SCREENINGS</h2>
+            <h2 className="section-title font-impact">UPCOMING SCREENINGS</h2>
           </div>
 
           <div className="category-tabs font-tech">
@@ -69,48 +69,55 @@ export default function Screenings({ onSelectEvent }) {
 
         {/* Screening Cards Grid */}
         <div className="screenings-grid">
-          {filteredScreenings.map((event) => {
+          {filteredScreenings.map((event, idx) => {
             const isF1 = event.category === 'f1';
             return (
               <article key={event.id} className={`screening-card card-${event.category}`}>
-                <div className="card-top-row">
-                  <span className="event-competition font-tech">
-                    {isF1 ? <F1Logo className="card-logo-img" /> : <FIFALogo className="fifa-card-logo" />}
-                    <span className="comp-text">{event.competition}</span>
-                  </span>
-
-                  <span className={`badge-status ${event.isLive ? (isF1 ? 'badge-live-f1' : 'badge-live-fb') : ''}`}>
-                    {event.status}
-                  </span>
+                {/* Background outline index watermark inspired by Wilder/Messi posters */}
+                <div className="card-watermark font-impact font-outline" aria-hidden="true">
+                  0{idx + 1}
                 </div>
 
-                <div className="card-main">
-                  <h3 className="event-name font-editorial">{event.name}</h3>
+                <div className="card-content-wrap">
+                  <div className="card-top-row">
+                    <span className="event-competition font-tech">
+                      {isF1 ? <F1Logo className="card-logo-img" /> : <FIFALogo className="fifa-card-logo" />}
+                      <span className="comp-text">{event.competition}</span>
+                    </span>
 
-                  <div className="event-metadata font-tech">
-                    <div className="meta-row">
-                      <Calendar size={14} className="meta-icon" />
-                      <span>{event.date}</span>
-                    </div>
-                    <div className="meta-row">
-                      <Clock size={14} className="meta-icon" />
-                      <span>{event.time}</span>
-                    </div>
-                    <div className="meta-row venue-row">
-                      <MapPin size={14} className="meta-icon" />
-                      <span>{event.venue}</span>
+                    <span className={`badge-status ${event.isLive ? (isF1 ? 'badge-live-f1' : 'badge-live-fb') : ''}`}>
+                      {event.status}
+                    </span>
+                  </div>
+
+                  <div className="card-main">
+                    <h3 className="event-name font-impact">{event.name}</h3>
+
+                    <div className="event-metadata font-tech">
+                      <div className="meta-row">
+                        <Calendar size={14} className="meta-icon" />
+                        <span>{event.date}</span>
+                      </div>
+                      <div className="meta-row">
+                        <Clock size={14} className="meta-icon" />
+                        <span>{event.time}</span>
+                      </div>
+                      <div className="meta-row venue-row">
+                        <MapPin size={14} className="meta-icon" />
+                        <span>{event.venue}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="card-actions">
-                  <button 
-                    className={`btn-brutalist card-btn btn-${event.category}`}
-                    onClick={() => onSelectEvent(event)}
-                  >
-                    <span>I'm Interested</span>
-                    <ArrowUpRight size={16} />
-                  </button>
+                  <div className="card-actions">
+                    <button 
+                      className={`btn-brutalist card-btn btn-${event.category}`}
+                      onClick={() => onSelectEvent(event)}
+                    >
+                      <span>I'm Interested</span>
+                      <ArrowUpRight size={16} />
+                    </button>
+                  </div>
                 </div>
               </article>
             );

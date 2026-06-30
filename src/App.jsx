@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
+import Marquee from './components/Marquee';
 import About from './components/About';
 import Screenings from './components/Screenings';
 import WhyJoin from './components/WhyJoin';
@@ -31,6 +32,7 @@ export default function App() {
       {activeView === 'public' ? (
         <main>
           <Hero />
+          <Marquee />
           <About />
           <Screenings onSelectEvent={(ev) => setSelectedEvent(ev)} />
           <WhyJoin />

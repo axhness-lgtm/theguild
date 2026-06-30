@@ -1,122 +1,173 @@
 /* ==========================================================================
-   HERO SECTION — EDITORIAL BRUTALISM
+   HERO SECTION — ATHLETIC POSTER & SWISS GRID EDITORIAL
    ========================================================================== */
 
 .hero-section {
   position: relative;
+  background-color: var(--bg-primary);
   border-bottom: var(--grid-border);
-  background: var(--bg-primary);
+  overflow: hidden;
+}
+
+/* Giant background watermark number inspired by Wilder/Messi posters */
+.hero-poster-watermark {
+  position: absolute;
+  top: 15%;
+  right: -2%;
+  font-size: clamp(16rem, 36vw, 42rem);
+  line-height: 0.8;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.12;
+  user-select: none;
 }
 
 .hero-container {
-  display: flex;
-  flex-direction: column;
+  position: relative;
+  z-index: 1;
 }
 
 .hero-meta-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   border-bottom: var(--grid-border);
+  font-size: 0.72rem;
+  color: var(--text-secondary);
 }
 
 .meta-cell {
+  padding: 1.25rem 2rem;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.85rem 1.75rem;
-  font-size: 0.68rem;
-  color: var(--text-secondary);
-  letter-spacing: 0.12em;
 }
 
 .meta-cell:not(:last-child) {
   border-right: var(--grid-border);
 }
 
-.text-center {
-  justify-content: center;
+.text-center { justify-content: center; }
+.text-right { justify-content: flex-end; }
+
+.live-pill {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255, 46, 46, 0.12);
+  padding: 0.3rem 0.65rem;
+  border: 1px solid rgba(255, 46, 46, 0.4);
+  color: #F5F5F5;
 }
 
-.text-right {
-  justify-content: flex-end;
+/* Main Body Layout with Vertical Index Column */
+.hero-main-layout {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  border-bottom: var(--grid-border);
 }
 
-.hero-main-content {
-  padding: 6rem 2.5rem 5rem 2.5rem;
+.hero-vertical-index {
   display: flex;
   flex-direction: column;
+  justify-content: space-around;
+  padding: 2.5rem 1rem;
+  border-right: var(--grid-border);
+  background: var(--bg-secondary);
+}
+
+.v-index-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  letter-spacing: 0.15em;
+  font-size: 0.68rem;
+  color: var(--text-secondary);
+}
+
+.v-num {
+  font-weight: 700;
+  color: #FF2E2E;
+  font-size: 0.8rem;
+}
+
+.hero-poster-center {
+  padding: 5rem 5rem 6rem 5rem;
 }
 
 .hero-tagline {
   font-size: 0.75rem;
   color: var(--text-secondary);
-  letter-spacing: 0.18em;
-  margin-bottom: 2rem;
+  letter-spacing: 0.15em;
+  margin-bottom: 2.5rem;
 }
 
+/* Athletic Impact Title */
 .hero-title {
-  font-size: clamp(3.2rem, 8.5vw, 7.8rem);
-  letter-spacing: -0.04em;
+  font-size: clamp(3.5rem, 8.5vw, 8rem);
+  line-height: 0.88;
   margin-bottom: 4.5rem;
   color: var(--text-primary);
 }
 
-.text-stroke {
-  color: transparent;
-  -webkit-text-stroke: 1.5px var(--text-primary);
-  transition: all 0.3s ease;
+/* Red overlay block inspired by Wilder fight posters */
+.hero-accent-block {
+  background-color: #FF2E2E;
+  color: #000000;
+  padding: 0 0.25em;
+  display: inline-block;
+  transform: skewX(-4deg);
 }
 
-.hero-title:hover .text-stroke {
-  color: var(--text-primary);
-  -webkit-text-stroke: 1.5px transparent;
+.text-hollow {
+  color: transparent;
+  -webkit-text-stroke: 2px rgba(255, 255, 255, 0.4);
 }
 
 .hero-subgrid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1.3fr;
   gap: 4rem;
   padding-top: 3.5rem;
   border-top: var(--grid-border);
 }
 
 .hero-subtitle {
-  font-size: clamp(1.5rem, 3vw, 2.5rem);
-  line-height: 1.1;
+  font-size: clamp(1.4rem, 2.2vw, 2rem);
+  line-height: 1.15;
   color: var(--text-primary);
-  max-width: 90%;
-}
-
-.subgrid-right {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
 }
 
 .hero-description {
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   line-height: 1.65;
   color: var(--text-secondary);
   font-weight: 300;
-  max-width: 580px;
   margin-bottom: 2.5rem;
 }
 
-.hero-cta-group {
-  display: flex;
-  align-items: center;
+.hero-btn {
+  background: #FF2E2E;
+  color: #000000;
+  border-color: #FF2E2E;
+  font-weight: 700;
 }
 
+.hero-btn:hover {
+  background: transparent;
+  color: #FF2E2E;
+}
+
+/* Footer Grid */
 .hero-footer-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  border-top: var(--grid-border);
+  grid-template-columns: repeat(3, 1fr);
 }
 
 .footer-cell {
+  padding: 1.75rem 2rem;
   display: flex;
   flex-direction: column;
-  padding: 1.25rem 1.75rem;
   gap: 0.35rem;
 }
 
@@ -125,51 +176,43 @@
 }
 
 .footer-cell .label {
-  font-size: 0.65rem;
+  font-size: 0.68rem;
   color: var(--text-muted);
 }
 
 .footer-cell .value {
-  font-size: 0.8rem;
+  font-size: 0.95rem;
   color: var(--text-primary);
-  font-weight: 600;
 }
 
-@media (max-width: 992px) {
+@media (max-width: 1024px) {
+  .hero-main-layout {
+    grid-template-columns: 1fr;
+  }
+  .hidden-mobile {
+    display: none !important;
+  }
+  .hero-poster-center {
+    padding: 3.5rem 2rem;
+  }
   .hero-subgrid {
     grid-template-columns: 1fr;
-    gap: 2.5rem;
-  }
-  
-  .hero-subtitle {
-    max-width: 100%;
-  }
-
-  .hero-meta-grid {
-    grid-template-columns: 1fr auto;
-  }
-
-  .hidden-mobile {
-    display: none;
+    gap: 2rem;
   }
 }
 
-@media (max-width: 640px) {
-  .hero-main-content {
-    padding: 3.5rem 1.25rem 3rem 1.25rem;
-  }
-
-  .hero-title {
-    font-size: 2.8rem;
-    margin-bottom: 2.5rem;
-  }
-
+@media (max-width: 768px) {
+  .hero-meta-grid,
   .hero-footer-grid {
     grid-template-columns: 1fr;
   }
-
+  .meta-cell:not(:last-child),
   .footer-cell:not(:last-child) {
     border-right: none;
     border-bottom: var(--grid-border);
+  }
+  .hero-poster-watermark {
+    font-size: 18rem;
+    top: 25%;
   }
 }
