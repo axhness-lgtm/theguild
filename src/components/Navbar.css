@@ -13,52 +13,64 @@
 }
 
 .navbar-container {
-  display: grid;
-  grid-template-columns: 320px 1fr auto;
+  display: flex;
   align-items: center;
-  min-height: 4.5rem;
+  justify-content: space-between;
+  min-height: 2.8rem;
+  padding: 0 1.5rem;
 }
 
 .navbar-brand {
   display: flex;
-  flex-direction: column;
-  padding: 1rem 1.75rem;
-  border-right: var(--grid-border);
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0.35rem 0;
   cursor: pointer;
   user-select: none;
+  height: 100%;
 }
 
-.brand-title {
-  font-size: 1.35rem;
-  color: var(--text-primary);
-  letter-spacing: -0.04em;
+.brand-logo-img {
+  max-height: 26px;
+  width: auto;
+  object-fit: contain;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.brand-meta {
-  font-size: 0.65rem;
-  color: var(--text-secondary);
-  letter-spacing: 0.15em;
-  margin-top: 0.15rem;
+.navbar-brand:hover .brand-logo-img {
+  transform: scale(1.04);
 }
 
 .navbar-links {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 2.5rem;
-  padding: 0 2rem;
+  justify-content: flex-end;
+  gap: 1.5rem;
 }
 
-.nav-link {
+.navbar-links button,
+.navbar-links .nav-link {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
   color: var(--text-secondary);
   text-decoration: none;
-  font-size: 0.75rem;
+  font-size: 0.82rem;
+  font-weight: 700;
   letter-spacing: 0.14em;
-  transition: color 0.2s ease;
+  padding: 0.35rem 0.75rem;
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.2s ease;
 }
 
 .nav-link:hover {
-  color: var(--text-primary);
+  color: #ffffff;
+  background: transparent !important;
+  border: none !important;
 }
 
 .navbar-admin-status {
@@ -114,14 +126,18 @@
 
 @media (max-width: 992px) {
   .navbar-container {
-    grid-template-columns: 1fr auto;
+    min-height: 2.6rem;
+    padding: 0 1rem;
   }
   
   .navbar-links {
-    display: none;
+    display: flex !important;
+    gap: 0.75rem;
   }
 
-  .navbar-brand {
-    border-right: none;
+  .navbar-links button,
+  .navbar-links .nav-link {
+    font-size: 0.72rem;
+    padding: 0.2rem 0.4rem;
   }
 }

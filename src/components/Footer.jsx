@@ -1,5 +1,7 @@
 import React from 'react';
 import { Mail, MapPin } from 'lucide-react';
+import RollingText from './RollingText';
+import LineReveal, { RevealItem } from './LineReveal';
 import './Footer.css';
 
 const InstagramIcon = () => (
@@ -10,53 +12,45 @@ const InstagramIcon = () => (
 
 export default function Footer({ setActiveView }) {
   return (
-    <footer className="footer-section">
+    <footer className="footer-section" data-scroll-section>
       <div className="grid-container footer-container">
         
         <div className="footer-top">
           <div className="f-brand">
-            <h2 className="footer-logo font-editorial">THE GUILD</h2>
-            <p className="footer-manifesto font-editorial">BUILT FOR FANS.</p>
+            <LineReveal delay={0.1} className="footer-logo font-editorial" as="h2">THE GUILD</LineReveal>
+            <LineReveal delay={0.25} className="footer-manifesto font-editorial" as="p">BUILT FOR FANS.</LineReveal>
           </div>
 
           <div className="f-links font-tech">
-            <div className="link-group">
+            <RevealItem delay={0.3} className="link-group">
               <span className="lg-title">LOCATION</span>
               <span className="lg-val">
                 <MapPin size={13} style={{display:'inline', marginRight:4}}/> 
                 VISAKHAPATNAM, INDIA
               </span>
-            </div>
+            </RevealItem>
 
-            <div className="link-group">
+            <RevealItem delay={0.38} className="link-group">
               <span className="lg-title">SOCIAL CHANNEL</span>
               <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="lg-link">
                 <InstagramIcon /> 
-                @THEGUILD.VZAG
+                <RollingText text="@THEGUILD.VZAG" stagger={true} />
               </a>
-            </div>
+            </RevealItem>
 
-            <div className="link-group">
+            <RevealItem delay={0.46} className="link-group">
               <span className="lg-title">DIRECT INQUIRY</span>
               <a href="mailto:hello@theguildvzag.com" className="lg-link">
                 <Mail size={13} style={{display:'inline', marginRight:4}}/> 
-                HELLO@THEGUILDVZAG.COM
+                <RollingText text="HELLO@THEGUILDVZAG.COM" stagger={true} />
               </a>
-            </div>
+            </RevealItem>
           </div>
         </div>
 
         <div className="footer-bottom font-tech">
           <div className="b-left">
-            <span>© {new Date().getFullYear()} THE GUILD // VISAKHAPATNAM. ALL RIGHTS RESERVED.</span>
-          </div>
-          <div className="b-right">
-            <button 
-              className="secret-admin-link"
-              onClick={() => setActiveView('admin')}
-            >
-              [ FOUNDER // DASHBOARD ]
-            </button>
+            <LineReveal delay={0.5}>© {new Date().getFullYear()} THE GUILD // VISAKHAPATNAM. ALL RIGHTS RESERVED.</LineReveal>
           </div>
         </div>
 

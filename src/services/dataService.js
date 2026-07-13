@@ -4,46 +4,50 @@ import { supabase } from './supabase';
 export const UPCOMING_SCREENINGS = [
   // FORMULA 1
   {
-    id: 'f1-british-2026',
+    id: 'f1-belgian-2026',
     category: 'f1',
-    name: 'BRITISH GRAND PRIX',
-    competition: 'FORMULA 1 // SILVERSTONE CIRCUIT',
-    date: 'SUN, JUL 05',
-    time: '7:30 PM IST',
-    venue: 'THE ROOFTOP HANGAR // BEACH ROAD, VIZAG',
-    status: 'LIVE SIGNUPS',
+    name: 'BELGIAN GRAND PRIX',
+    competition: 'FORMULA 1 // CIRCUIT DE SPA-FRANCORCHAMPS',
+    date: 'SUN, JUL 26',
+    time: '6:30 PM IST ONWARDS',
+    venue: 'BREW N CUE CAFE // SIRIPURAM, VIZAG',
+    status: 'LIVE BOOKINGS',
     isLive: true,
-    atmosphere: 'High-speed heritage screening. Surround F1 V6 turbo acoustic arrays, live telemetry timing screens, and British pub-style refreshment counter.',
-    capacity: '100 Members Max',
-    hasPackageSelection: true
+    ticket_price: 199,
+    capacity: '40 Seats Max',
+    atmosphere: 'High-speed Spa-Francorchamps heritage screening at Brew N Cue. Live telemetry timing screens, surround F1 engine acoustics, and intimate 40-seat racing community.'
   },
 
-  // FOOTBALL
+  // WORLD CUP
   {
-    id: 'fb-por-cro-2026',
-    category: 'football',
-    name: 'PORTUGAL VS CROATIA',
-    competition: 'FIFA WORLD CUP // ROUND OF 32',
-    date: 'FRI, JUL 03',
-    time: '4:30 AM IST',
-    venue: 'THE AMPHITHEATER // RUSHIKONDA, VIZAG',
-    status: 'LIVE SIGNUPS',
+    id: 'wc-spain-france-2026',
+    category: 'world_cup',
+    name: 'SPAIN VS FRANCE',
+    competition: 'FIFA WORLD CUP // SEMI FINAL 01',
+    date: 'TUE, JUL 15',
+    time: '00:30 AM IST ONWARDS',
+    venue: 'BREW N CUE CAFE // VIZAG',
+    status: 'LIVE BOOKINGS',
     isLive: true,
-    atmosphere: 'High-stakes World Cup knockout screening. Late-night acoustic stadium immersion, terrace seating, and espresso bar open till dawn.',
-    capacity: '150 Members Max'
+    ticket_price: 199,
+    bundle_price: 349,
+    capacity: '40 Seats Max',
+    atmosphere: 'High-stakes World Cup Semi-Final midnight screening at Brew N Cue. Acoustic pitch immersion, synchronized chant feeds, and late-night football passion.'
   },
   {
-    id: 'fb-arg-cpv-2026',
-    category: 'football',
-    name: 'ARGENTINA VS CABO VERDE',
-    competition: 'FIFA WORLD CUP // ROUND OF 32',
-    date: 'SAT, JUL 04',
-    time: '3:30 AM IST',
-    venue: 'THE STUDIO LOFT // SIRIPURAM',
-    status: 'LIVE SIGNUPS',
+    id: 'wc-england-argentina-2026',
+    category: 'world_cup',
+    name: 'ENGLAND VS ARGENTINA',
+    competition: 'FIFA WORLD CUP // SEMI FINAL 02',
+    date: 'WED, JUL 16',
+    time: '00:30 AM IST ONWARDS',
+    venue: 'BREW N CUE CAFE // VIZAG',
+    status: 'LIVE BOOKINGS',
     isLive: true,
-    atmosphere: 'Intense midnight World Cup clash. Synchronized pitch lighting, stadium chant audio feeds, and passionate national team supporters.',
-    capacity: '120 Members Max'
+    ticket_price: 199,
+    bundle_price: 349,
+    capacity: '40 Seats Max',
+    atmosphere: 'Intense World Cup Semi-Final clash at Brew N Cue. High-energy collective screening, espresso bar open till dawn, and uninhibited stadium atmosphere.'
   }
 ];
 

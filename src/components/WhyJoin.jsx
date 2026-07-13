@@ -1,5 +1,7 @@
 import React from 'react';
 import { Users, Building2, Zap, HeartHandshake, ShieldCheck } from 'lucide-react';
+import RollingText from './RollingText';
+import LineReveal, { RevealItem } from './LineReveal';
 import './WhyJoin.css';
 
 const PILLARS = [
@@ -32,35 +34,39 @@ const PILLARS = [
 
 export default function WhyJoin() {
   return (
-    <section id="why-join" className="why-section">
+    <section id="why-join" className="why-section" data-scroll-section>
       <div className="grid-container why-container">
         
         <div className="why-header">
-          <span className="section-index font-tech">03 // CORE PILLARS</span>
-          <h2 className="section-title font-editorial">WHY JOIN THE GUILD?</h2>
+          <LineReveal delay={0.1} className="section-index font-tech">03 // CORE PILLARS</LineReveal>
+          <LineReveal delay={0.2} className="section-title font-editorial" as="h2">WHY JOIN THE GUILD?</LineReveal>
         </div>
 
         <div className="pillars-grid">
           {PILLARS.map((item, idx) => (
-            <div key={idx} className="pillar-card">
+            <RevealItem 
+              key={idx} 
+              delay={(idx % 3) * 0.12}
+              className="pillar-card scroll-reveal-card"
+            >
               <div className="pillar-num font-tech">[ 0{idx + 1} ]</div>
               <div className="pillar-icon">{item.icon}</div>
-              <h3 className="pillar-title font-editorial">{item.title}</h3>
-              <p className="pillar-desc">{item.desc}</p>
-            </div>
+              <LineReveal delay={0.18} className="pillar-title font-editorial" as="h3">{item.title}</LineReveal>
+              <LineReveal delay={0.28} className="pillar-desc" as="p">{item.desc}</LineReveal>
+            </RevealItem>
           ))}
           
           {/* 6th filler card to complete grid cleanly */}
-          <div className="pillar-card join-cta-card">
+          <RevealItem delay={0.24} className="pillar-card join-cta-card scroll-reveal-card">
             <div className="pillar-num font-tech">[ STATUS ]</div>
-            <h3 className="pillar-title font-editorial">NO SOLO VIEWING.</h3>
-            <p className="pillar-desc">
+            <LineReveal delay={0.2} className="pillar-title font-editorial" as="h3">NO SOLO VIEWING.</LineReveal>
+            <LineReveal delay={0.3} className="pillar-desc" as="p">
               Be there for the very first screening. Select any upcoming event above to join the invite list.
-            </p>
+            </LineReveal>
             <a href="#screenings" className="btn-brutalist-outline mt-auto">
-              <span>EXPLORE EVENTS</span>
+              <RollingText text="EXPLORE EVENTS" stagger={true} />
             </a>
-          </div>
+          </RevealItem>
         </div>
 
       </div>

@@ -1,0 +1,105 @@
+/* ==========================================================================
+   ROLLING TEXT — LANDO NORRIS INSPIRED KINETIC HOVER ANIMATION
+   ========================================================================== */
+
+.rolling-text-wrap {
+  display: inline-flex;
+  position: relative;
+  overflow: hidden;
+  vertical-align: middle;
+  line-height: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+}
+
+/* Staggered Character Roll */
+.rolling-char {
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+  line-height: inherit;
+}
+
+.rolling-char-primary,
+.rolling-char-secondary {
+  display: inline-block;
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+  line-height: inherit;
+}
+
+.rolling-char-secondary {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  transform: translateY(105%);
+}
+
+/* Trigger roll on parent hover (`a`, `button`, `.rolling-hover-parent`) or direct hover */
+a:hover .rolling-char-primary,
+button:hover .rolling-char-primary,
+[role="button"]:hover .rolling-char-primary,
+.rolling-hover-parent:hover .rolling-char-primary,
+.rolling-text-wrap:hover .rolling-char-primary {
+  transform: translateY(-105%);
+  transition-delay: calc(var(--char-index, 0) * 0.018s);
+}
+
+a:hover .rolling-char-secondary,
+button:hover .rolling-char-secondary,
+[role="button"]:hover .rolling-char-secondary,
+.rolling-hover-parent:hover .rolling-char-secondary,
+.rolling-text-wrap:hover .rolling-char-secondary {
+  transform: translateY(0%);
+  transition-delay: calc(var(--char-index, 0) * 0.018s);
+}
+
+/* Block / Line Roll (for longer text or solid block wipes) */
+.rolling-block-wrap {
+  display: inline-flex;
+  position: relative;
+  overflow: hidden;
+  vertical-align: middle;
+  line-height: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+}
+
+.rolling-block-primary,
+.rolling-block-secondary {
+  display: inline-block;
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+  line-height: inherit;
+}
+
+.rolling-block-secondary {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  transform: translateY(105%);
+}
+
+a:hover .rolling-block-primary,
+button:hover .rolling-block-primary,
+[role="button"]:hover .rolling-block-primary,
+.rolling-hover-parent:hover .rolling-block-primary,
+.rolling-block-wrap:hover .rolling-block-primary {
+  transform: translateY(-105%);
+}
+
+a:hover .rolling-block-secondary,
+button:hover .rolling-block-secondary,
+[role="button"]:hover .rolling-block-secondary,
+.rolling-hover-parent:hover .rolling-block-secondary,
+.rolling-block-wrap:hover .rolling-block-secondary {
+  transform: translateY(0%);
+}

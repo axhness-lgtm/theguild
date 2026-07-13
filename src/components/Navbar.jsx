@@ -1,27 +1,56 @@
 import React from 'react';
+import RollingText from './RollingText';
 import './Navbar.css';
 
-export default function Navbar({ activeView, setActiveView }) {
+export default function Navbar({ activeView, setActiveView, activeCategory = 'f1', setActiveCategory }) {
   return (
-    <header className="navbar-wrapper">
+    <header className="navbar-wrapper is-revealed" data-scroll-section>
       <div className="grid-container navbar-container">
         <div 
-          className="navbar-brand" 
-          onClick={() => setActiveView('public')}
+          className="navbar-brand swipe-reveal-right flex items-center justify-start" 
+          onClick={() => {
+            setActiveView('public');
+            if (setActiveCategory) setActiveCategory('f1');
+          }}
           role="button"
           tabIndex={0}
         >
-          <span className="brand-title font-editorial">THE GUILD</span>
-          <span className="brand-meta font-tech">// VISAKHAPATNAM — MVP 1.0</span>
+          <img src="/logo.png" alt="THE GUILD" className="brand-logo-img" />
         </div>
 
         {activeView === 'public' ? (
-          <nav className="navbar-links font-tech">
-            <a href="#about" className="nav-link">01. ETHOS</a>
-            <a href="#screenings" className="nav-link">02. SCREENINGS</a>
-            <a href="#why-join" className="nav-link">03. PILLARS</a>
-            <a href="#coming-soon" className="nav-link">04. ROADMAP</a>
+          <nav className="navbar-links font-tech flex items-center justify-center gap-4">
+            <button 
+              type="button"
+              style={{ backgroundColor: 'transparent', background: 'transparent', border: 'none', boxShadow: 'none', outline: 'none', padding: '0.35rem 0.75rem', cursor: 'pointer', fontSize: '0.82rem', letterSpacing: '0.14em', fontWeight: '700' }}
+              className={`nav-link transition-colors ${activeCategory === 'f1' ? 'text-red-500 font-extrabold' : 'text-gray-300 hover:text-white'}`}
+              onClick={() => {
+                if (setActiveCategory) setActiveCategory('f1');
+              }}
+            >
+              <RollingText text="[ FORMULA 1 ]" />
+            </button>
+            <button 
+              type="button"
+              style={{ backgroundColor: 'transparent', background: 'transparent', border: 'none', boxShadow: 'none', outline: 'none', padding: '0.35rem 0.75rem', cursor: 'pointer', fontSize: '0.82rem', letterSpacing: '0.14em', fontWeight: '700' }}
+              className={`nav-link transition-colors ${activeCategory === 'world_cup' ? 'text-red-500 font-extrabold' : 'text-gray-300 hover:text-white'}`}
+              onClick={() => {
+                if (setActiveCategory) setActiveCategory('world_cup');
+              }}
+            >
+              <RollingText text="[ WORLD CUP ]" />
+            </button>
           </nav>
+        ) : activeView === 'booking' ? (
+          <div className="navbar-admin-status font-tech">
+            <span className="admin-tag border-emerald-500 text-emerald-400 bg-emerald-950/20">LIVE INOX 147-SEAT TICKETING</span>
+            <button 
+              className="btn-return"
+              onClick={() => setActiveView('public')}
+            >
+              <RollingText text="[ ← RETURN TO PUBLIC SITE ]" stagger={false} />
+            </button>
+          </div>
         ) : (
           <div className="navbar-admin-status font-tech">
             <span className="admin-tag">FOUNDER CONTROL ROOM</span>
@@ -29,20 +58,10 @@ export default function Navbar({ activeView, setActiveView }) {
               className="btn-return"
               onClick={() => setActiveView('public')}
             >
-              [ ← RETURN TO PUBLIC SITE ]
+              <RollingText text="[ ← RETURN TO PUBLIC SITE ]" stagger={false} />
             </button>
           </div>
         )}
-
-        <div className="navbar-action">
-          <button 
-            className="admin-toggle-btn font-tech"
-            onClick={() => setActiveView(activeView === 'public' ? 'admin' : 'public')}
-            title="Toggle Founder Portal"
-          >
-            {activeView === 'public' ? 'FOUNDER // LOGIN' : 'EXIT // PORTAL'}
-          </button>
-        </div>
       </div>
     </header>
   );

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Lock, CreditCard, Armchair, Award, Smartphone, Star } from 'lucide-react';
+import LineReveal, { RevealItem } from './LineReveal';
 import './ComingSoon.css';
 
 const ROADMAP_ITEMS = [
@@ -37,23 +38,29 @@ const ROADMAP_ITEMS = [
 
 export default function ComingSoon() {
   return (
-    <section id="coming-soon" className="roadmap-section">
+    <section id="coming-soon" className="roadmap-section" data-scroll-section>
       <div className="grid-container roadmap-container">
         
         <div className="roadmap-header">
           <div className="r-left">
-            <span className="section-index font-tech">04 // VERSION 2.0 ROADMAP</span>
-            <h2 className="section-title font-editorial">COMING SOON TO THE GUILD</h2>
+            <LineReveal delay={0.1} className="section-index font-tech">04 // VERSION 2.0 ROADMAP</LineReveal>
+            <LineReveal delay={0.2} className="section-title font-editorial" as="h2">COMING SOON TO THE GUILD</LineReveal>
           </div>
           <div className="r-right font-tech">
-            <Lock size={16} />
-            <span>EXCLUSIVELY TEASED FOR MVP VALIDATION</span>
+            <RevealItem delay={0.3}>
+              <Lock size={16} />
+              <span>EXCLUSIVELY TEASED FOR MVP VALIDATION</span>
+            </RevealItem>
           </div>
         </div>
 
         <div className="roadmap-list">
           {ROADMAP_ITEMS.map((item, idx) => (
-            <div key={idx} className="roadmap-row">
+            <RevealItem 
+              key={idx} 
+              delay={idx * 0.1}
+              className="roadmap-row scroll-reveal-card"
+            >
               <div className="row-meta font-tech">
                 <span className="row-idx">[ 0{idx + 1} ]</span>
                 <span className="row-status badge-status">{item.status}</span>
@@ -62,15 +69,15 @@ export default function ComingSoon() {
               <div className="row-main">
                 <div className="row-icon">{item.icon}</div>
                 <div className="row-text">
-                  <h3 className="roadmap-title font-editorial">{item.title}</h3>
-                  <p className="roadmap-desc">{item.desc}</p>
+                  <LineReveal delay={0.15} className="roadmap-title font-editorial" as="h3">{item.title}</LineReveal>
+                  <LineReveal delay={0.25} className="roadmap-desc" as="p">{item.desc}</LineReveal>
                 </div>
               </div>
 
               <div className="row-action font-tech">
                 <span>// LOCKED</span>
               </div>
-            </div>
+            </RevealItem>
           ))}
         </div>
 

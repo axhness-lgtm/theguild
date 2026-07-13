@@ -1,0 +1,81 @@
+/* ==========================================================================
+   LINE-BY-LINE TEXT REVEAL — LANDO NORRIS INSPIRED LINEAR SWIPES
+   ========================================================================== */
+
+.reveal-line-wrap {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  vertical-align: top;
+  line-height: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  margin: 0;
+  padding: 0;
+}
+
+/* Optional inline variation when needed inside inline elements */
+.reveal-line-wrap.reveal-inline {
+  display: inline-block;
+}
+
+.reveal-line-inner {
+  display: block;
+  transform: translateY(104%);
+  clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+  transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1),
+              clip-path 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, clip-path;
+  transition-delay: var(--line-delay, 0s);
+  line-height: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+}
+
+/* When the line itself, or its parent section/container, has .is-revealed */
+.is-revealed .reveal-line-inner,
+.reveal-line-wrap.is-revealed .reveal-line-inner,
+[data-scroll-section].is-revealed .reveal-line-inner,
+.reveal-active .reveal-line-inner {
+  transform: translateY(0%);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+}
+
+/* Reveal item container for non-text blocks (buttons, cards, badges) */
+.reveal-item-wrap {
+  display: block;
+  opacity: 0;
+  transform: translateY(20px);
+  clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
+  transition: opacity 0.75s ease,
+              transform 0.85s cubic-bezier(0.16, 1, 0.3, 1),
+              clip-path 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform, clip-path;
+  transition-delay: var(--line-delay, 0s);
+}
+
+.is-revealed .reveal-item-wrap,
+.reveal-item-wrap.is-revealed,
+[data-scroll-section].is-revealed .reveal-item-wrap,
+.reveal-active .reveal-item-wrap {
+  opacity: 1;
+  transform: translateY(0%);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+}
+
+/* Fallback for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .reveal-line-inner,
+  .reveal-item-wrap {
+    transform: none !important;
+    clip-path: none !important;
+    opacity: 1 !important;
+    transition: none !important;
+  }
+}

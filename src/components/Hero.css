@@ -1,5 +1,5 @@
 /* ==========================================================================
-   HERO SECTION — ATHLETIC POSTER & SWISS GRID EDITORIAL
+   HERO SECTION — SPLIT INTERACTIVE POSTER (2.PNG / 3.PNG -> 4.PNG / 5.PNG)
    ========================================================================== */
 
 .hero-section {
@@ -7,212 +7,166 @@
   background-color: var(--bg-primary);
   border-bottom: var(--grid-border);
   overflow: hidden;
+  width: 100%;
 }
 
-/* Giant background watermark number inspired by Wilder/Messi posters */
-.hero-poster-watermark {
-  position: absolute;
-  top: 15%;
-  right: -2%;
-  font-size: clamp(16rem, 36vw, 42rem);
-  line-height: 0.8;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.12;
-  user-select: none;
-}
-
-.hero-container {
-  position: relative;
-  z-index: 1;
-}
-
-.hero-meta-grid {
+.split-hero-container {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  border-bottom: var(--grid-border);
-  font-size: 0.72rem;
-  color: var(--text-secondary);
+  grid-template-columns: 1fr 1fr;
+  height: calc(100vh - 4.5rem);
+  min-height: 640px;
+  position: relative;
+  width: 100%;
 }
 
-.meta-cell {
-  padding: 1.25rem 2rem;
+.hero-side {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  cursor: pointer;
+  background-color: #0c0c0c;
+}
+
+.hero-side-left {
+  border-right: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.side-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.base-img {
+  opacity: 1;
+  z-index: 1;
+  transform: scale(1);
+}
+
+.hero-side:hover .base-img {
+  transform: scale(1.03);
+}
+
+.hover-img {
+  opacity: 0;
+  z-index: 2;
+  transform: scale(1.04);
+}
+
+.hover-img.active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Central Overlay Group holding centered F1 Logo and lower CTA */
+.hero-center-overlay-group {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 20;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* F1 Logo exactly right in the center of the screen */
+.hero-f1-logo-wrap {
   display: flex;
   align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.meta-cell:not(:last-child) {
-  border-right: var(--grid-border);
+.hero-center-f1-logo {
+  max-width: 220px;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.85));
 }
 
-.text-center { justify-content: center; }
-.text-right { justify-content: flex-end; }
+.hero-f1-logo-wrap:hover {
+  transform: scale(1.05);
+}
 
-.live-pill {
+/* Compact Sporty Matrix-ish CTA positioned lower down */
+.center-cta-btn {
+  position: absolute;
+  top: 78%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
   display: inline-flex;
   align-items: center;
-  background: rgba(255, 46, 46, 0.12);
-  padding: 0.3rem 0.65rem;
-  border: 1px solid rgba(255, 46, 46, 0.4);
-  color: #F5F5F5;
+  justify-content: center;
+  gap: 0.65rem;
+  background: rgba(10, 10, 10, 0.85);
+  color: #00FF66; /* matrix green accent default text or crisp white, let's keep crisp white with matrix green hover or pure red as requested! */
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  padding: 0.75rem 1.65rem;
+  font-family: var(--font-tech), 'Space Grotesk', monospace;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-decoration: none;
+  cursor: pointer;
+  border-radius: 2px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.9), 0 0 15px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
 }
 
-/* Main Body Layout with Vertical Index Column */
-.hero-main-layout {
-  display: grid;
-  grid-template-columns: 80px 1fr;
-  border-bottom: var(--grid-border);
+.cta-arrow {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.hero-vertical-index {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  padding: 2.5rem 1rem;
-  border-right: var(--grid-border);
-  background: var(--bg-secondary);
-}
-
-.v-index-item {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
-  transform: rotate(180deg);
-  letter-spacing: 0.15em;
-  font-size: 0.68rem;
-  color: var(--text-secondary);
-}
-
-.v-num {
-  font-weight: 700;
-  color: #FF2E2E;
-  font-size: 0.8rem;
-}
-
-.hero-poster-center {
-  padding: 5rem 5rem 6rem 5rem;
-}
-
-.hero-tagline {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  letter-spacing: 0.15em;
-  margin-bottom: 2.5rem;
-}
-
-/* Athletic Impact Title */
-.hero-title {
-  font-size: clamp(3.5rem, 8.5vw, 8rem);
-  line-height: 0.88;
-  margin-bottom: 4.5rem;
-  color: var(--text-primary);
-}
-
-/* Red overlay block inspired by Wilder fight posters */
-.hero-accent-block {
-  background-color: #FF2E2E;
-  color: #000000;
-  padding: 0 0.25em;
-  display: inline-block;
-  transform: skewX(-4deg);
-}
-
-.text-hollow {
-  color: transparent;
-  -webkit-text-stroke: 2px rgba(255, 255, 255, 0.4);
-}
-
-.hero-subgrid {
-  display: grid;
-  grid-template-columns: 1fr 1.3fr;
-  gap: 4rem;
-  padding-top: 3.5rem;
-  border-top: var(--grid-border);
-}
-
-.hero-subtitle {
-  font-size: clamp(1.4rem, 2.2vw, 2rem);
-  line-height: 1.15;
-  color: var(--text-primary);
-}
-
-.hero-description {
-  font-size: 1.05rem;
-  line-height: 1.65;
-  color: var(--text-secondary);
-  font-weight: 300;
-  margin-bottom: 2.5rem;
-}
-
-.hero-btn {
+.center-cta-btn:hover {
   background: #FF2E2E;
-  color: #000000;
   border-color: #FF2E2E;
-  font-weight: 700;
+  color: #ffffff;
+  transform: translate(-50%, -50%) scale(1.05);
+  box-shadow: 0 0 35px rgba(255, 46, 46, 0.75), 0 15px 35px rgba(0, 0, 0, 0.95);
 }
 
-.hero-btn:hover {
-  background: transparent;
-  color: #FF2E2E;
+.center-cta-btn:hover .cta-arrow {
+  transform: translateY(3px);
 }
 
-/* Footer Grid */
-.hero-footer-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-}
-
-.footer-cell {
-  padding: 1.75rem 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-}
-
-.footer-cell:not(:last-child) {
-  border-right: var(--grid-border);
-}
-
-.footer-cell .label {
-  font-size: 0.68rem;
-  color: var(--text-muted);
-}
-
-.footer-cell .value {
-  font-size: 0.95rem;
-  color: var(--text-primary);
-}
-
-@media (max-width: 1024px) {
-  .hero-main-layout {
+/* Responsive adjustments for tablet / mobile */
+@media (max-width: 992px) {
+  .split-hero-container {
     grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
+    height: auto;
+    min-height: calc(100vh - 4.5rem);
   }
-  .hidden-mobile {
-    display: none !important;
-  }
-  .hero-poster-center {
-    padding: 3.5rem 2rem;
-  }
-  .hero-subgrid {
-    grid-template-columns: 1fr;
-    gap: 2rem;
-  }
-}
 
-@media (max-width: 768px) {
-  .hero-meta-grid,
-  .hero-footer-grid {
-    grid-template-columns: 1fr;
-  }
-  .meta-cell:not(:last-child),
-  .footer-cell:not(:last-child) {
+  .hero-side-left {
     border-right: none;
-    border-bottom: var(--grid-border);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   }
-  .hero-poster-watermark {
-    font-size: 18rem;
-    top: 25%;
+
+  .hero-center-f1-logo {
+    max-width: 160px;
+  }
+
+  .center-cta-btn {
+    top: 84%;
+    padding: 0.65rem 1.35rem;
+    font-size: 0.78rem;
   }
 }
