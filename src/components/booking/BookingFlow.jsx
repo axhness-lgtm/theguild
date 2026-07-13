@@ -215,14 +215,14 @@ export default function BookingFlow({ onReturnHome }) {
         <div className="grid-container">
           <div className="booking-overview-grid max-w-4xl mx-auto">
             <div className="overview-main w-full">
-              <div className="overview-banner-card bg-zinc-900 border border-zinc-800 p-8">
-                <span className="section-index font-tech text-red-500 text-xs">// SCREEN 03 // INOX VARUN'S MALL</span>
-                <h2 className="text-3xl font-impact text-white mt-1 mb-3">FIFA WORLD CUP FINAL // LIVE SCREENING</h2>
-                <p className="text-gray-300 text-sm mb-6 leading-relaxed">
+              <div className="overview-banner-card bg-zinc-900 border border-zinc-800 p-8 is-revealed reveal-active animate-fade-in">
+                <LineReveal delay={0.1} className="section-index font-tech text-red-500 text-xs">// SCREEN 03 // INOX VARUN'S MALL</LineReveal>
+                <LineReveal delay={0.2} as="h2" className="text-3xl font-impact text-white mt-1 mb-3">FIFA WORLD CUP FINAL // LIVE SCREENING</LineReveal>
+                <RevealItem delay={0.3} className="text-gray-300 text-sm mb-6 leading-relaxed">
                   Join Visakhapatnam's most passionate collective inside an acoustically engineered 147-seat auditorium. Synchronized stadium sound arrays and private laser projection.
-                </p>
+                </RevealItem>
 
-                <div className="grid grid-cols-2 gap-4 mb-8 bg-black/40 p-4 border border-zinc-800 font-tech text-sm">
+                <RevealItem delay={0.4} className="grid grid-cols-2 gap-4 mb-8 bg-black/40 p-4 border border-zinc-800 font-tech text-sm">
                   <div>
                     <span className="text-gray-400 block text-xs">// TICKET PRICE</span>
                     <strong className="text-white text-lg">₹{event.ticket_price}</strong> <span className="text-xs text-gray-400">ALL INCLUSIVE</span>
@@ -231,23 +231,25 @@ export default function BookingFlow({ onReturnHome }) {
                     <span className="text-gray-400 block text-xs">// SEATS AVAILABLE</span>
                     <strong className="text-red-500 text-lg">{seatsAvailableCount} / 147</strong> <span className="text-xs text-gray-400">OPEN NOW</span>
                   </div>
-                </div>
+                </RevealItem>
 
-                <div className="booking-rules-box bg-zinc-950 border border-zinc-800 p-4 mb-8">
+                <RevealItem delay={0.5} className="booking-rules-box bg-zinc-950 border border-zinc-800 p-4 mb-8">
                   <div className="rules-title font-tech text-xs text-gray-400 mb-2">// QUICK BOOKING RULES</div>
                   <ul className="text-xs text-gray-300 space-y-2 font-tech">
                     <li className="flex items-center gap-2"><span className="text-red-500">●</span> <strong>MAX 4 SEATS:</strong> Up to 4 consecutive seats per transaction.</li>
                     <li className="flex items-center gap-2"><span className="text-yellow-500">●</span> <strong>CONSECUTIVE ONLY:</strong> Seats must be adjacent within the exact same row.</li>
                     <li className="flex items-center gap-2"><span className="text-emerald-500">●</span> <strong>10-MIN TIMER:</strong> Complete UPI verification within 10 mins once seats are picked.</li>
                   </ul>
-                </div>
+                </RevealItem>
 
-                <button 
-                  className="btn-brutalist w-full py-4 text-center justify-center text-sm"
-                  onClick={() => setStep('seatmap')}
-                >
-                  <RollingText text="SELECT SEATS ON SCREEN 3 MAP →" stagger={true} />
-                </button>
+                <RevealItem delay={0.6}>
+                  <button 
+                    className="btn-brutalist w-full py-4 text-center justify-center text-sm"
+                    onClick={() => setStep('seatmap')}
+                  >
+                    <RollingText text="SELECT SEATS ON SCREEN 3 MAP →" stagger={true} />
+                  </button>
+                </RevealItem>
               </div>
             </div>
           </div>

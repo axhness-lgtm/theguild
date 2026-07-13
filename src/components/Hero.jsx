@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowDown } from 'lucide-react';
 import RollingText from './RollingText';
+import LineReveal, { RevealItem } from './LineReveal';
 import './Hero.css';
 
 export default function Hero({ activeCategory = 'f1', setActiveView }) {
@@ -30,7 +31,8 @@ export default function Hero({ activeCategory = 'f1', setActiveView }) {
         
         {/* Left Side: 2.png (683x768) -> 4.png on hover */}
         <div 
-          className={`hero-side hero-side-left ${hoverLeft ? 'is-hovered' : ''}`}
+          className={`hero-side hero-side-left swipe-reveal-right ${hoverLeft ? 'is-hovered' : ''}`}
+          data-scroll-section
           onMouseEnter={() => setHoverLeft(true)}
           onMouseLeave={() => setHoverLeft(false)}
         >
@@ -40,7 +42,8 @@ export default function Hero({ activeCategory = 'f1', setActiveView }) {
 
         {/* Right Side: 3.png -> 5.png on hover */}
         <div 
-          className={`hero-side hero-side-right ${hoverRight ? 'is-hovered' : ''}`}
+          className={`hero-side hero-side-right swipe-reveal-left ${hoverRight ? 'is-hovered' : ''}`}
+          data-scroll-section
           onMouseEnter={() => setHoverRight(true)}
           onMouseLeave={() => setHoverRight(false)}
         >
@@ -50,25 +53,29 @@ export default function Hero({ activeCategory = 'f1', setActiveView }) {
 
         {/* Central Floating Elements: F1/FIFA Logo & Compact Sporty CTA */}
         <div className="hero-center-overlay-group">
-          <div className="hero-f1-logo-wrap">
+          <RevealItem delay={0.2} className="hero-f1-logo-wrap" data-scroll-section>
             {activeCategory === 'world_cup' ? (
               <img src="/fifa.png" alt="FIFA World Cup" className="hero-center-f1-logo" />
             ) : (
               <img src="/f1.png" alt="Formula 1" className="hero-center-f1-logo" />
             )}
-          </div>
+          </RevealItem>
           
-          <a 
-            href={activeCategory === 'world_cup' ? "#booking" : "#screenings"} 
-            className="center-cta-btn font-tech"
-            onClick={handleCtaClick}
-          >
-            <RollingText 
-              text={activeCategory === 'world_cup' ? "[ BOOK TICKETS NOW! ]" : "[ NEXT RACE ]"} 
-              stagger={true} 
-            />
-            <ArrowDown size={14} className="cta-arrow" />
-          </a>
+          <RevealItem delay={0.35} data-scroll-section>
+            <a 
+              href={activeCategory === 'world_cup' ? "#booking" : "#screenings"} 
+              className="center-cta-btn font-tech"
+              onClick={handleCtaClick}
+            >
+              <LineReveal inline={true} delay={0.45}>
+                <RollingText 
+                  text={activeCategory === 'world_cup' ? "[ BOOK TICKETS NOW! ]" : "[ NEXT RACE ]"} 
+                  stagger={true} 
+                />
+              </LineReveal>
+              <ArrowDown size={14} className="cta-arrow" />
+            </a>
+          </RevealItem>
         </div>
 
       </div>

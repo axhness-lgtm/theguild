@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, CheckCircle, ShieldAlert, Sparkles, Users, Flag, Copy, Check, ArrowRight, QrCode } from 'lucide-react';
 import { dataService } from '../services/dataService';
+import LineReveal, { RevealItem } from './LineReveal';
 import './EventModal.css';
 
 export default function EventModal({ event, onClose }) {
@@ -80,16 +81,16 @@ export default function EventModal({ event, onClose }) {
         </div>
 
         {step === 3 ? (
-          <div className="modal-success animate-fade-in">
-            <div className="success-icon">
+          <div className="modal-success animate-fade-in is-revealed reveal-active">
+            <RevealItem delay={0.1} className="success-icon">
               <CheckCircle size={56} color="#00FF66" />
-            </div>
-            <h3 className="success-title font-impact text-2xl text-white mt-4">REGISTRATION CONFIRMED!</h3>
-            <p className="success-message text-gray-300 max-w-md mx-auto text-center mt-2 font-tech">
+            </RevealItem>
+            <LineReveal delay={0.2} as="h3" className="success-title font-impact text-2xl text-white mt-4">REGISTRATION CONFIRMED!</LineReveal>
+            <RevealItem delay={0.3} className="success-message text-gray-300 max-w-md mx-auto text-center mt-2 font-tech">
               Your pass for <strong className="text-white">{form.packagePreference}</strong> has been secured and logged into the verification queue.
-            </p>
+            </RevealItem>
             
-            <div className="bg-zinc-900/90 border border-zinc-800 p-4 rounded mt-6 w-full max-w-sm mx-auto font-tech text-xs text-left">
+            <RevealItem delay={0.4} className="bg-zinc-900/90 border border-zinc-800 p-4 rounded mt-6 w-full max-w-sm mx-auto font-tech text-xs text-left">
               <div className="flex justify-between border-b border-zinc-800 pb-2 mb-2">
                 <span className="text-gray-400">ATTENDEE:</span>
                 <strong className="text-white">{form.name}</strong>
@@ -110,26 +111,28 @@ export default function EventModal({ event, onClose }) {
                 <span className="text-gray-400">VERIFIED UTR:</span>
                 <strong className="text-white font-mono">{form.utr}</strong>
               </div>
-            </div>
+            </RevealItem>
 
-            <div className="success-notice font-tech mt-6 text-emerald-400">
+            <RevealItem delay={0.5} className="success-notice font-tech mt-6 text-emerald-400">
               <span>// SHOW THIS SCREEN OR VERIFIED PHONE NUMBER AT ENTRY //</span>
-            </div>
+            </RevealItem>
 
-            <button className="btn-brutalist success-btn mt-6" onClick={onClose}>
-              <span>RETURN TO CURATED CALENDAR</span>
-            </button>
+            <RevealItem delay={0.6}>
+              <button className="btn-brutalist success-btn mt-6" onClick={onClose}>
+                <span>RETURN TO CURATED CALENDAR</span>
+              </button>
+            </RevealItem>
           </div>
         ) : step === 2 ? (
-          <div className="modal-body p-4 animate-fade-in" style={{ maxWidth: '640px', margin: '0 auto' }}>
-            <div className="bg-red-950/30 border border-red-500/40 py-1.5 px-3 rounded mb-3 font-tech text-xs text-red-400 text-center">
+          <div className="modal-body p-4 animate-fade-in is-revealed reveal-active" style={{ maxWidth: '640px', margin: '0 auto' }}>
+            <LineReveal delay={0.1} className="bg-red-950/30 border border-red-500/40 py-1.5 px-3 rounded mb-3 font-tech text-xs text-red-400 text-center">
               // EXACTLY 40 SEATS MAX AT BREW N CUE — SCAN & PAY TO SECURE PASS
-            </div>
+            </LineReveal>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
               
               {/* Left Box: Compact QR & Amount */}
-              <div className="bg-zinc-950 border border-zinc-800 rounded-lg p-4 text-center shadow-lg">
+              <RevealItem delay={0.2} className="bg-zinc-950 border border-zinc-800 rounded-lg p-4 text-center shadow-lg">
                 <div className="font-tech text-[11px] text-gray-400 uppercase mb-1">TOTAL AMOUNT PAYABLE</div>
                 <div className="font-impact text-3xl text-emerald-400 mb-2">₹{currentPrice}</div>
                 <div className="font-tech text-[11px] text-gray-400 mb-2 truncate" title={form.packagePreference}>
@@ -160,10 +163,10 @@ export default function EventModal({ event, onClose }) {
                     {copied ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
                   </button>
                 </div>
-              </div>
+              </RevealItem>
 
               {/* Right Box: UTR Form & Confirm */}
-              <form onSubmit={handleSubmitPayment} className="bg-zinc-900/90 border border-zinc-800 rounded-lg p-4 text-left flex flex-col justify-between h-full">
+              <RevealItem delay={0.3} as="form" onSubmit={handleSubmitPayment} className="bg-zinc-900/90 border border-zinc-800 rounded-lg p-4 text-left flex flex-col justify-between h-full">
                 <div>
                   <div className="font-tech text-xs text-emerald-400 mb-2 flex items-center gap-1.5 border-b border-zinc-800 pb-2">
                     <QrCode size={14} />
@@ -212,22 +215,22 @@ export default function EventModal({ event, onClose }) {
                     <ArrowRight size={14} />
                   </button>
                 </div>
-              </form>
+              </RevealItem>
 
             </div>
           </div>
         ) : (
-          <div className="modal-body">
+          <div className="modal-body is-revealed reveal-active animate-fade-in">
             
             {/* Event Specs Panel */}
             <div className="event-specs-panel">
               <div className="spec-item">
                 <span className="spec-label font-tech">COMPETITION</span>
-                <span className="spec-val font-editorial">{event.competition}</span>
+                <LineReveal delay={0.1} className="spec-val font-editorial">{event.competition}</LineReveal>
               </div>
-              <h2 className="modal-event-title font-editorial">{event.name}</h2>
+              <LineReveal delay={0.2} as="h2" className="modal-event-title font-editorial">{event.name}</LineReveal>
               
-              <div className="spec-grid font-tech">
+              <RevealItem delay={0.25} className="spec-grid font-tech">
                 <div className="spec-box">
                   <span className="s-label">DATE & TIME</span>
                   <span className="s-val">{event.date} // {event.time}</span>
@@ -236,21 +239,21 @@ export default function EventModal({ event, onClose }) {
                   <span className="s-label">VENUE CAPACITY</span>
                   <span className="s-val text-red-500 font-bold"><Users size={14} style={{display:'inline', marginRight:4}}/>{event.capacity}</span>
                 </div>
-              </div>
+              </RevealItem>
 
-              <div className="spec-atmosphere">
+              <RevealItem delay={0.32} className="spec-atmosphere">
                 <span className="spec-label font-tech"><Sparkles size={13} style={{display:'inline', marginRight:4}}/> EXPECTED ATMOSPHERE</span>
                 <p className="atmosphere-desc">{event.atmosphere}</p>
-              </div>
+              </RevealItem>
 
-              <div className="specs-disclaimer font-tech">
+              <RevealItem delay={0.38} className="specs-disclaimer font-tech">
                 <ShieldAlert size={14} />
                 <span>LIMITED TO 40 SEATS AT BREW N CUE — REGISTER NOW</span>
-              </div>
+              </RevealItem>
             </div>
 
             {/* Interest Form Panel */}
-            <form className="interest-form" onSubmit={handleProceedToPayment}>
+            <RevealItem delay={0.25} as="form" className="interest-form" onSubmit={handleProceedToPayment}>
               <div className="form-header font-tech">
                 <span>ATTENDEE REGISTRATION</span>
               </div>
@@ -351,7 +354,7 @@ export default function EventModal({ event, onClose }) {
                 <span>PROCEED TO PAYMENT (₹{currentPrice})</span>
                 <ArrowRight size={16} />
               </button>
-            </form>
+            </RevealItem>
 
           </div>
         )}
