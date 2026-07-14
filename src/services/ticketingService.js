@@ -98,7 +98,7 @@ function saveLocalStore(state) {
 async function mirrorBookingToCloud(booking) {
   if (!supabase || !booking) return;
   try {
-    await supabase.from('bookings').upsert([{
+    const { error } = await supabase.from('bookings').upsert([{
       id: booking.id,
       event_id: booking.event_id,
       user_name: booking.user_name,
@@ -113,6 +113,9 @@ async function mirrorBookingToCloud(booking) {
       created_at: booking.created_at,
       expires_at: booking.expires_at
     }]);
+    if (error) {
+      console.error('Supabase upsert error:', error.message || error);
+    }
   } catch (e) {
     console.warn('Supabase sync notice during booking update', e);
   }
@@ -158,10 +161,18 @@ export const ticketingService = {
   // Sync live cross-device state from Supabase cloud database into local cache
   syncWithCloud: async () => {
     if (!supabase) return ticketingService.getTicketingData();
+    const store = getLocalStore();
     try {
+      // Proactively push all existing local bookings to Supabase so other devices can discover them immediately
+      if (store.bookings && store.bookings.length > 0) {
+        await Promise.all(store.bookings.map(b => mirrorBookingToCloud(b)));
+      }
+
       const { data, error } = await supabase.from('bookings').select('*').order('created_at', { ascending: false });
+      if (error) {
+        console.error('Supabase fetch error during cloud sync:', error.message || error);
+      }
       if (!error && data) {
-        const store = getLocalStore();
         const cloudBookingsMap = new Map(data.map(b => [b.id, {
           id: b.id,
           event_id: b.event_id || store.event.id,
@@ -178,11 +189,10 @@ export const ticketingService = {
           expires_at: b.expires_at
         }]));
 
-        // Preserve active local bookings (HELD/PENDING_PAYMENT/UNDER_REVIEW) that haven't pushed to cloud yet
+        // Preserve active local bookings that haven't pushed to cloud yet
         store.bookings.forEach(localB => {
           if (!cloudBookingsMap.has(localB.id) && ['HELD', 'PENDING_PAYMENT', 'UNDER_REVIEW', 'CONFIRMED'].includes(localB.status)) {
             cloudBookingsMap.set(localB.id, localB);
-            mirrorBookingToCloud(localB);
           }
         });
 
