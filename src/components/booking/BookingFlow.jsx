@@ -355,79 +355,65 @@ export default function BookingFlow({ onReturnHome }) {
           PAGE 1.5: BOOKMYSHOW-STYLE SEAT QUANTITY MODAL (WITHOUT ILLUSTRATION)
           ========================================================================= */}
       {step === 'seatcount' && (
-        <div className="grid-container py-12 sm:py-20 booking-step-transition flex items-center justify-center min-h-[85vh]">
-          <div className="max-w-5xl w-full mx-auto bg-zinc-950 border-4 sm:border-8 border-zinc-800 p-6 sm:p-14 rounded-[3.5rem] shadow-2xl my-6 text-center font-tech relative animate-fade-in">
+        <div className="grid-container py-12 booking-step-transition flex items-center justify-center min-h-[75vh]">
+          <div className="max-w-4xl w-full mx-auto bg-zinc-950 border-4 border-zinc-800 p-6 sm:p-12 rounded-3xl shadow-2xl my-6 text-center font-tech relative animate-fade-in">
             
-            <h3 className="text-4xl sm:text-7xl font-impact font-bold text-white mb-10 uppercase tracking-tight leading-none">
+            <h3 className="text-3xl sm:text-5xl font-impact font-bold text-white mb-8 uppercase tracking-tight">
               HOW MANY SEATS?
             </h3>
             
-            {/* Gigantic Stacked Toggle Pill Cards (Inspired by the Tennis Pill/Toggle Design) */}
-            <div className="space-y-6 sm:space-y-8 my-12 max-w-4xl mx-auto">
-              {[1, 2, 3, 4].map((num, idx) => {
+            {/* Massive Prominent Quantity Buttons (+200% Size with Green Transition) */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-8 my-10 max-w-3xl mx-auto">
+              {[1, 2, 3, 4].map((num) => {
                 const isActive = targetSeatCount === num;
-                const priceForNum = num * (event.ticket_price || 499);
-                const isEven = idx % 2 === 1; // 0 (1 seat) left, 1 (2 seats) right, 2 (3 seats) left, 3 (4 seats) right
-
                 return (
-                  <div
+                  <button
                     key={num}
+                    type="button"
                     onClick={() => setTargetSeatCount(num)}
-                    className={`w-full py-5 sm:py-8 px-6 sm:px-10 rounded-full font-impact transition-all duration-300 flex items-center justify-between gap-4 sm:gap-8 cursor-pointer border-4 sm:border-8 shadow-2xl ${
+                    className={`py-10 sm:py-16 px-4 rounded-3xl font-impact transition-all duration-300 flex flex-col items-center justify-center cursor-pointer border-4 shadow-2xl ${
                       isActive
-                        ? 'bg-[#DCFF02] border-white text-black font-black shadow-[0_0_50px_rgba(220,255,2,0.7)] scale-105 z-10'
-                        : 'bg-zinc-900 border-zinc-700 text-white hover:border-emerald-400 hover:bg-zinc-800/90 hover:scale-[1.02] opacity-90'
-                    } ${isEven ? 'flex-row-reverse text-right' : 'flex-row text-left'}`}
+                        ? 'bg-emerald-600 border-emerald-400 text-white font-black shadow-emerald-500/80 scale-105 ring-4 ring-white/40 z-10'
+                        : 'bg-zinc-900 border-zinc-700 text-gray-300 hover:bg-emerald-700 hover:border-emerald-400 hover:text-white hover:scale-105 shadow-xl'
+                    }`}
                   >
-                    {/* Circle Toggle Ball / Badge */}
-                    <div className={`w-20 h-20 sm:w-32 sm:h-32 rounded-full flex flex-col items-center justify-center shrink-0 border-4 sm:border-6 transition-all ${
-                      isActive 
-                        ? 'bg-black text-[#DCFF02] border-white shadow-2xl scale-110' 
-                        : 'bg-zinc-800 text-gray-300 border-zinc-600 group-hover:border-white'
-                    }`}>
-                      <span className="text-4xl sm:text-7xl font-black leading-none">{num}</span>
-                      <span className="text-[10px] sm:text-sm font-tech font-bold uppercase tracking-wider mt-1">
-                        {num === 1 ? 'SEAT' : 'SEATS'}
-                      </span>
-                    </div>
-
-                    {/* Pill Text Content */}
-                    <div className="flex-1 min-w-0">
-                      <div className="text-3xl sm:text-6xl md:text-7xl font-black tracking-tight leading-none uppercase truncate">
-                        {num} {num === 1 ? 'SEAT' : 'SEATS'} PASS
-                      </div>
-                      <div className={`text-base sm:text-2xl font-tech font-bold tracking-widest uppercase mt-2 ${isActive ? 'text-black/80 font-black' : 'text-emerald-400'}`}>
-                        ALL INCLUSIVE // ₹{priceForNum}/-
-                      </div>
-                    </div>
-                  </div>
+                    <span className="text-6xl sm:text-8xl font-black tracking-tight">{num}</span>
+                    <span className="text-sm sm:text-lg font-tech font-bold uppercase tracking-widest mt-3 opacity-95">
+                      {num === 1 ? 'SEAT' : 'SEATS'}
+                    </span>
+                  </button>
                 );
               })}
             </div>
 
-            {/* Dynamic Multiplied Price Banner (Huge Font Size) */}
-            <div className="mt-12 pt-8 border-t-2 border-zinc-800 space-y-4">
-              <span className="text-sm sm:text-xl text-gray-300 font-bold uppercase tracking-widest block">
+            {/* Dynamic Multiplied Price Section (Huge Font Size) */}
+            <div className="mt-10 pt-8 border-t border-zinc-800/80 space-y-3">
+              <span className="text-xs sm:text-sm text-gray-300 font-bold uppercase tracking-widest block">
                 EXECUTIVE // EARLY BIRD PASS ({targetSeatCount} {targetSeatCount === 1 ? 'SEAT' : 'SEATS'} × ₹{event.ticket_price || 499})
               </span>
-              <div className="font-impact text-6xl sm:text-9xl text-emerald-400 bg-black border-4 sm:border-8 border-emerald-500 py-6 sm:py-8 px-10 sm:px-14 rounded-[3rem] shadow-[0_0_40px_rgba(16,185,129,0.4)] inline-block my-4 tracking-tight">
+              <div className="font-impact text-6xl sm:text-8xl text-emerald-400 bg-emerald-950/90 border-4 border-emerald-500 py-6 px-10 rounded-3xl shadow-2xl inline-block my-4 tracking-tight">
                 ₹{targetSeatCount * (event.ticket_price || 499)}/-
               </div>
-              <span className="text-sm sm:text-lg font-bold text-emerald-400 uppercase block tracking-wider">
-                🍿 COMPLIMENTARY GOURMET SNACK & BEVERAGE INCLUDED FOR EVERY SEAT!
+              <span className="text-xs sm:text-sm font-bold text-emerald-400 uppercase block tracking-wider mt-1">
+                AVAILABLE (LIMITED TIME) — ALL INCLUSIVE OF SEATING + SNACK + BEVERAGE
               </span>
             </div>
 
-            {/* Massive Pill Action CTA Button (+300% Size) */}
+            {/* Bestseller / Perks Banner */}
+            <div className="bg-zinc-900/90 border-2 border-zinc-800 py-3.5 px-5 rounded-2xl text-sm sm:text-base text-gray-200 font-medium flex items-center justify-center gap-2 mt-6 leading-snug shadow-lg max-w-2xl mx-auto">
+              <span>🍿 Book exact cinema seats + complimentary snack & beverage included!</span>
+            </div>
+
+            {/* Massive Action CTA Button (+200% Size) */}
             <button 
               type="button"
               onClick={() => {
                 setSelectedSeats([]);
                 setStep('seatmap');
               }}
-              className="w-full py-8 sm:py-12 px-6 sm:px-10 bg-emerald-500 hover:bg-emerald-400 text-black font-impact font-black text-3xl sm:text-6xl rounded-full shadow-[0_0_60px_rgba(16,185,129,0.8)] border-6 sm:border-8 border-white transition-all duration-300 hover:scale-[1.03] cursor-pointer mt-12 uppercase tracking-wider block"
+              className="w-full py-6 sm:py-8 bg-emerald-600 hover:bg-emerald-500 text-white font-impact font-bold text-2xl sm:text-4xl rounded-3xl shadow-2xl shadow-emerald-600/60 border-4 border-emerald-400 transition-all hover:scale-[1.02] cursor-pointer mt-8 uppercase tracking-wider block"
             >
-              SELECT SEATS (₹{targetSeatCount * (event.ticket_price || 499)}) →
+              SELECT SEATS ({targetSeatCount} FOR ₹{targetSeatCount * (event.ticket_price || 499)}) →
             </button>
 
           </div>
@@ -449,28 +435,33 @@ export default function BookingFlow({ onReturnHome }) {
             )}
 
             {/* Target Seat Count Header Bar (Clean & Spaced) */}
-            {/* Minimal Compact Horizontal Legend + Screen Bar (All extra noisy text removed) */}
-            <div className="w-full max-w-4xl mx-auto mb-6 bg-zinc-950 border-2 border-zinc-800 p-3 sm:p-4 rounded-2xl flex flex-wrap items-center justify-between gap-3 font-tech shadow-xl text-xs sm:text-sm font-bold">
-              <div className="flex flex-wrap items-center gap-3 sm:gap-6 mx-auto md:mx-0">
-                <span className="flex items-center gap-1.5 text-emerald-400">
-                  <span className="w-4 h-4 rounded bg-emerald-600 border border-emerald-400 inline-block"></span>
-                  AVAILABLE (₹{event.ticket_price || 499})
-                </span>
-                <span className="flex items-center gap-1.5 text-white">
-                  <span className="w-4 h-4 rounded bg-white border border-gray-300 inline-block shadow"></span>
-                  SELECTED
-                </span>
-                <span className="flex items-center gap-1.5 text-yellow-400">
-                  <span className="w-4 h-4 rounded bg-yellow-600 border border-yellow-400 inline-block"></span>
-                  HELD
-                </span>
-                <span className="flex items-center gap-1.5 text-red-400">
-                  <span className="w-4 h-4 rounded bg-red-600 border border-red-400 inline-block"></span>
-                  BOOKED
-                </span>
+            {/* Minimal Compact Horizontal Legend (Cards so they never mush together) */}
+            <div className="w-full max-w-4xl mx-auto mb-6 bg-zinc-950 border-2 border-zinc-800 p-3 sm:p-4 rounded-2xl flex flex-wrap items-center justify-center gap-3 font-tech shadow-xl text-xs sm:text-sm font-bold">
+              <div className="flex items-center gap-2 bg-black px-3 py-1.5 rounded-lg border border-zinc-800 text-emerald-400 shrink-0">
+                <span className="w-4 h-4 rounded bg-emerald-600 border border-emerald-400 inline-block shrink-0"></span>
+                <span>AVAILABLE (₹{event.ticket_price || 499})</span>
               </div>
-              <div className="mx-auto md:mx-0 bg-zinc-900 border border-zinc-700 px-3 py-1 rounded text-gray-300 text-[11px] sm:text-xs tracking-widest uppercase">
-                CINEMA SCREEN ↓
+              <div className="flex items-center gap-2 bg-black px-3 py-1.5 rounded-lg border border-zinc-800 text-white shrink-0">
+                <span className="w-4 h-4 rounded bg-white border border-gray-300 inline-block shadow shrink-0"></span>
+                <span>SELECTED</span>
+              </div>
+              <div className="flex items-center gap-2 bg-black px-3 py-1.5 rounded-lg border border-zinc-800 text-yellow-400 shrink-0">
+                <span className="w-4 h-4 rounded bg-yellow-600 border border-yellow-400 inline-block shrink-0"></span>
+                <span>HELD</span>
+              </div>
+              <div className="flex items-center gap-2 bg-black px-3 py-1.5 rounded-lg border border-zinc-800 text-red-400 shrink-0">
+                <span className="w-4 h-4 rounded bg-red-600 border border-red-400 inline-block shrink-0"></span>
+                <span>BOOKED</span>
+              </div>
+            </div>
+
+            {/* Simple Green Screen Saying ALL EYES THIS WAY & Row K Notice */}
+            <div className="w-full max-w-4xl mx-auto mb-6 bg-emerald-950/90 border-4 border-emerald-500 py-4 px-6 rounded-2xl text-center shadow-2xl shadow-emerald-500/30">
+              <div className="font-impact text-2xl sm:text-4xl text-emerald-300 tracking-[0.2em] uppercase font-black animate-pulse">
+                // ALL EYES THIS WAY ↓ //
+              </div>
+              <div className="text-xs sm:text-base font-tech font-bold text-emerald-300 uppercase tracking-widest mt-1.5">
+                CINEMA SCREEN — ROW K IS LOWEST & CLOSEST TO SCREEN ↓
               </div>
             </div>
 
@@ -538,6 +529,13 @@ export default function BookingFlow({ onReturnHome }) {
                   );
                 })}
               </div>
+            </div>
+
+            {/* Clear Indicator that Row A is highest elevation / furthest from screen */}
+            <div className="w-full max-w-4xl mx-auto mt-4 mb-2 bg-zinc-900/90 border-2 border-zinc-700 py-3 px-6 rounded-xl text-center shadow-lg font-tech">
+              <span className="text-xs sm:text-base font-bold text-gray-200 uppercase tracking-wider block">
+                ↑ ROW A IS HIGHEST (TOP TIER ELEVATION / FURTHEST FROM SCREEN) ↑
+              </span>
             </div>
 
             {/* Sticky Bottom Summary Bar */}
