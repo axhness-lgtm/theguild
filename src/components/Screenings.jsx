@@ -82,7 +82,7 @@ export default function Screenings({ onSelectEvent, activeCategory = 'f1', setAc
             {activeCategory === 'f1' ? (
               <span className="banner-accent-f1 font-bold text-white">// FORMULA 1 NEXT RACE: BELGIAN GRAND PRIX AT BREW N CUE CAFE (40 SEATS MAX) — ₹199</span>
             ) : (
-              <span className="font-bold text-white">// FIFA WORLD CUP FINAL 2026: <span className="text-yellow-400 font-impact tracking-wider">PVR INOX, BEACH ROAD, VIZAG</span> — <span className="text-emerald-400 font-impact text-base">₹459/-</span> (SEATING + SNACK + BEVERAGE INCLUDED)</span>
+              <span className="font-bold text-white">// FIFA WORLD CUP FINAL 2026: <span className="text-yellow-400 font-impact tracking-wider">PVR INOX, BEACH ROAD, VIZAG</span> — <span className="text-emerald-400 font-impact text-base">₹499/-</span> (SEATING + SNACK + BEVERAGE INCLUDED)</span>
             )}
           </LineReveal>
           <LineReveal delay={0.35} className="banner-status text-xs px-3 py-1 bg-red-950 text-red-300 border border-red-800 rounded font-bold uppercase tracking-wider">
@@ -142,7 +142,7 @@ export default function Screenings({ onSelectEvent, activeCategory = 'f1', setAc
                   <div className="card-actions pt-5 mt-5 border-t border-zinc-800 flex items-center justify-between">
                     <div className="font-tech">
                       <span className="text-[11px] text-gray-400 block">PASS PRICE:</span>
-                      <span className="text-lg font-bold text-emerald-400">₹{event.ticket_price || (isWorldCup ? 459 : 199)}</span>
+                      <span className="text-lg font-bold text-emerald-400">₹{event.ticket_price || (isWorldCup ? 499 : 199)}</span>
                       {isWorldCup && <span className="text-[10px] text-gray-400 block font-normal leading-tight">+ SNACK & BEVERAGE INCLUDED</span>}
                     </div>
 

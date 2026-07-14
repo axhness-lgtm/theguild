@@ -56,7 +56,7 @@ function getInitialTicketingState() {
       venue: 'PVR INOX, BEACH ROAD, VIZAG',
       date: '20TH JULY',
       time: '00:30 AM ONWARDS',
-      ticket_price: 459,
+      ticket_price: 499,
       total_seats: 147,
       max_seats_per_booking: 4,
       upi_id: 'steveoguri07-2@okicici', // Official permanent UPI ID
@@ -78,7 +78,7 @@ function getLocalStore() {
   try {
     const parsed = JSON.parse(data);
     if (parsed && parsed.event) {
-      parsed.event.ticket_price = 459;
+      parsed.event.ticket_price = 499;
       parsed.event.venue = 'PVR INOX, BEACH ROAD, VIZAG';
       parsed.event.date = '20TH JULY';
       parsed.event.time = '00:30 AM ONWARDS';

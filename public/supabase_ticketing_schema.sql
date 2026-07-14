@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS events (
     title TEXT NOT NULL,
     competition TEXT NOT NULL,
     screening_time TIMESTAMPTZ NOT NULL,
-    ticket_price NUMERIC(10, 2) NOT NULL DEFAULT 459.00,
+    ticket_price NUMERIC(10, 2) NOT NULL DEFAULT 499.00,
     max_seats_per_booking INTEGER NOT NULL DEFAULT 4,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS seats (
     row_label VARCHAR(5) NOT NULL,
     seat_number INTEGER NOT NULL,
     seat_label VARCHAR(10) NOT NULL UNIQUE, -- e.g. 'A1', 'G6'
-    price NUMERIC(10, 2) NOT NULL DEFAULT 459.00,
+    price NUMERIC(10, 2) NOT NULL DEFAULT 499.00,
     is_accessible BOOLEAN DEFAULT FALSE,
     UNIQUE(auditorium_id, row_label, seat_number)
 );
@@ -165,7 +165,7 @@ BEGIN
 
     -- 3. Calculate total amount
     SELECT ticket_price INTO v_ticket_price FROM events WHERE id = p_event_id;
-    IF v_ticket_price IS NULL THEN v_ticket_price := 459.00; END IF;
+    IF v_ticket_price IS NULL THEN v_ticket_price := 499.00; END IF;
     v_total := v_ticket_price * ARRAY_LENGTH(p_seat_ids, 1);
 
     -- 4. Generate unpredictable ID

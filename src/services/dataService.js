@@ -30,8 +30,8 @@ export const UPCOMING_SCREENINGS = [
     venue: 'PVR INOX, BEACH ROAD, VIZAG',
     status: 'LIVE INOX BOOKING',
     isLive: true,
-    ticket_price: 459,
-    vip_price: 459,
+    ticket_price: 499,
+    vip_price: 499,
     capacity: '147 Seats Cinema Hangar',
     atmosphere: 'The ultimate football showdown in Visakhapatnam\'s largest private cinema hangar. BookMyShow style seat reservation, 4K HDR stadium feed, and stadium acoustic volume.'
   }
