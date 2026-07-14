@@ -1,232 +1,228 @@
 /* ==========================================================================
-   BOOKING FLOW & SEAT MAP — BOOKMYSHOW INSPIRED BRUTALIST EDITORIAL
+   THE GUILD // BOOKING FLOW & SEAT MATRIX DESIGN SYSTEM
+   8-Point Spacing System • 1000-1200px Max Content • 700px Centered Cards
    ========================================================================== */
 
 .booking-root {
   min-height: calc(100vh - 4.5rem);
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  padding: 3rem 0 6rem;
+  background-color: #080808;
+  color: #FFFFFF;
+  padding: 2rem 1rem 6rem;
   font-family: var(--font-body);
 }
 
-.booking-header-bar {
+/* Wizard Header Bar & Progress Indicator */
+.wizard-header-bar {
+  max-width: 1200px;
+  margin: 0 auto 3rem;
+  background: #18181B;
+  border: 1px solid #27272A;
+  border-radius: 16px;
+  padding: 1.25rem 2rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: var(--grid-border);
-  padding: 1.5rem 2rem;
-  background: var(--bg-secondary);
-  margin-bottom: 2.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
-.booking-step-badge {
-  display: inline-flex;
+.wizard-logo-area {
+  display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.4rem 0.85rem;
-  background: rgba(255, 46, 46, 0.12);
-  border: 1px solid var(--accent-red);
-  color: var(--accent-red);
-  font-family: var(--font-tech);
-  font-size: 0.75rem;
-  letter-spacing: 0.12em;
+  gap: 0.75rem;
 }
 
-.booking-event-title {
-  font-size: 2rem;
-  letter-spacing: 0.02em;
-  margin-bottom: 0.25rem;
-}
-
-.booking-venue-sub {
+.wizard-steps-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
   font-family: var(--font-tech);
   font-size: 0.85rem;
-  color: var(--text-secondary);
+  text-transform: uppercase;
   letter-spacing: 0.08em;
 }
 
-/* Timer Countdown Pill */
-.timer-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.6rem 1.2rem;
-  background: #1A0D0D;
-  border: 1px solid var(--accent-red);
-  color: #FF2E2E;
-  font-family: var(--font-tech);
-  font-weight: 700;
-  font-size: 0.95rem;
-  letter-spacing: 0.1em;
-  animation: pulseTimer 2s infinite ease-in-out;
-}
-
-@keyframes pulseTimer {
-  0%, 100% { border-color: #FF2E2E; box-shadow: 0 0 10px rgba(255, 46, 46, 0.2); }
-  50% { border-color: rgba(255, 46, 46, 0.4); box-shadow: none; }
-}
-
-/* Overview Layout */
-.booking-overview-grid {
-  display: grid;
-  grid-template-columns: 1fr 380px;
-  gap: 2.5rem;
-  align-items: start;
-}
-
-@media (max-width: 992px) {
-  .booking-overview-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.overview-banner-card {
-  background: var(--bg-secondary);
-  border: var(--grid-border);
-  padding: 2.5rem;
-  position: relative;
-  overflow: hidden;
-}
-
-.overview-price-pill {
-  font-family: var(--font-tech);
-  font-size: 1.5rem;
-  color: var(--text-primary);
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-strong);
-  padding: 0.75rem 1.5rem;
-  display: inline-block;
-  margin-top: 1rem;
-}
-
-/* Rules List */
-.booking-rules-box {
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-strong);
-  padding: 1.75rem;
-  font-family: var(--font-tech);
-}
-
-.rules-title {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  letter-spacing: 0.12em;
-  margin-bottom: 1.25rem;
-  border-bottom: 1px solid var(--border-subtle);
-  padding-bottom: 0.5rem;
-}
-
-.rules-list {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.rules-list li {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  font-size: 0.8rem;
-  color: var(--text-primary);
-  line-height: 1.4;
-}
-
-/* ==========================================================================
-   INTERACTIVE CINEMA SEAT MAP (147 SEATS)
-   ========================================================================== */
-.seatmap-container {
-  background: var(--bg-secondary);
-  border: var(--grid-border);
-  padding: 3rem 2rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.cinema-screen-wrap {
-  width: 100%;
-  max-width: 700px;
-  margin: 0 auto 3.5rem;
-  text-align: center;
-}
-
-.cinema-screen-bar {
-  height: 8px;
-  background: linear-gradient(90deg, transparent 0%, #FFFFFF 50%, transparent 100%);
-  border-radius: 4px;
-  margin-bottom: 0.75rem;
-  box-shadow: 0 10px 25px -5px rgba(255, 255, 255, 0.35);
-}
-
-.cinema-screen-label {
-  font-family: var(--font-tech);
-  font-size: 0.7rem;
-  letter-spacing: 0.25em;
-  color: var(--text-secondary);
-}
-
-/* Legend */
-.seatmap-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2rem;
-  justify-content: center;
-  margin-bottom: 3rem;
-  font-family: var(--font-tech);
-  font-size: 0.75rem;
-}
-
-.legend-item {
+.wizard-step-item {
+  color: #71717A;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   gap: 0.6rem;
 }
 
-.legend-box {
-  width: 18px;
-  height: 18px;
-  border-radius: 4px;
+.wizard-step-item.active {
+  color: #FFFFFF;
+  font-weight: 700;
 }
 
-.legend-available { border: 1px solid var(--border-strong); background: var(--bg-tertiary); }
-.legend-held { border: 1px solid #D97706; background: rgba(217, 119, 6, 0.2); }
-.legend-selected { border: 1px solid #FFFFFF; background: #FFFFFF; }
-.legend-booked { border: 1px solid #3F3F46; background: #27272A; }
+.wizard-step-bullet {
+  color: #3F3F46;
+  font-size: 0.7rem;
+}
+
+.wizard-step-item.active .wizard-step-bullet {
+  color: #E11D48;
+}
+
+/* Timer Pill */
+.wizard-timer-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid #F59E0B;
+  color: #F59E0B;
+  border-radius: 8px;
+  font-family: var(--font-tech);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.wizard-timer-pill.urgent {
+  background: rgba(225, 29, 72, 0.15);
+  border-color: #E11D48;
+  color: #E11D48;
+  animation: pulseUrgent 1.5s infinite ease-in-out;
+}
+
+@keyframes pulseUrgent {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(0.97); opacity: 0.8; }
+}
+
+/* Centered Form Cards (Max 700px) */
+.wizard-card-centered {
+  max-width: 700px;
+  margin: 0 auto;
+  background: #18181B;
+  border: 1px solid #27272A;
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+}
+
+@media (min-width: 768px) {
+  .wizard-card-centered {
+    padding: 3rem;
+  }
+}
+
+/* Page 1: Overview Section */
+.overview-hero-title {
+  font-family: var(--font-impact);
+  font-size: 42px;
+  line-height: 0.95;
+  text-transform: uppercase;
+  color: #FFFFFF;
+  margin: 0.75rem 0;
+}
+
+@media (min-width: 768px) {
+  .overview-hero-title {
+    font-size: 64px;
+  }
+}
+
+/* Page 2: Interactive Cinema Seat Map Layout */
+.seatmap-layout-grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (min-width: 1024px) {
+  .seatmap-layout-grid {
+    grid-template-columns: 7fr 3fr;
+    gap: 2.5rem;
+  }
+}
+
+.seatmap-matrix-panel {
+  background: #18181B;
+  border: 1px solid #27272A;
+  border-radius: 20px;
+  padding: 2.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cinema-screen-bar {
+  height: 8px;
+  width: 100%;
+  max-width: 560px;
+  background: linear-gradient(90deg, transparent 0%, #FFFFFF 50%, transparent 100%);
+  border-radius: 4px;
+  margin: 0 auto 0.75rem;
+  box-shadow: 0 10px 25px -5px rgba(255, 255, 255, 0.4);
+}
+
+/* Seat Legend */
+.seatmap-compact-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  font-family: var(--font-tech);
+  font-size: 13px;
+  color: #A1A1AA;
+  margin: 1.5rem 0 2.5rem;
+}
+
+.legend-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.legend-box {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+}
 
 /* Seat Grid Rows */
 .seatmap-grid-wrap {
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
+  gap: 0.75rem;
   width: 100%;
-  max-width: 850px;
+  max-width: 760px;
   margin: 0 auto;
 }
 
 .seatmap-row {
   display: grid;
-  grid-template-columns: 35px 1fr 35px;
+  grid-template-columns: 32px 1fr 32px;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
 .row-label-text {
   font-family: var(--font-tech);
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 700;
-  color: var(--text-secondary);
+  color: #E11D48;
   text-align: center;
+  background: #080808;
+  border: 1px solid #27272A;
+  border-radius: 4px;
+  padding: 0.25rem 0;
 }
 
 .seats-in-row {
   display: flex;
   justify-content: center;
-  gap: 0.45rem;
+  gap: 0.5rem;
 }
 
-/* Individual Seat Button */
 .seat-btn {
   width: 36px;
   height: 36px;
@@ -235,34 +231,43 @@
   align-items: center;
   justify-content: center;
   font-family: var(--font-tech);
-  font-size: 0.7rem;
-  font-weight: 600;
+  font-size: 0.75rem;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  position: relative;
   user-select: none;
 }
 
-/* Statuses */
-.seat-AVAILABLE {
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-strong);
-  color: var(--text-primary);
+@media (min-width: 768px) {
+  .seat-btn {
+    width: 38px;
+    height: 38px;
+    font-size: 0.8rem;
+  }
 }
+
+.seat-AVAILABLE {
+  background: #27272A;
+  border: 1px solid #3F3F46;
+  color: #F5F5F5;
+}
+
 .seat-AVAILABLE:hover {
   border-color: #FFFFFF;
-  transform: translateY(-2px);
+  background: #3F3F46;
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15);
 }
 
 .seat-HELD {
-  background: rgba(217, 119, 6, 0.18);
-  border: 1px solid #D97706;
+  background: rgba(245, 158, 11, 0.2);
+  border: 1px solid #F59E0B;
   color: #FBBF24;
   cursor: not-allowed;
 }
 
 .seat-BOOKED {
-  background: #18181B;
+  background: #111113;
   border: 1px solid #27272A;
   color: #525252;
   cursor: not-allowed;
@@ -271,238 +276,95 @@
 .seat-SELECTED {
   background: #FFFFFF;
   border: 1px solid #FFFFFF;
-  color: #000000;
+  color: #080808;
   font-weight: 800;
-  transform: scale(1.08);
-  box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+  transform: scale(1.12);
+  box-shadow: 0 0 16px rgba(255, 255, 255, 0.45);
 }
 
-/* Bottom Selection Summary Bar */
-.seatmap-bottom-bar {
-  position: sticky;
-  bottom: 0;
-  z-index: 50;
-  background: rgba(17, 17, 17, 0.95);
-  backdrop-filter: blur(12px);
-  border-top: 1px solid var(--border-strong);
-  padding: 1.25rem 2rem;
-  margin-top: 3.5rem;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.selection-summary {
-  font-family: var(--font-tech);
-}
-
-.summary-seats {
-  font-size: 1.15rem;
-  color: var(--text-primary);
-  font-weight: 700;
-}
-
-.summary-total {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  margin-top: 0.2rem;
-}
-
-/* Brutalist Rule Violation Warning */
-.rule-warning-banner {
-  background: #2D0E0E;
-  border: 1px solid #FF2E2E;
-  color: #FF2E2E;
-  padding: 1rem 1.5rem;
-  font-family: var(--font-tech);
-  font-size: 0.85rem;
-  letter-spacing: 0.08em;
-  margin-bottom: 2rem;
-  width: 100%;
-  max-width: 850px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-/* ==========================================================================
-   CONTACT DETAILS & ATOMIC RESERVATION PAGE
-   ========================================================================== */
-.contact-form-wrap {
-  background: var(--bg-secondary);
-  border: var(--grid-border);
-  padding: 3rem;
-  max-width: 680px;
+/* Page 4: Payment Split Layout */
+.payment-split-grid {
+  max-width: 1100px;
   margin: 0 auto;
-}
-
-.contact-form-group {
-  margin-bottom: 1.75rem;
-}
-
-.contact-form-group label {
-  display: block;
-  font-family: var(--font-tech);
-  font-size: 0.75rem;
-  letter-spacing: 0.14em;
-  color: var(--text-secondary);
-  margin-bottom: 0.6rem;
-}
-
-.contact-form-group input {
-  width: 100%;
-  padding: 1.1rem 1.25rem;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-strong);
-  color: var(--text-primary);
-  font-family: var(--font-tech);
-  font-size: 0.95rem;
-  outline: none;
-  transition: border-color 0.2s ease;
-}
-
-.contact-form-group input:focus {
-  border-color: var(--text-primary);
-}
-
-/* ==========================================================================
-   STATIC UPI QR PAYMENT PAGE
-   ========================================================================== */
-.payment-grid {
   display: grid;
-  grid-template-columns: 1fr 400px;
-  gap: 3rem;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
   align-items: start;
 }
 
-@media (max-width: 992px) {
-  .payment-grid {
-    grid-template-columns: 1fr;
+@media (min-width: 1024px) {
+  .payment-split-grid {
+    grid-template-columns: 5fr 6fr;
+    gap: 3rem;
   }
 }
 
-.upi-qr-card {
-  background: var(--bg-secondary);
-  border: var(--grid-border);
-  padding: 2.5rem;
-  text-align: center;
-}
-
-.qr-image-box {
+.qr-white-card {
   background: #FFFFFF;
-  padding: 1.5rem;
-  display: inline-block;
-  border-radius: 12px;
-  margin: 1.5rem 0;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
-}
-
-.qr-code-img {
-  width: 220px;
-  height: 220px;
-  display: block;
-}
-
-.upi-id-box {
-  font-family: var(--font-tech);
-  font-size: 1.05rem;
-  color: #10B981;
-  background: rgba(16, 185, 129, 0.12);
-  border: 1px solid #10B981;
-  padding: 0.75rem 1.25rem;
-  display: inline-block;
-  border-radius: 6px;
-}
-
-/* UTR Form */
-.utr-form-card {
-  background: var(--bg-secondary);
-  border: var(--grid-border);
-  padding: 2.5rem;
-}
-
-/* Upload Dropzone */
-.screenshot-dropzone {
-  border: 2px dashed var(--border-strong);
-  padding: 2rem;
+  border: 1px solid #E4E4E7;
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
   text-align: center;
-  cursor: pointer;
-  background: var(--bg-tertiary);
-  transition: all 0.2s ease;
-}
-
-.screenshot-dropzone:hover {
-  border-color: var(--text-primary);
-  background: rgba(255, 255, 255, 0.03);
-}
-
-.dropzone-preview {
-  max-height: 180px;
-  margin: 1rem auto 0;
-  border: 1px solid var(--border-strong);
-}
-
-/* ==========================================================================
-   BOOKING CONFIRMATION & TIMELINE PAGE
-   ========================================================================== */
-.confirmation-card {
-  background: var(--bg-secondary);
-  border: var(--grid-border);
-  padding: 3.5rem 3rem;
-  max-width: 780px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+  max-width: 440px;
   margin: 0 auto;
+  width: 100%;
 }
 
-.booking-id-pill {
-  font-family: var(--font-tech);
-  font-size: 1.4rem;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-strong);
-  padding: 0.85rem 1.75rem;
-  display: inline-block;
-  margin: 1.5rem 0 2.5rem;
+.qr-white-card img {
+  max-width: 280px;
+  max-height: 280px;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  margin: 1.5rem auto;
 }
 
-.timeline-list {
+/* Numbered Steps List */
+.numbered-step-item {
   display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  margin-top: 2rem;
-  position: relative;
-  padding-left: 2rem;
-  border-left: 2px solid var(--border-strong);
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
 }
 
-.timeline-item {
-  position: relative;
-}
-
-.timeline-dot {
-  position: absolute;
-  left: -2.35rem;
-  top: 0.2rem;
-  width: 14px;
-  height: 14px;
+.step-circle {
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-  background: var(--border-strong);
-  border: 2px solid var(--bg-secondary);
-}
-
-.timeline-active .timeline-dot {
-  background: #10B981;
-  box-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
-}
-
-.timeline-state {
+  background: #27272A;
+  border: 1px solid #3F3F46;
+  color: #FFFFFF;
   font-family: var(--font-tech);
   font-size: 0.85rem;
   font-weight: 700;
-  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
-.timeline-note {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  margin-top: 0.2rem;
+/* Accordion Component */
+.accordion-box {
+  background: #18181B;
+  border: 1px solid #27272A;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+/* Responsive Sticky Footer for Mobile */
+.mobile-sticky-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 50;
+  background: rgba(24, 24, 27, 0.98);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid #3F3F46;
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.5);
 }
