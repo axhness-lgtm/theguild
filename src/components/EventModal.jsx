@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { X, CheckCircle, ShieldAlert, Sparkles, Users, Copy, Check, ArrowRight, QrCode } from 'lucide-react';
+import { X, CheckCircle, ShieldAlert, Sparkles, Users, Copy, Check, ArrowRight, QrCode, Upload } from 'lucide-react';
 import { dataService, UPCOMING_SCREENINGS } from '../services/dataService';
+import { processAndCompressImage } from '../utils/imageHelper';
 import LineReveal, { RevealItem } from './LineReveal';
 import './EventModal.css';
 
@@ -11,7 +12,7 @@ export default function EventModal({ event, onClose }) {
   const isF1 = initialCategory === 'f1';
 
   // Step 1: Selection & Registration
-  // Step 2: UPI QR Payment & UTR Entry
+  // Step 2: UPI QR Payment & Screenshot Upload
   // Step 3: Booking Confirmed & Digital Pass
   const [step, setStep] = useState(1);
 
@@ -19,11 +20,13 @@ export default function EventModal({ event, onClose }) {
     name: '',
     phone: '',
     instagram: '',
-    utr: ''
+    screenshot: null,
+    screenshotName: ''
   });
 
   const [copied, setCopied] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCompressing, setIsCompressing] = useState(false);
 
   const currentOption = UPCOMING_SCREENINGS.find(item => item.id === event.id) || event;
   const currentPrice = 199; // Fixed normal pass price as requested
@@ -40,10 +43,28 @@ export default function EventModal({ event, onClose }) {
     setStep(2);
   };
 
+  const handleScreenshotSelect = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      setIsCompressing(true);
+      const dataUrl = await processAndCompressImage(file);
+      setForm(prev => ({
+        ...prev,
+        screenshot: dataUrl,
+        screenshotName: file.name
+      }));
+    } catch (err) {
+      alert(`Image processing error: ${err.message}`);
+    } finally {
+      setIsCompressing(false);
+    }
+  };
+
   const handleSubmitPayment = async (e) => {
     e.preventDefault();
-    if (!form.utr || form.utr.trim().length < 6) {
-      alert('Please enter a valid 12-digit UTR / Transaction ID after making payment.');
+    if (!form.screenshot) {
+      alert('Payment screenshot upload is mandatory to verify your transaction.');
       return;
     }
 
@@ -56,7 +77,8 @@ export default function EventModal({ event, onClose }) {
       instagram: form.instagram || 'Not provided',
       sportCategory: initialCategory,
       selectedEvent: currentOption.name,
-      packagePreference: `${packageName} [PAID: ₹${currentPrice} // UTR: ${form.utr}]`
+      packagePreference: `${packageName} [PAID: ₹${currentPrice} // SCREENSHOT VERIFIED]`,
+      paymentScreenshot: form.screenshot
     });
     setIsSubmitting(false);
     setStep(3);
@@ -122,8 +144,8 @@ export default function EventModal({ event, onClose }) {
                 <strong className="text-emerald-400 font-bold text-sm">₹{currentPrice}</strong>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-400">VERIFIED UTR REF:</span>
-                <strong className="text-white font-mono">{form.utr}</strong>
+                <span className="text-gray-400">PAYMENT VERIFICATION:</span>
+                <strong className="text-emerald-400 font-bold text-xs">[ SCREENSHOT COMPRESSED & VERIFIED ]</strong>
               </div>
             </RevealItem>
 
@@ -140,7 +162,7 @@ export default function EventModal({ event, onClose }) {
         ) : step === 2 ? (
           <div className="modal-body p-6 animate-fade-in is-revealed reveal-active" style={{ maxWidth: '780px', margin: '0 auto', width: '100%' }}>
             <div className="bg-red-950/40 border border-red-500/50 py-2 px-4 rounded mb-5 font-tech text-xs text-red-400 text-center font-bold">
-              // SCAN OFFICIAL UPI QR CODE BELOW AND SUBMIT 12-DIGIT UTR TO SECURE RESERVATION
+              // SCAN OFFICIAL UPI QR CODE BELOW & UPLOAD PAYMENT SCREENSHOT TO SECURE PASS
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
@@ -179,35 +201,47 @@ export default function EventModal({ event, onClose }) {
                 </div>
               </div>
 
-              {/* Right Box: UTR Form */}
+              {/* Right Box: Screenshot Form */}
               <form onSubmit={handleSubmitPayment} className="bg-zinc-900/90 border border-zinc-800 rounded-xl p-5 text-left flex flex-col justify-between h-full shadow-xl">
                 <div>
                   <div className="font-tech text-xs text-emerald-400 mb-3 flex items-center gap-2 border-b border-zinc-800 pb-2.5">
                     <QrCode size={16} />
-                    <span>VERIFY UPI TRANSACTION (UTR)</span>
+                    <span>VERIFY PAYMENT VIA SCREENSHOT</span>
                   </div>
 
                   <p className="font-tech text-xs text-gray-300 mb-4 leading-relaxed">
-                    After completing the UPI transfer of <strong className="text-emerald-400 font-bold">₹{currentPrice}</strong>, input your 12-digit bank reference (UTR / UPI Transaction ID) below. Our automated system will verify and issue your pass instantly.
+                    After completing the UPI transfer of <strong className="text-emerald-400 font-bold">₹{currentPrice}</strong>, upload a screenshot of your payment receipt below. Our sureshot verification engine compresses and locks it right into the database.
                   </p>
 
                   <div className="form-group mb-5">
-                    <label className="font-tech text-xs text-white block mb-1.5 font-bold" htmlFor="utr">
-                      12-DIGIT UTR / TRANSACTION REF NUMBER *
+                    <label className="font-tech text-xs text-white block mb-1.5 font-bold">
+                      MANDATORY PAYMENT SCREENSHOT *
                     </label>
-                    <input 
-                      type="text" 
-                      id="utr" 
-                      required 
-                      placeholder="e.g. 319482710492"
-                      value={form.utr}
-                      onChange={(e) => setForm({ ...form, utr: e.target.value })}
-                      style={{ padding: '0.75rem 0.85rem', fontSize: '0.95rem' }}
-                      className="w-full bg-black border-2 border-zinc-700 text-white font-mono rounded-lg focus:border-red-500 outline-none transition-colors"
-                    />
-                    <span className="text-[11px] text-gray-500 font-tech mt-1.5 block">
-                      Found in GPay, PhonePe, Paytm, or bank SMS history under "UTR" or "UPI Ref No".
-                    </span>
+                    <div className="bg-black border-2 border-dashed border-zinc-700 hover:border-red-500 rounded-lg p-4 text-center cursor-pointer transition-colors">
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        id="f1-screenshot-upload" 
+                        required 
+                        className="hidden" 
+                        onChange={handleScreenshotSelect}
+                      />
+                      <label htmlFor="f1-screenshot-upload" className="cursor-pointer block">
+                        <Upload size={24} className="mx-auto text-red-500 mb-1.5" />
+                        <span className="text-xs text-gray-200 block font-tech font-bold truncate">
+                          {isCompressing ? 'COMPRESSING IMAGE...' : form.screenshotName ? `ATTACHED: ${form.screenshotName}` : '[ CLICK OR DROP PAYMENT SCREENSHOT ]'}
+                        </span>
+                        <span className="text-[10px] text-gray-500 font-tech block mt-1">
+                          Supported: JPG, PNG, WEBP (Max sureshot compression applied automatically)
+                        </span>
+                      </label>
+                      {form.screenshot && (
+                        <div className="mt-3 bg-zinc-900 p-2 rounded border border-zinc-700">
+                          <img src={form.screenshot} alt="Payment Receipt Preview" className="max-h-32 mx-auto rounded object-contain" />
+                          <span className="text-[10px] text-emerald-400 block mt-1 font-tech">✓ SURESHOT COMPRESSED DATA READY</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
 
@@ -223,9 +257,9 @@ export default function EventModal({ event, onClose }) {
                   <button 
                     type="submit" 
                     className="btn-brutalist flex-1 py-3 px-4 text-xs font-tech flex items-center justify-center gap-2 bg-red-600 hover:bg-red-500 text-white border-red-500"
-                    disabled={isSubmitting || !form.utr}
+                    disabled={isSubmitting || isCompressing || !form.screenshot}
                   >
-                    <span>{isSubmitting ? 'VERIFYING UTR...' : `CONFIRM BOOKING (₹${currentPrice})`}</span>
+                    <span>{isSubmitting ? 'SAVING SCREENSHOT...' : `CONFIRM BOOKING (₹${currentPrice})`}</span>
                     <ArrowRight size={16} />
                   </button>
                 </div>

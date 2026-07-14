@@ -19,14 +19,24 @@ export default function App() {
   useScrollReveal();
   const [isLoading, setIsLoading] = useState(true);
   const [activeView, setActiveView] = useState('public');
-  const [activeCategory, setActiveCategory] = useState('f1');
+  const [activeCategory, setActiveCategory] = useState('world_cup');
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
 
   useEffect(() => {
     const checkRoute = () => {
-      if (window.location.pathname.toLowerCase() === '/founder') {
+      const path = window.location.pathname.toLowerCase();
+      if (path === '/founder') {
         setActiveView('admin-ticketing');
+      } else if (path === '/formula1' || path === '/f1') {
+        setActiveCategory('f1');
+        setActiveView('public');
+      } else {
+        setActiveCategory('world_cup');
+        setActiveView('public');
+        if (path === '/' || path === '') {
+          window.history.replaceState({}, '', '/worldcup');
+        }
       }
     };
     checkRoute();
@@ -34,9 +44,26 @@ export default function App() {
     return () => window.removeEventListener('popstate', checkRoute);
   }, []);
 
+  const handleSetCategory = (cat) => {
+    setActiveCategory(cat);
+    if (cat === 'f1') {
+      if (window.location.pathname.toLowerCase() !== '/formula1') {
+        window.history.pushState({}, '', '/formula1');
+      }
+    } else if (cat === 'world_cup') {
+      if (window.location.pathname.toLowerCase() !== '/worldcup') {
+        window.history.pushState({}, '', '/worldcup');
+      }
+    }
+  };
+
   const handleSetView = (view) => {
-    if (view === 'public' && window.location.pathname.toLowerCase() === '/founder') {
-      window.history.pushState({}, '', '/');
+    if (view === 'public') {
+      const path = window.location.pathname.toLowerCase();
+      if (path === '/founder' || path === '/') {
+        const targetUrl = activeCategory === 'f1' ? '/formula1' : '/worldcup';
+        window.history.pushState({}, '', targetUrl);
+      }
     } else if (view === 'admin' || view === 'admin-ticketing') {
       if (window.location.pathname.toLowerCase() !== '/founder') {
         window.history.pushState({}, '', '/founder');
@@ -58,7 +85,7 @@ export default function App() {
         activeView={activeView} 
         setActiveView={handleSetView}
         activeCategory={activeCategory}
-        setActiveCategory={setActiveCategory}
+        setActiveCategory={handleSetCategory}
       />
 
       {activeView === 'public' && (
@@ -71,7 +98,7 @@ export default function App() {
           <Marquee />
           <Screenings 
             activeCategory={activeCategory} 
-            setActiveCategory={setActiveCategory} 
+            setActiveCategory={handleSetCategory} 
             setActiveView={handleSetView}
             onSelectEvent={(ev) => setSelectedEvent(ev)} 
           />

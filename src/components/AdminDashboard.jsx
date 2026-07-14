@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Download, Trash2, CheckCircle2, RefreshCw, Filter, ArrowUpDown } from 'lucide-react';
+import { Search, Download, Trash2, CheckCircle2, RefreshCw, Filter, ArrowUpDown, Eye, X } from 'lucide-react';
 import { dataService } from '../services/dataService';
 import './Admin.css';
 
@@ -10,6 +10,7 @@ export default function AdminDashboard({ onLogout }) {
   const [filterStatus, setFilterStatus] = useState('ALL');
   const [sortOrder, setSortOrder] = useState('NEWEST');
   const [loading, setLoading] = useState(false);
+  const [selectedScreenshotItem, setSelectedScreenshotItem] = useState(null);
 
   const loadData = async () => {
     setLoading(true);
@@ -161,6 +162,7 @@ export default function AdminDashboard({ onLogout }) {
                 <th>SELECTED SCREENING</th>
                 <th>SPORT</th>
                 <th>SUBMITTED ON</th>
+                <th>PAYMENT RECEIPT</th>
                 <th>STATUS</th>
                 <th className="text-right">ACTIONS</th>
               </tr>
@@ -168,7 +170,7 @@ export default function AdminDashboard({ onLogout }) {
             <tbody>
               {filteredList.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="empty-row font-tech">
+                  <td colSpan={9} className="empty-row font-tech">
                     // NO MATCHING INTEREST SUBMISSIONS FOUND
                   </td>
                 </tr>
@@ -191,6 +193,20 @@ export default function AdminDashboard({ onLogout }) {
                         hour: '2-digit',
                         minute: '2-digit'
                       })}
+                    </td>
+                    <td className="font-tech">
+                      {item.paymentScreenshot ? (
+                        <button 
+                          onClick={() => setSelectedScreenshotItem(item)}
+                          className="text-xs text-emerald-400 hover:text-emerald-300 underline flex items-center gap-1 font-bold"
+                        >
+                          <Eye size={14} /> View Screenshot
+                        </button>
+                      ) : (
+                        <span className="text-gray-500 text-xs">
+                          {item.packagePreference && item.packagePreference !== 'N/A' ? item.packagePreference : 'No Screenshot'}
+                        </span>
+                      )}
                     </td>
                     <td>
                       <span className={`status-pill font-tech ${item.status === 'Contacted' ? 'status-contacted' : 'status-pending'}`}>
@@ -228,6 +244,39 @@ export default function AdminDashboard({ onLogout }) {
         </div>
 
       </div>
+
+      {/* Screenshot Preview Modal for Founder Dashboard */}
+      {selectedScreenshotItem && (
+        <div className="modal-backdrop animate-fade-in" style={{ zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setSelectedScreenshotItem(null)}>
+          <div className="bg-zinc-950 border border-zinc-800 p-6 rounded-xl max-w-lg w-full text-left font-tech shadow-2xl m-4" onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4">
+              <h4 className="font-impact text-lg text-white">PAYMENT SCREENSHOT // {selectedScreenshotItem.name}</h4>
+              <button onClick={() => setSelectedScreenshotItem(null)} className="text-gray-400 hover:text-white"><X size={20} /></button>
+            </div>
+            
+            <div className="text-xs text-gray-300 space-y-1 mb-4 bg-zinc-900 p-3 rounded border border-zinc-800">
+              <div>ATTENDEE: <strong className="text-white">{selectedScreenshotItem.name}</strong> ({selectedScreenshotItem.phone})</div>
+              <div>SCREENING: <strong className="text-emerald-400">{selectedScreenshotItem.selectedEvent}</strong></div>
+              <div>DETAILS: <span className="text-gray-300">{selectedScreenshotItem.packagePreference}</span></div>
+            </div>
+
+            <div className="bg-black p-3 rounded border border-zinc-800 text-center flex items-center justify-center overflow-hidden max-h-[70vh]">
+              <img 
+                src={selectedScreenshotItem.paymentScreenshot} 
+                alt="Payment Verification Screenshot" 
+                className="max-h-[60vh] max-w-full rounded object-contain mx-auto"
+              />
+            </div>
+
+            <div className="flex justify-between items-center mt-5 pt-4 border-t border-zinc-800">
+              <span className="text-emerald-400 text-xs font-bold">✓ SURESHOT COMPRESSED DATA STORED IN DB</span>
+              <button onClick={() => setSelectedScreenshotItem(null)} className="btn-brutalist py-2 px-6 text-xs">
+                CLOSE PREVIEW
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

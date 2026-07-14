@@ -35,6 +35,7 @@ export default function BookingFlow({ onReturnHome }) {
   const [screenshotUrl, setScreenshotUrl] = useState('');
   const [screenshotName, setScreenshotName] = useState('');
   const [isSubmittingPayment, setIsSubmittingPayment] = useState(false);
+  const [isCompressing, setIsCompressing] = useState(false);
 
   // Load ticketing state whenever step changes
   const reloadTicketingData = () => {
@@ -139,16 +140,16 @@ export default function BookingFlow({ onReturnHome }) {
   // Step 4: Submit UPI Payment
   const handleSubmitPayment = async (e) => {
     e.preventDefault();
-    if (!utrNumber || utrNumber.length < 8) {
-      alert('Please enter a valid 12-digit UPI UTR / Transaction reference number.');
+    if (!screenshotUrl) {
+      alert('Please upload your payment screenshot before confirming.');
       return;
     }
 
     setIsSubmittingPayment(true);
     try {
       const updated = await ticketingService.submitPayment(activeBooking.id, {
-        utr: utrNumber,
-        screenshotUrl: screenshotUrl || 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=600&q=80'
+        utr: utrNumber || 'SCREENSHOT_VERIFIED',
+        screenshotUrl: screenshotUrl
       });
       setActiveBooking(updated);
       setStep('confirmation');
@@ -159,13 +160,19 @@ export default function BookingFlow({ onReturnHome }) {
     }
   };
 
-  const handleFileUpload = (e) => {
+  const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      setScreenshotName(file.name);
-      // Create local preview blob URL
-      const url = URL.createObjectURL(file);
-      setScreenshotUrl(url);
+      try {
+        setIsCompressing(true);
+        setScreenshotName(file.name);
+        const dataUrl = await processAndCompressImage(file);
+        setScreenshotUrl(dataUrl);
+      } catch (err) {
+        alert(`Screenshot processing error: ${err.message}`);
+      } finally {
+        setIsCompressing(false);
+      }
     }
   };
 
@@ -499,46 +506,41 @@ export default function BookingFlow({ onReturnHome }) {
                 </div>
               </div>
 
-              {/* Right: UTR & Screenshot Verification Form */}
+              {/* Right: Screenshot Verification Form */}
               <div className="utr-form-card bg-zinc-900 border border-zinc-800 p-6 font-tech">
-                <span className="section-index text-red-500 text-xs">// 04 — SUBMIT UTR</span>
-                <h3 className="text-xl font-impact mt-1 mb-4">ENTER TRANSACTION REFERENCE</h3>
+                <span className="section-index text-red-500 text-xs">// 04 — VERIFY PAYMENT</span>
+                <h3 className="text-xl font-impact mt-1 mb-4">UPLOAD PAYMENT SCREENSHOT</h3>
 
                 <form onSubmit={handleSubmitPayment} className="space-y-4">
-                  <div>
-                    <label className="block text-xs text-gray-400 mb-1.5">12-DIGIT UPI UTR / REF NUMBER *</label>
-                    <input 
-                      type="text" 
-                      required 
-                      className="w-full p-3 bg-zinc-950 border border-zinc-800 text-white text-sm outline-none focus:border-red-500 font-mono"
-                      placeholder="e.g. 419283746501"
-                      maxLength={16}
-                      value={utrNumber}
-                      onChange={(e) => setUtrNumber(e.target.value)}
-                    />
-                    <span className="text-[11px] text-gray-500 block mt-1">
-                      Found in your bank app payment receipt.
-                    </span>
-                  </div>
+                  <p className="text-xs text-gray-300 leading-relaxed mb-2">
+                    After completing the UPI transfer of <strong className="text-emerald-400 font-bold">₹{activeBooking.total_amount}</strong>, uploading a screenshot of your transaction receipt is <strong className="text-red-500 underline">mandatory</strong>. Our sureshot image compression engine secures and embeds it right into your booking record.
+                  </p>
 
                   <div>
-                    <label className="block text-xs text-gray-400 mb-1.5">ATTACH SCREENSHOT (OPTIONAL)</label>
-                    <div className="screenshot-dropzone bg-zinc-950 border border-dashed border-zinc-800 p-4 text-center cursor-pointer hover:border-zinc-600 transition-all">
+                    <label className="block text-xs text-white font-bold mb-1.5">MANDATORY TRANSACTION SCREENSHOT *</label>
+                    <div className="screenshot-dropzone bg-zinc-950 border-2 border-dashed border-zinc-700 hover:border-red-500 p-5 text-center cursor-pointer transition-all rounded-lg">
                       <input 
                         type="file" 
                         accept="image/*" 
                         id="screenshot-input" 
+                        required
                         className="hidden" 
                         onChange={handleFileUpload}
                       />
                       <label htmlFor="screenshot-input" className="cursor-pointer block">
-                        <Upload size={20} className="mx-auto text-gray-400 mb-1" />
-                        <span className="text-xs text-gray-300 block truncate">
-                          {screenshotName ? `ATTACHED: ${screenshotName}` : '[ CLICK TO UPLOAD SCREENSHOT ]'}
+                        <Upload size={24} className="mx-auto text-red-500 mb-2" />
+                        <span className="text-xs text-gray-200 block font-bold truncate">
+                          {isCompressing ? 'COMPRESSING & PROCESSING...' : screenshotName ? `ATTACHED: ${screenshotName}` : '[ CLICK OR DROP PAYMENT SCREENSHOT ]'}
+                        </span>
+                        <span className="text-[10px] text-gray-500 block mt-1">
+                          Supported: JPG, PNG, WEBP (Max ~50KB sureshot compression applied automatically)
                         </span>
                       </label>
                       {screenshotUrl && (
-                        <img src={screenshotUrl} alt="Screenshot Preview" className="mt-3 max-h-24 mx-auto rounded border border-zinc-700" />
+                        <div className="mt-4 bg-zinc-900 p-2 rounded border border-zinc-700">
+                          <img src={screenshotUrl} alt="Screenshot Preview" className="max-h-36 mx-auto rounded object-contain" />
+                          <span className="text-[10px] text-emerald-400 block mt-1">✓ SURESHOT COMPRESSED DATA EMBEDDED</span>
+                        </div>
                       )}
                     </div>
                   </div>
@@ -546,10 +548,10 @@ export default function BookingFlow({ onReturnHome }) {
                   <div className="pt-4 mt-4 border-t border-zinc-800">
                     <button 
                       type="submit" 
-                      className="btn-brutalist w-full py-3.5 text-center justify-center text-xs"
-                      disabled={isSubmittingPayment}
+                      className="btn-brutalist w-full py-3.5 text-center justify-center text-xs bg-red-600 hover:bg-red-500 text-white border-red-500"
+                      disabled={isSubmittingPayment || isCompressing || !screenshotUrl}
                     >
-                      <RollingText text={isSubmittingPayment ? "VERIFYING UTR..." : "SUBMIT PAYMENT & CONFIRM →"} stagger={true} />
+                      <RollingText text={isSubmittingPayment ? "SECURING SCREENSHOT & PASS..." : "SUBMIT SCREENSHOT & CONFIRM TICKETS →"} stagger={true} />
                     </button>
                   </div>
                 </form>

@@ -19,22 +19,7 @@ export default function Hero({ activeCategory = 'f1', setActiveView, onSelectEve
 
   const handleCtaClick = (e) => {
     e.preventDefault();
-    if (activeCategory === 'world_cup') {
-      if (setActiveView) {
-        setActiveView('booking');
-      } else {
-        scrollToScreenings(e);
-      }
-    } else if (onSelectEvent) {
-      const f1Option = UPCOMING_SCREENINGS.find(item => item.category === 'f1');
-      if (f1Option) {
-        onSelectEvent(f1Option);
-      } else {
-        scrollToScreenings(e);
-      }
-    } else {
-      scrollToScreenings(e);
-    }
+    scrollToScreenings(e);
   };
 
   return (
@@ -65,30 +50,28 @@ export default function Hero({ activeCategory = 'f1', setActiveView, onSelectEve
 
         {/* Central Floating Elements: F1/FIFA Logo & Compact Sporty CTA */}
         <div className="hero-center-overlay-group">
-          <RevealItem delay={0.2} className="hero-f1-logo-wrap" data-scroll-section>
+          <div className="hero-f1-logo-wrap animate-fade-in is-revealed reveal-active">
             {activeCategory === 'world_cup' ? (
               <img src="/fifa.png" alt="FIFA World Cup" className="hero-center-f1-logo" />
             ) : (
               <img src="/f1.png" alt="Formula 1" className="hero-center-f1-logo" />
             )}
-          </RevealItem>
+          </div>
           
-          <RevealItem delay={0.35} data-scroll-section>
+          <div className="hero-cta-wrapper animate-fade-in is-revealed reveal-active">
             <button 
               type="button"
               className="center-cta-btn font-tech"
               onClick={handleCtaClick}
               style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
             >
-              <LineReveal inline={true} delay={0.45}>
-                <RollingText 
-                  text={activeCategory === 'world_cup' ? "[ BOOK TICKETS NOW ]" : "[ NEXT RACE ]"} 
-                  stagger={true} 
-                />
-              </LineReveal>
+              <RollingText 
+                text={activeCategory === 'world_cup' ? "[ BOOK TICKETS NOW ]" : "[ NEXT RACE ]"} 
+                stagger={true} 
+              />
               <ArrowDown size={14} className="cta-arrow" />
             </button>
-          </RevealItem>
+          </div>
         </div>
 
       </div>

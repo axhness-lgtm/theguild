@@ -277,8 +277,8 @@ export const ticketingService = {
     return newBooking;
   },
 
-  // Submit UPI Payment (UTR + Screenshot) -> transition to UNDER_REVIEW
-  submitPayment: async (bookingId, { utr, screenshotUrl }) => {
+  // Submit UPI Payment (Mandatory Screenshot) -> transition to UNDER_REVIEW
+  submitPayment: async (bookingId, { utr = 'SCREENSHOT_VERIFIED', screenshotUrl }) => {
     const store = cleanupExpiredReservations(getLocalStore());
     const bookingIndex = store.bookings.findIndex(b => b.id === bookingId);
     if (bookingIndex === -1) throw new Error('Booking not found');
@@ -288,18 +288,23 @@ export const ticketingService = {
       throw new Error('This reservation has already expired or been cancelled. Please select new seats.');
     }
 
+    if (!screenshotUrl) {
+      throw new Error('Payment screenshot upload is mandatory to verify your transaction.');
+    }
+
     const now = new Date();
     const updatedTimeline = [
       ...(booking.timeline || []),
       { state: 'PENDING_PAYMENT', timestamp: new Date(now.getTime() - 60000).toISOString(), note: 'UPI QR code scanned' },
-      { state: 'UNDER_REVIEW', timestamp: now.toISOString(), note: `Payment UTR ${utr} submitted for verification` }
+      { state: 'UNDER_REVIEW', timestamp: now.toISOString(), note: `Payment screenshot submitted for verification` }
     ];
 
     const updatedBooking = {
       ...booking,
       status: 'UNDER_REVIEW',
-      utr,
-      screenshot_url: screenshotUrl || 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=600&q=80',
+      utr: utr || 'SCREENSHOT_VERIFIED',
+      screenshot_url: screenshotUrl,
+      paymentScreenshot: screenshotUrl,
       timeline: updatedTimeline
     };
 
@@ -308,7 +313,7 @@ export const ticketingService = {
       id: 'log-' + Math.random().toString(36).substring(2, 8),
       timestamp: now.toISOString(),
       action: 'PAYMENT_SUBMITTED',
-      details: `Customer ${booking.user_name} submitted UTR #${utr} (${booking.seats.join(', ')}) for verification`
+      details: `Customer ${booking.user_name} uploaded payment screenshot for (${booking.seats.join(', ')})`
     });
 
     saveLocalStore(store);

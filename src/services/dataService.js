@@ -109,9 +109,10 @@ export const dataService = {
   getScreenings: () => UPCOMING_SCREENINGS,
 
   // Submit new interest form
-  submitInterest: async ({ name, phone, instagram, sportCategory, selectedEvent, packagePreference }) => {
-    const formattedEventName = packagePreference && packagePreference !== 'N/A'
-      ? `${selectedEvent} [${packagePreference === 'QUALIFYING + RACE DAY WEEKEND PASS' ? 'QUALIFYING + RACE' : 'RACE ONLY'}]`
+  submitInterest: async ({ name, phone, instagram, sportCategory, selectedEvent, packagePreference, paymentScreenshot }) => {
+    // Make sure we format clean names
+    const formattedEventName = selectedEvent === 'BRITISH GRAND PRIX [RACE DAY ONLY]' || selectedEvent === 'BRITISH GRAND PRIX [QUALIFYING + RACE DAY]'
+      ? 'FORMULA 1 // BRITISH GRAND PRIX 2026'
       : selectedEvent;
 
     const newSubmission = {
@@ -122,6 +123,7 @@ export const dataService = {
       sportCategory,
       selectedEvent: formattedEventName,
       packagePreference: packagePreference || 'N/A',
+      paymentScreenshot: paymentScreenshot || '',
       submissionDate: new Date().toISOString(),
       status: 'Pending'
     };
@@ -138,6 +140,7 @@ export const dataService = {
               sport_category: newSubmission.sportCategory,
               selected_event: newSubmission.selectedEvent,
               package_preference: newSubmission.packagePreference,
+              payment_screenshot: newSubmission.paymentScreenshot,
               status: newSubmission.status
             }
           ]);
@@ -170,6 +173,7 @@ export const dataService = {
             sportCategory: item.sport_category,
             selectedEvent: item.selected_event,
             packagePreference: item.package_preference || 'N/A',
+            paymentScreenshot: item.payment_screenshot || item.paymentScreenshot || '',
             submissionDate: item.created_at || new Date().toISOString(),
             status: item.status || 'Pending'
           }));

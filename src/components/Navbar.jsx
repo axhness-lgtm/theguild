@@ -10,7 +10,7 @@ export default function Navbar({ activeView, setActiveView, activeCategory = 'f1
           className="navbar-brand swipe-reveal-right flex items-center justify-start" 
           onClick={() => {
             setActiveView('public');
-            if (setActiveCategory) setActiveCategory('f1');
+            if (setActiveCategory) setActiveCategory('world_cup');
           }}
           role="button"
           tabIndex={0}
