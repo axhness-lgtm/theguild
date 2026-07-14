@@ -8,8 +8,8 @@ export default function AdminLogin({ onLogin, onExit }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Default founder password: guild2026 or founder
-    if (password === 'guild2026' || password === 'founder' || password === 'admin') {
+    // Verify customized founder password without hints
+    if (password === 'Guild2@111' || password === 'guild2@111') {
       onLogin();
     } else {
       setError(true);
@@ -43,7 +43,7 @@ export default function AdminLogin({ onLogin, onExit }) {
               <KeyRound size={18} className="key-icon" />
               <input 
                 type="password" 
-                placeholder="ENTER FOUNDER PASSPHRASE (HINT: guild2026)" 
+                placeholder="ENTER FOUNDER PASSPHRASE" 
                 value={password}
                 onChange={(e) => { setPassword(e.target.value); setError(false); }}
                 className="font-tech login-input"
@@ -61,10 +61,6 @@ export default function AdminLogin({ onLogin, onExit }) {
               </div>
             )}
           </form>
-
-          <div className="login-hint font-tech">
-            <span>PASSPHRASE FOR DEMO: <strong>guild2026</strong></span>
-          </div>
         </div>
 
       </div>

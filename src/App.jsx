@@ -26,7 +26,7 @@ export default function App() {
   useEffect(() => {
     const checkRoute = () => {
       const path = window.location.pathname.toLowerCase();
-      if (path === '/founder') {
+      if (path === '/founder' || path === '/admin') {
         setActiveView('admin-ticketing');
       } else if (path === '/formula1' || path === '/f1') {
         setActiveCategory('f1');
@@ -60,12 +60,13 @@ export default function App() {
   const handleSetView = (view) => {
     if (view === 'public') {
       const path = window.location.pathname.toLowerCase();
-      if (path === '/founder' || path === '/') {
+      if (path === '/founder' || path === '/admin' || path === '/') {
         const targetUrl = activeCategory === 'f1' ? '/formula1' : '/worldcup';
         window.history.pushState({}, '', targetUrl);
       }
     } else if (view === 'admin' || view === 'admin-ticketing') {
-      if (window.location.pathname.toLowerCase() !== '/founder') {
+      const path = window.location.pathname.toLowerCase();
+      if (path !== '/founder' && path !== '/admin') {
         window.history.pushState({}, '', '/founder');
       }
     }
