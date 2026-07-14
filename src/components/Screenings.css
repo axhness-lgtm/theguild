@@ -379,9 +379,13 @@
     grid-template-columns: 1fr;
   }
 
+  .screenings-title-group {
+    padding: 1.25rem 1rem !important;
+  }
+
   .screening-card {
     border-right: none !important;
-    padding: 2.25rem 1.5rem;
+    padding: 1.5rem 1rem !important;
   }
 
   .tab-banner {
@@ -390,6 +394,7 @@
   }
 
   .tab-btn {
-    padding: 1.25rem;
+    padding: 1rem 0.75rem !important;
+    font-size: 0.78rem !important;
   }
 }

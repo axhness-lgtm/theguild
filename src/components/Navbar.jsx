@@ -19,11 +19,11 @@ export default function Navbar({ activeView, setActiveView, activeCategory = 'f1
         </div>
 
         {activeView === 'public' ? (
-          <nav className="navbar-links font-tech flex items-center justify-center gap-4">
+          <nav className="navbar-links font-tech flex items-center justify-end gap-1 sm:gap-3 md:gap-4 shrink-0">
             <button 
               type="button"
-              style={{ backgroundColor: 'transparent', background: 'transparent', border: 'none', boxShadow: 'none', outline: 'none', padding: '0.5rem 1rem', cursor: 'pointer', fontSize: '1.05rem', letterSpacing: '0.15em', fontWeight: '800' }}
-              className={`nav-link transition-all ${activeCategory === 'f1' ? 'text-red-500 font-black scale-105' : 'text-gray-300 hover:text-white'}`}
+              style={{ backgroundColor: 'transparent', background: 'transparent', border: 'none', boxShadow: 'none', outline: 'none', cursor: 'pointer' }}
+              className={`nav-link transition-all px-1.5 sm:px-3 py-1 text-xs sm:text-sm md:text-base tracking-wider md:tracking-widest font-black shrink-0 ${activeCategory === 'f1' ? 'text-red-500 scale-105' : 'text-gray-300 hover:text-white'}`}
               onClick={() => {
                 if (setActiveCategory) setActiveCategory('f1');
               }}
@@ -32,8 +32,8 @@ export default function Navbar({ activeView, setActiveView, activeCategory = 'f1
             </button>
             <button 
               type="button"
-              style={{ backgroundColor: 'transparent', background: 'transparent', border: 'none', boxShadow: 'none', outline: 'none', padding: '0.5rem 1rem', cursor: 'pointer', fontSize: '1.05rem', letterSpacing: '0.15em', fontWeight: '800' }}
-              className={`nav-link transition-all ${activeCategory === 'world_cup' ? 'text-red-500 font-black scale-105' : 'text-gray-300 hover:text-white'}`}
+              style={{ backgroundColor: 'transparent', background: 'transparent', border: 'none', boxShadow: 'none', outline: 'none', cursor: 'pointer' }}
+              className={`nav-link transition-all px-1.5 sm:px-3 py-1 text-xs sm:text-sm md:text-base tracking-wider md:tracking-widest font-black shrink-0 ${activeCategory === 'world_cup' ? 'text-red-500 scale-105' : 'text-gray-300 hover:text-white'}`}
               onClick={() => {
                 if (setActiveCategory) setActiveCategory('world_cup');
               }}
@@ -42,23 +42,23 @@ export default function Navbar({ activeView, setActiveView, activeCategory = 'f1
             </button>
           </nav>
         ) : activeView === 'booking' ? (
-          <div className="navbar-admin-status font-tech">
-            <span className="admin-tag border-emerald-500 text-emerald-400 bg-emerald-950/20">LIVE INOX 147-SEAT TICKETING</span>
+          <div className="navbar-admin-status font-tech flex items-center gap-2 sm:gap-3 shrink-0">
+            <span className="admin-tag border-emerald-500 text-emerald-400 bg-emerald-950/20 text-[10px] sm:text-xs px-2 py-1">LIVE TICKETING</span>
             <button 
-              className="btn-return"
+              className="btn-return text-xs sm:text-sm px-2 py-1 shrink-0"
               onClick={() => setActiveView('public')}
             >
-              <RollingText text="[ ← RETURN TO PUBLIC SITE ]" stagger={false} />
+              <RollingText text="[ ← EXIT ]" stagger={false} />
             </button>
           </div>
         ) : (
-          <div className="navbar-admin-status font-tech">
-            <span className="admin-tag">FOUNDER CONTROL ROOM</span>
+          <div className="navbar-admin-status font-tech flex items-center gap-2 sm:gap-3 shrink-0">
+            <span className="admin-tag text-[10px] sm:text-xs px-2 py-1">CONTROL ROOM</span>
             <button 
-              className="btn-return"
+              className="btn-return text-xs sm:text-sm px-2 py-1 shrink-0"
               onClick={() => setActiveView('public')}
             >
-              <RollingText text="[ ← RETURN TO PUBLIC SITE ]" stagger={false} />
+              <RollingText text="[ ← EXIT ]" stagger={false} />
             </button>
           </div>
         )}

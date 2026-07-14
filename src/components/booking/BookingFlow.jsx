@@ -478,130 +478,137 @@ export default function BookingFlow({ onReturnHome }) {
             )}
 
             {/* Target Seat Count Header Bar (Clean & Spaced) */}
-            <div className="w-full max-w-4xl mx-auto mb-8 bg-zinc-950 border-2 border-zinc-800 py-4 px-6 md:px-8 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 font-tech shadow-xl">
+            <div className="w-full max-w-4xl mx-auto mb-6 sm:mb-8 bg-zinc-950 border-2 border-zinc-800 py-3.5 px-3 sm:px-6 md:px-8 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 font-tech shadow-xl">
               <div className="text-center sm:text-left">
-                <span className="text-xs text-red-400 font-bold block uppercase tracking-wider">// STEP 02 — PICK EXACT SEATS ON MAP</span>
-                <span className="text-base md:text-lg text-white font-impact tracking-wide block mt-0.5">
+                <span className="text-[11px] sm:text-xs text-red-400 font-bold block uppercase tracking-wider">// STEP 02 — PICK EXACT SEATS ON MAP</span>
+                <span className="text-sm sm:text-base md:text-lg text-white font-impact tracking-wide block mt-0.5">
                   PLEASE SELECT EXACTLY {targetSeatCount} {targetSeatCount === 1 ? 'SEAT' : 'SEATS'} ({selectedSeats.length} / {targetSeatCount} SELECTED)
                 </span>
               </div>
               <button 
                 type="button" 
                 onClick={() => setStep('seatcount')} 
-                className="btn-brutalist-outline py-2.5 px-5 text-xs bg-zinc-900 hover:bg-zinc-800 text-gray-300 hover:text-white border-zinc-700 font-bold tracking-wider uppercase cursor-pointer shrink-0"
+                className="btn-brutalist-outline py-2 px-4 sm:py-2.5 sm:px-5 text-[11px] sm:text-xs bg-zinc-900 hover:bg-zinc-800 text-gray-300 hover:text-white border-zinc-700 font-bold tracking-wider uppercase cursor-pointer shrink-0"
               >
                 CHANGE COUNT ({targetSeatCount})
               </button>
             </div>
 
             {/* Cinema Screen Bar with ALL EYES THIS WAY */}
-            <div className="text-center mb-8">
-              <div className="font-impact text-xl md:text-3xl text-yellow-400 tracking-[0.3em] uppercase font-bold animate-pulse mb-3">
+            <div className="text-center mb-6 sm:mb-8">
+              <div className="font-impact text-lg sm:text-xl md:text-3xl text-yellow-400 tracking-[0.2em] sm:tracking-[0.3em] uppercase font-bold animate-pulse mb-3">
                 // ALL EYES THIS WAY ↓ //
               </div>
               <div className="cinema-screen-wrap">
                 <div className="cinema-screen-bar" />
-                <span className="cinema-screen-label font-tech text-xs text-gray-400">// PVR INOX, BEACH ROAD, VIZAG // ALL SIGHTLINES UNBLOCKABLE //</span>
+                <span className="cinema-screen-label font-tech text-[10px] sm:text-xs text-gray-400 block px-2">// PVR INOX, BEACH ROAD, VIZAG // ALL SIGHTLINES UNBLOCKABLE //</span>
               </div>
             </div>
 
             {/* High-Contrast Interactive Legend with Replica Seat Illustrations */}
-            <div className="bg-zinc-950 border-2 border-zinc-800 p-5 rounded-2xl flex flex-wrap items-center justify-center gap-3 sm:gap-4 shadow-2xl mx-auto mb-8 font-tech text-xs sm:text-sm font-bold w-full">
+            <div className="bg-zinc-950 border-2 border-zinc-800 p-3 sm:p-5 rounded-xl sm:rounded-2xl flex flex-wrap items-center justify-center gap-2 sm:gap-4 shadow-2xl mx-auto mb-6 sm:mb-8 font-tech text-xs sm:text-sm font-bold w-full max-w-4xl">
               
               {/* Available */}
-              <div className="flex items-center gap-3 bg-black/80 border border-zinc-800 px-3.5 py-2 rounded-xl shrink-0">
-                <div className="w-8 h-8 rounded-md bg-zinc-800 border-2 border-zinc-500 text-white font-bold flex items-center justify-center text-xs shrink-0 shadow">
+              <div className="flex items-center gap-1.5 sm:gap-3 bg-black/80 border border-zinc-800 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl shrink-0 whitespace-nowrap">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-md bg-zinc-800 border-2 border-zinc-500 text-white font-bold flex items-center justify-center text-[11px] sm:text-xs shrink-0 shadow">
                   A1
                 </div>
-                <span className="text-gray-200 tracking-wide font-impact">AVAILABLE (₹{event.ticket_price})</span>
+                <span className="text-gray-200 tracking-wide font-impact text-xs sm:text-sm">AVAILABLE (₹{event.ticket_price})</span>
               </div>
 
               {/* Selected */}
-              <div className="flex items-center gap-3 bg-red-950/40 border border-red-600/60 px-3.5 py-2 rounded-xl shrink-0">
-                <div className="w-8 h-8 rounded-md bg-red-600 border-2 border-white text-white font-black flex items-center justify-center text-xs shrink-0 shadow-lg shadow-red-500/80 ring-1 ring-white">
+              <div className="flex items-center gap-1.5 sm:gap-3 bg-red-950/40 border border-red-600/60 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl shrink-0 whitespace-nowrap">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-md bg-red-600 border-2 border-white text-white font-black flex items-center justify-center text-[11px] sm:text-xs shrink-0 shadow-lg shadow-red-500/80 ring-1 ring-white">
                   ✓
                 </div>
-                <span className="text-white font-impact tracking-wide">SELECTED</span>
+                <span className="text-white font-impact tracking-wide text-xs sm:text-sm">SELECTED</span>
               </div>
 
               {/* Held / Reserved */}
-              <div className="flex items-center gap-3 bg-amber-950/40 border border-amber-600/50 px-3.5 py-2 rounded-xl shrink-0">
-                <div className="w-8 h-8 rounded-md bg-amber-500/20 border-2 border-amber-500 text-amber-400 font-bold flex items-center justify-center text-xs shrink-0">
+              <div className="flex items-center gap-1.5 sm:gap-3 bg-amber-950/40 border border-amber-600/50 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl shrink-0 whitespace-nowrap">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-md bg-amber-500/20 border-2 border-amber-500 text-amber-400 font-bold flex items-center justify-center text-[11px] sm:text-xs shrink-0">
                   🔒
                 </div>
-                <span className="text-amber-300 font-impact tracking-wide">HELD / RESERVED</span>
+                <span className="text-amber-300 font-impact tracking-wide text-xs sm:text-sm">HELD / RESERVED</span>
               </div>
 
               {/* Booked / Sold */}
-              <div className="flex items-center gap-3 bg-zinc-900/60 border border-zinc-800 px-3.5 py-2 rounded-xl shrink-0">
-                <div className="w-8 h-8 rounded-md bg-zinc-950 border border-zinc-800 text-zinc-500 font-bold flex items-center justify-center text-xs shrink-0 opacity-60">
+              <div className="flex items-center gap-1.5 sm:gap-3 bg-zinc-900/60 border border-zinc-800 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl shrink-0 whitespace-nowrap">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-md bg-zinc-950 border border-zinc-800 text-zinc-500 font-bold flex items-center justify-center text-[11px] sm:text-xs shrink-0 opacity-60">
                   ✕
                 </div>
-                <span className="text-zinc-500 font-impact tracking-wide">BOOKED / SOLD</span>
+                <span className="text-zinc-500 font-impact tracking-wide text-xs sm:text-sm">BOOKED / SOLD</span>
               </div>
 
             </div>
 
+            {/* Mobile Swipe Guide Banner */}
+            <div className="w-full max-w-4xl mx-auto bg-yellow-400 text-black font-impact text-xs sm:text-sm md:text-base text-center py-2.5 px-3 rounded-xl mb-4 shadow-lg flex items-center justify-center gap-2 animate-pulse tracking-wide border-2 border-yellow-500">
+              <span>⬅️ SWIPE / SCROLL HORIZONTALLY TO VIEW & SELECT ALL SEATS (1 TO 16) ➡️</span>
+            </div>
+
             {/* Seat Rows Grid (Rows K down to A matching physical diagram exactly) */}
-            <div className="seatmap-grid-wrap overflow-x-auto pb-6">
-              {['K','J','I','H','G','F','E','D','C','B','A'].map((rowLabel) => {
-                const rowSeats = seats
-                  .filter(s => s.row_label === rowLabel)
-                  .sort((a, b) => b.seat_number - a.seat_number);
+            <div className="seatmap-grid-wrap overflow-x-auto pb-6 w-full">
+              <div className="seatmap-inner-track min-w-max mx-auto px-2 sm:px-8 flex flex-col items-start md:items-center">
+                {['K','J','I','H','G','F','E','D','C','B','A'].map((rowLabel) => {
+                  const rowSeats = seats
+                    .filter(s => s.row_label === rowLabel)
+                    .sort((a, b) => b.seat_number - a.seat_number);
 
-                return (
-                  <div key={rowLabel} className="seatmap-row flex items-center justify-center gap-2 sm:gap-2.5 my-1.5">
-                    <span className="row-label-text font-impact text-sm sm:text-base w-7 sm:w-8 text-center text-red-500 bg-zinc-900 border-2 border-zinc-800 py-1 rounded shrink-0 shadow">{rowLabel}</span>
-                    
-                    <div className="seats-in-row flex items-center gap-1.5 sm:gap-2 flex-wrap justify-center">
-                      {rowSeats.map((seat) => {
-                        const isSelected = selectedSeats.includes(seat.label);
-                        const statusClass = isSelected ? 'SELECTED' : seat.status;
-                        
-                        // Visual gaps corresponding to walkways & stairs
-                        const showAisleBreak = seat.seat_number === 13 || seat.seat_number === 7;
+                  return (
+                    <div key={rowLabel} className="seatmap-row flex items-center justify-start gap-1.5 sm:gap-2 my-1.5 min-w-max">
+                      <span className="row-label-text font-impact text-xs sm:text-base w-6 sm:w-8 text-center text-red-500 bg-zinc-900 border-2 border-zinc-800 py-1 rounded shrink-0 shadow sticky left-0 z-20">{rowLabel}</span>
+                      
+                      <div className="seats-in-row flex items-center gap-1 sm:gap-2 flex-nowrap justify-start">
+                        {rowSeats.map((seat) => {
+                          const isSelected = selectedSeats.includes(seat.label);
+                          const statusClass = isSelected ? 'SELECTED' : seat.status;
+                          
+                          // Visual gaps corresponding to walkways & stairs
+                          const showAisleBreak = seat.seat_number === 13 || seat.seat_number === 7;
 
-                        return (
-                          <React.Fragment key={seat.id}>
-                            <button
-                              type="button"
-                              className={`seat-btn seat-${statusClass} w-9 h-9 sm:w-10 sm:h-10 text-xs sm:text-sm font-bold rounded-md border-2 transition-all flex items-center justify-center shrink-0 ${
-                                isSelected 
-                                  ? 'bg-red-600 text-white font-black border-white scale-125 shadow-xl shadow-red-500/80 ring-2 ring-white z-10' 
-                                  : seat.status === 'AVAILABLE' 
-                                  ? 'bg-zinc-800 text-gray-200 border-zinc-600 hover:border-red-500 hover:bg-zinc-700 hover:text-white hover:scale-105 shadow-sm' 
-                                  : 'bg-zinc-950 text-zinc-600 border-zinc-900 cursor-not-allowed opacity-40'
-                              }`}
-                              onClick={() => handleSeatClick(seat)}
-                              title={`${seat.label} — ${seat.status === 'AVAILABLE' ? `₹${event.ticket_price || 1}` : seat.status}`}
-                            >
-                              {seat.seat_number}
-                            </button>
+                          return (
+                            <React.Fragment key={seat.id}>
+                              <button
+                                type="button"
+                                className={`seat-btn seat-${statusClass} w-8 h-8 sm:w-10 sm:h-10 text-xs sm:text-sm font-bold rounded-md border-2 transition-all flex items-center justify-center shrink-0 ${
+                                  isSelected 
+                                    ? 'bg-red-600 text-white font-black border-white scale-125 shadow-xl shadow-red-500/80 ring-2 ring-white z-10' 
+                                    : seat.status === 'AVAILABLE' 
+                                    ? 'bg-zinc-800 text-gray-200 border-zinc-600 hover:border-red-500 hover:bg-zinc-700 hover:text-white hover:scale-105 shadow-sm' 
+                                    : 'bg-zinc-950 text-zinc-600 border-zinc-900 cursor-not-allowed opacity-40'
+                                }`}
+                                onClick={() => handleSeatClick(seat)}
+                                title={`${seat.label} — ${seat.status === 'AVAILABLE' ? `₹${event.ticket_price || 1}` : seat.status}`}
+                              >
+                                {seat.seat_number}
+                              </button>
 
-                            {showAisleBreak && (
-                              <div className="w-4 shrink-0" />
-                            )}
+                              {showAisleBreak && (
+                                <div className="w-3 sm:w-4 shrink-0" />
+                              )}
 
-                            {/* ENTRY / EXIT block on right side of rows K to F */}
-                            {seat.seat_number === 7 && ['K','J','I','H','G','F'].includes(rowLabel) && (
-                              <div className="seat-gap gap-[64px]" />
-                            )}
+                              {/* ENTRY / EXIT block on right side of rows K to F */}
+                              {seat.seat_number === 7 && ['K','J','I','H','G','F'].includes(rowLabel) && (
+                                <div className="seat-gap gap-[48px] sm:gap-[64px]" />
+                              )}
 
-                            {/* Stairs aisle gap on rows E, D, C, B right where seats 6, 5 would be */}
-                            {seat.seat_number === 7 && ['E','D','C','B'].includes(rowLabel) && (
-                              <div className="w-8 h-8 flex items-center justify-center text-zinc-600 font-mono text-[10px] shrink-0" title="Stairs / Aisle">
-                                ||
-                              </div>
-                            )}
-                          </React.Fragment>
-                        );
-                      })}
+                              {/* Stairs aisle gap on rows E, D, C, B right where seats 6, 5 would be */}
+                              {seat.seat_number === 7 && ['E','D','C','B'].includes(rowLabel) && (
+                                <div className="w-6 sm:w-8 h-8 flex items-center justify-center text-zinc-600 font-mono text-[10px] shrink-0" title="Stairs / Aisle">
+                                  ||
+                                </div>
+                              )}
+                            </React.Fragment>
+                          );
+                        })}
+                      </div>
+
+                      <span className="row-label-text font-bold text-xs w-6 text-center text-red-500 bg-zinc-900 border border-zinc-800 py-1 shrink-0">{rowLabel}</span>
                     </div>
-
-                    <span className="row-label-text font-bold text-xs w-6 text-center text-red-500 bg-zinc-900 border border-zinc-800 py-1 shrink-0">{rowLabel}</span>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
 
             {/* Sticky Bottom Summary Bar */}

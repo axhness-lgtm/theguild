@@ -184,6 +184,9 @@
     grid-template-rows: 1fr 1fr;
     height: auto;
     min-height: calc(100vh - 4.5rem);
+    width: 100%;
+    max-width: 100vw;
+    overflow: hidden;
   }
 
   .hero-side-left {
@@ -192,12 +195,30 @@
   }
 
   .hero-center-f1-logo {
-    max-width: 160px;
+    max-width: 140px;
   }
 
   .center-cta-btn {
     top: 84%;
-    padding: 0.65rem 1.35rem;
-    font-size: 0.78rem;
+    padding: 0.6rem 1.1rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.15em;
+    max-width: 90vw;
+    white-space: normal;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .split-hero-container {
+    min-height: 560px;
+  }
+  .hero-center-f1-logo {
+    max-width: 120px;
+  }
+  .center-cta-btn {
+    top: 85%;
+    padding: 0.55rem 0.9rem;
+    font-size: 0.68rem;
   }
 }
