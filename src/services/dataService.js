@@ -173,7 +173,7 @@ export const dataService = {
             sportCategory: item.sport_category,
             selectedEvent: item.selected_event,
             packagePreference: item.package_preference || 'N/A',
-            paymentScreenshot: item.payment_screenshot || item.paymentScreenshot || '',
+            paymentScreenshot: item.payment_screenshot || item.paymentScreenshot || item.screenshot_url || item.screenshot || item.image_url || '',
             submissionDate: item.created_at || new Date().toISOString(),
             status: item.status || 'Pending'
           }));

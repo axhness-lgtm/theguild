@@ -142,7 +142,7 @@ async function mirrorBookingToCloud(booking) {
       status: booking.status,
       seats: booking.seats,
       utr: booking.utr || null,
-      screenshot_url: booking.screenshot_url || null,
+      screenshot_url: booking.screenshot_url || booking.paymentScreenshot || booking.screenshot || booking.image_url || null,
       timeline: booking.timeline || [],
       created_at: booking.created_at,
       expires_at: booking.expires_at
@@ -224,7 +224,8 @@ export const ticketingService = {
           status: b.status,
           seats: Array.isArray(b.seats) ? b.seats : (typeof b.seats === 'string' ? JSON.parse(b.seats) : []),
           utr: b.utr || null,
-          screenshot_url: b.screenshot_url || null,
+          screenshot_url: b.screenshot_url || b.paymentScreenshot || b.screenshot || b.payment_screenshot || b.image_url || null,
+          paymentScreenshot: b.screenshot_url || b.paymentScreenshot || b.screenshot || b.payment_screenshot || b.image_url || null,
           timeline: Array.isArray(b.timeline) ? b.timeline : (typeof b.timeline === 'string' ? JSON.parse(b.timeline) : []),
           created_at: b.created_at,
           expires_at: b.expires_at

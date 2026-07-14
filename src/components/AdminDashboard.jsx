@@ -195,7 +195,7 @@ export default function AdminDashboard({ onLogout }) {
                       })}
                     </td>
                     <td className="font-tech">
-                      {item.paymentScreenshot ? (
+                      {(item.paymentScreenshot || item.screenshot_url || item.payment_screenshot || item.screenshot || item.image_url) ? (
                         <button 
                           onClick={() => setSelectedScreenshotItem(item)}
                           className="text-xs text-emerald-400 hover:text-emerald-300 underline flex items-center gap-1 font-bold"
@@ -262,7 +262,7 @@ export default function AdminDashboard({ onLogout }) {
 
             <div className="bg-black p-3 rounded border border-zinc-800 text-center flex items-center justify-center overflow-hidden max-h-[70vh]">
               <img 
-                src={selectedScreenshotItem.paymentScreenshot} 
+                src={selectedScreenshotItem.paymentScreenshot || selectedScreenshotItem.screenshot_url || selectedScreenshotItem.payment_screenshot || selectedScreenshotItem.screenshot || selectedScreenshotItem.image_url} 
                 alt="Payment Verification Screenshot" 
                 className="max-h-[60vh] max-w-full rounded object-contain mx-auto"
               />

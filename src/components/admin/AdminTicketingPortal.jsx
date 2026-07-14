@@ -355,19 +355,19 @@ export default function AdminTicketingPortal({ onSwitchToSignups }) {
                         <td className="font-bold text-white">₹{b.total_amount}</td>
                         <td>
                           {b.utr ? (
-                            <div>
-                              <div className="text-emerald-400 font-mono text-xs">#{b.utr}</div>
-                              {b.screenshot_url && (
-                                <button 
-                                  onClick={() => setSelectedScreenshotBooking(b)}
-                                  className="text-xs text-blue-400 underline flex items-center gap-1 mt-1"
-                                >
-                                  <Eye size={12} /> View Screenshot
-                                </button>
-                              )}
-                            </div>
+                            <div className="text-emerald-400 font-mono text-xs">#{b.utr}</div>
                           ) : (
-                            <span className="text-gray-500 text-xs">PENDING SUBMISSION</span>
+                            <div className="text-gray-500 text-xs">PENDING / {b.status}</div>
+                          )}
+                          {(b.screenshot_url || b.paymentScreenshot || b.screenshot || b.image_url) ? (
+                            <button 
+                              onClick={() => setSelectedScreenshotBooking(b)}
+                              className="text-xs text-blue-400 hover:text-blue-300 underline flex items-center gap-1 mt-1 font-bold"
+                            >
+                              <Eye size={12} /> View Screenshot
+                            </button>
+                          ) : (
+                            <div className="text-[10px] text-zinc-600 mt-0.5">No Screenshot Uploaded</div>
                           )}
                         </td>
                         <td>
@@ -560,7 +560,7 @@ export default function AdminTicketingPortal({ onSwitchToSignups }) {
             </div>
 
             <img 
-              src={selectedScreenshotBooking.screenshot_url} 
+              src={selectedScreenshotBooking.screenshot_url || selectedScreenshotBooking.paymentScreenshot || selectedScreenshotBooking.screenshot || selectedScreenshotBooking.image_url} 
               alt="Payment Screenshot" 
               className="modal-img-preview" 
             />
