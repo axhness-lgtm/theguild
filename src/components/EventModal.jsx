@@ -166,16 +166,16 @@ export default function EventModal({ event, onClose }) {
             
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-center bg-zinc-950 border border-zinc-800 p-4 sm:p-6 rounded-2xl shadow-2xl">
               
-              {/* Left Column: Official UPI QR Code ONLY (Reduced significantly for PC and mobile) */}
-              <div className="md:col-span-4 flex flex-col items-center justify-center p-3 sm:p-4 bg-zinc-900/60 border border-zinc-800 rounded-xl h-full w-full mx-auto max-w-[200px] md:max-w-none">
-                <div className="bg-white rounded-xl shadow-2xl border-2 sm:border-4 border-zinc-200 p-2 sm:p-2.5 flex items-center justify-center w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 mx-auto">
+              {/* Left Column: Official UPI QR Code ONLY (Smaller & compact in mobile and PC) */}
+              <div className="md:col-span-4 flex flex-col items-center justify-center p-2.5 sm:p-4 bg-zinc-900/60 border border-zinc-800 rounded-xl h-full w-full mx-auto max-w-[170px] sm:max-w-[200px] md:max-w-none">
+                <div className="bg-white rounded-lg shadow-2xl border-2 border-zinc-200 p-1 sm:p-1.5 flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 mx-auto">
                   <img 
                     src="/guildqr.png" 
                     alt="Official Guild UPI QR Code" 
                     className="w-full h-full object-contain block mx-auto"
                   />
                 </div>
-                <span className="text-[10px] sm:text-xs text-gray-400 font-bold mt-2 sm:mt-3 tracking-wider uppercase">// OFFICIAL SCANNER QR</span>
+                <span className="text-[9px] sm:text-xs text-gray-400 font-bold mt-1.5 sm:mt-3 tracking-wider uppercase">// OFFICIAL SCANNER QR</span>
               </div>
 
               {/* Right Column: 1. UPI ID, 2. Total Amount, 3. Mandatory Screenshot Upload, 4. Confirm Button */}

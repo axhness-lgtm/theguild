@@ -345,119 +345,75 @@ export default function BookingFlow({ onReturnHome }) {
       {/* =========================================================================
           PAGE 1.5: DEDICATED SEAT COUNT QUANTITY PICKER (BEFORE MAP)
           ========================================================================= */}
+      {/* =========================================================================
+          PAGE 1.5: BOOKMYSHOW-STYLE SEAT QUANTITY MODAL (WITHOUT ILLUSTRATION)
+          ========================================================================= */}
       {step === 'seatcount' && (
-        <div className="grid-container py-8 booking-step-transition">
-          <div className="max-w-4xl mx-auto bg-zinc-950 border-2 border-zinc-800 p-6 sm:p-10 md:p-14 rounded-3xl shadow-2xl my-6 text-center w-full space-y-line">
+        <div className="grid-container py-12 booking-step-transition flex items-center justify-center min-h-[70vh]">
+          <div className="max-w-md w-full mx-auto bg-zinc-950 border-2 border-zinc-800 p-6 sm:p-8 rounded-3xl shadow-2xl my-6 text-center font-tech relative animate-fade-in">
             
-            <div className="inline-block bg-red-600 text-white font-tech font-bold text-xs sm:text-sm px-5 py-2 rounded-full uppercase tracking-widest mb-6 shadow">
-              // STEP 01 — SELECT TICKET QUANTITY //
+            <h3 className="text-xl sm:text-2xl font-impact font-bold text-white mb-6 uppercase tracking-tight">
+              How many seats?
+            </h3>
+            
+            {/* Horizontal Quantity Circles (1 to 10 max or max_seats_per_booking) */}
+            <div className="flex items-center justify-center gap-1.5 sm:gap-2 my-6 flex-wrap">
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => {
+                const isActive = targetSeatCount === num;
+                return (
+                  <button
+                    key={num}
+                    type="button"
+                    onClick={() => setTargetSeatCount(num)}
+                    className={`w-9 h-9 sm:w-11 sm:h-11 rounded-full font-impact text-base sm:text-lg transition-all flex items-center justify-center cursor-pointer ${
+                      isActive
+                        ? 'bg-red-600 text-white font-black shadow-lg shadow-red-500/50 scale-110 ring-2 ring-white z-10'
+                        : 'bg-transparent text-gray-400 hover:bg-zinc-800 hover:text-white'
+                    }`}
+                  >
+                    {num}
+                  </button>
+                );
+              })}
             </div>
-            
-            <h2 className="text-3xl sm:text-5xl md:text-6xl font-impact text-white uppercase tracking-tight my-4 leading-none">
-              HOW MANY SEATS DO YOU WANT TO BOOK?
-            </h2>
-            
-            <p className="text-gray-300 font-tech text-sm sm:text-base max-w-xl mx-auto mb-8">
-              Choose between 1 and 4 seats for the FIFA World Cup Final screening at PVR INOX, Beach Road, Vizag.
-            </p>
 
-            {/* Quick-Pick Direct Number Buttons (1, 2, 3, 4) */}
-            <div className="my-10 space-y-4">
-              <span className="text-gray-400 font-tech font-bold text-xs sm:text-sm tracking-widest uppercase mb-4 block">
-                // TAP TO QUICK-SELECT QUANTITY (MAX 4 SEATS):
+            {/* Category / Price Section */}
+            <div className="mt-8 pt-6 border-t border-zinc-800/80 space-y-1">
+              <span className="text-[11px] text-gray-400 font-bold uppercase tracking-widest block">
+                EXECUTIVE // FIFA WORLD CUP PASS
               </span>
-              <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
-                {[1, 2, 3, 4].map((num) => {
-                  const isActive = targetSeatCount === num;
-                  return (
-                    <button
-                      key={num}
-                      type="button"
-                      onClick={() => setTargetSeatCount(num)}
-                      className={`w-18 h-18 sm:w-24 sm:h-24 md:w-28 md:h-28 font-impact text-4xl sm:text-5xl md:text-6xl rounded-2xl border-2 transition-all flex flex-col items-center justify-center cursor-pointer ${
-                        isActive
-                          ? 'bg-red-600 text-white border-white scale-110 shadow-2xl shadow-red-500/50 ring-2 sm:ring-4 ring-white z-10'
-                          : 'bg-zinc-900 text-gray-400 border-zinc-700 hover:border-red-500 hover:text-white hover:scale-105'
-                      }`}
-                    >
-                      <span>{num}</span>
-                      <span className="text-[11px] sm:text-xs font-tech font-bold uppercase mt-0.5 tracking-wider">
-                        {num === 1 ? 'Seat' : 'Seats'}
-                      </span>
-                    </button>
-                  );
-                })}
+              <div className="font-impact text-2xl sm:text-3xl text-white block">
+                ₹{event.ticket_price}
               </div>
-            </div>
-
-            {/* Massive Quantity Selector Box with + / - */}
-            <div className="bg-black border-2 border-zinc-800 p-6 sm:p-8 rounded-2xl max-w-xl mx-auto shadow-2xl flex flex-col items-center justify-center my-8 space-y-6">
-              <span className="text-red-400 font-tech font-bold text-xs sm:text-sm tracking-widest uppercase mb-4 block">
-                // OR USE STEPPER CONTROLS (MAX 4 SEATS)
+              <span className="text-[11px] font-bold text-emerald-400 uppercase block tracking-wider">
+                AVAILABLE
               </span>
-
-              <div className="flex items-center justify-center gap-6 sm:gap-10">
-                <button 
-                  type="button" 
-                  onClick={() => setTargetSeatCount(Math.max(1, targetSeatCount - 1))}
-                  disabled={targetSeatCount <= 1}
-                  className="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center bg-zinc-800 hover:bg-red-600 disabled:opacity-20 text-white font-bold text-3xl sm:text-4xl rounded-2xl border-2 border-zinc-600 transition-all cursor-pointer shadow-xl select-none"
-                >
-                  -
-                </button>
-
-                <div className="w-32 sm:w-44 py-4 bg-zinc-950 border-2 border-red-500 rounded-2xl text-center shadow-inner">
-                  <span className="font-impact text-5xl sm:text-6xl text-white block leading-none">
-                    {targetSeatCount}
-                  </span>
-                  <span className="font-tech text-xs text-emerald-400 font-bold uppercase block mt-1.5">
-                    {targetSeatCount === 1 ? '1 SEAT' : `${targetSeatCount} SEATS`} SELECTED
-                  </span>
-                </div>
-
-                <button 
-                  type="button" 
-                  onClick={() => setTargetSeatCount(Math.min(4, targetSeatCount + 1))}
-                  disabled={targetSeatCount >= 4}
-                  className="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center bg-zinc-800 hover:bg-red-600 disabled:opacity-20 text-white font-bold text-3xl sm:text-4xl rounded-2xl border-2 border-zinc-600 transition-all cursor-pointer shadow-xl select-none"
-                >
-                  +
-                </button>
-              </div>
-
-              {/* Highlighted Total Payable Banner inside counter box */}
-              <div className="mt-6 pt-5 border-t border-zinc-800 w-full text-center space-y-2">
-                <span className="text-xs text-gray-400 font-tech block uppercase tracking-wider">// ESTIMATED TOTAL PAYABLE</span>
-                <div className="font-impact text-4xl sm:text-5xl text-emerald-400 block mt-1 tracking-tight">
-                  ₹{targetSeatCount * event.ticket_price}/-
-                </div>
-                <span className="bg-emerald-950/80 border border-emerald-500/50 text-emerald-300 font-tech text-xs px-3 py-1 rounded-md inline-block mt-2 font-bold tracking-wider uppercase">
-                  INCLUDES: SEATING + SNACK + BEVERAGE
-                </span>
-              </div>
             </div>
 
-            {/* Centered Transition CTA Button to Seat Map */}
-            <div className="mt-12 w-full flex flex-col items-center justify-center gap-5 pt-4">
-              <button 
-                type="button"
-                onClick={() => {
-                  setSelectedSeats([]);
-                  setStep('seatmap');
-                }}
-                className="btn-brutalist mx-auto block w-full max-w-xl py-5 px-10 text-center justify-center text-lg sm:text-2xl font-impact tracking-widest uppercase bg-red-600 hover:bg-red-500 text-white border-red-500 shadow-2xl transition-all hover:scale-105 cursor-pointer rounded-2xl"
-              >
-                <RollingText text={`CONTINUE TO PICK ${targetSeatCount} ${targetSeatCount === 1 ? 'SEAT' : 'SEATS'} ON MAP →`} stagger={true} />
-              </button>
-
-              <button 
-                type="button"
-                onClick={() => setStep('overview')}
-                className="text-xs sm:text-sm text-gray-400 hover:text-white underline font-tech inline-block cursor-pointer py-2"
-              >
-                ← BACK TO OVERVIEW & RULES
-              </button>
+            {/* Bestseller / Perks Banner */}
+            <div className="bg-zinc-900/90 border border-zinc-800/80 py-2.5 px-3.5 rounded-xl text-xs text-gray-300 font-medium flex items-center justify-center gap-2 mt-5 leading-snug">
+              <span>🍿 Book exact cinema seats + complimentary snack & beverage included!</span>
             </div>
+
+            {/* Big Action CTA Button */}
+            <button 
+              type="button"
+              onClick={() => {
+                setSelectedSeats([]);
+                setStep('seatmap');
+              }}
+              className="w-full py-3.5 sm:py-4 bg-red-600 hover:bg-red-500 text-white font-impact font-bold text-base sm:text-lg rounded-xl shadow-xl shadow-red-600/30 transition-all hover:scale-[1.02] cursor-pointer mt-6 uppercase tracking-wider block"
+            >
+              Select Seats
+            </button>
+
+            <button 
+              type="button"
+              onClick={() => setStep('overview')}
+              className="text-xs text-gray-400 hover:text-white underline inline-block cursor-pointer mt-4 pt-1"
+            >
+              ← Back to Overview
+            </button>
 
           </div>
         </div>
@@ -542,24 +498,24 @@ export default function BookingFlow({ onReturnHome }) {
 
             </div>
 
-            {/* Mobile Swipe Guide Banner */}
-            <div className="w-full max-w-4xl mx-auto bg-yellow-400 text-black font-impact text-xs sm:text-sm md:text-base text-center py-2.5 px-3 rounded-xl mb-4 shadow-lg flex items-center justify-center gap-2 animate-pulse tracking-wide border-2 border-yellow-500">
-              <span>⬅️ SWIPE / SCROLL HORIZONTALLY TO VIEW & SELECT SEATS ACROSS ALL ROWS (1 TO 16) ➡️</span>
+            {/* Mobile Scale-Out Banner */}
+            <div className="w-full max-w-4xl mx-auto bg-zinc-900 text-gray-300 font-tech text-xs sm:text-sm text-center py-2 px-3 rounded-xl mb-4 shadow border border-zinc-800 flex items-center justify-center gap-2">
+              <span>📱 ALL SEATS (1 TO 16) FULLY SCALED TO FIT SCREEN END-TO-END — TAP TO SELECT SEAT ↓</span>
             </div>
 
             {/* Seat Rows Grid (Rows K down to A matching physical diagram exactly) */}
-            <div className="seatmap-grid-wrap overflow-x-auto pb-6 w-full">
-              <div className="seatmap-inner-track min-w-max mx-auto px-4 sm:px-8 flex flex-col items-start md:items-center">
+            <div className="seatmap-grid-wrap overflow-hidden sm:overflow-x-auto pb-6 w-full max-w-full">
+              <div className="seatmap-inner-track w-full max-w-full sm:min-w-max mx-auto px-0.5 sm:px-8 flex flex-col items-center">
                 {['K','J','I','H','G','F','E','D','C','B','A'].map((rowLabel) => {
                   const rowSeats = seats
                     .filter(s => s.row_label === rowLabel)
                     .sort((a, b) => b.seat_number - a.seat_number);
 
                   return (
-                    <div key={rowLabel} className="seatmap-row flex items-center justify-start gap-1.5 sm:gap-2 my-1.5 min-w-max">
-                      <span className="row-label-text font-impact text-xs sm:text-base w-6 sm:w-8 text-center text-red-500 bg-zinc-900 border-2 border-zinc-800 py-1 rounded shrink-0 shadow sticky left-0 z-20">{rowLabel}</span>
+                    <div key={rowLabel} className="seatmap-row flex items-center justify-between sm:justify-center gap-[1.5px] sm:gap-2 my-1 sm:my-1.5 w-full sm:w-auto">
+                      <span className="row-label-text font-impact text-[9px] sm:text-base w-3.5 sm:w-8 text-center text-red-500 bg-zinc-900 border border-zinc-800 py-0.5 sm:py-1 rounded shrink-0 shadow">{rowLabel}</span>
                       
-                      <div className="seats-in-row flex items-center gap-1.5 sm:gap-2 flex-nowrap justify-start">
+                      <div className="seats-in-row flex items-center justify-center gap-[1.5px] sm:gap-2 flex-1 sm:flex-initial min-w-0 max-w-full overflow-hidden sm:overflow-visible px-0.5">
                         {rowSeats.map((seat) => {
                           const isSelected = selectedSeats.includes(seat.label);
                           const statusClass = isSelected ? 'SELECTED' : seat.status;
@@ -571,9 +527,9 @@ export default function BookingFlow({ onReturnHome }) {
                             <React.Fragment key={seat.id}>
                               <button
                                 type="button"
-                                className={`seat-btn seat-${statusClass} w-8 h-8 sm:w-10 sm:h-10 text-xs sm:text-sm font-bold rounded-md border-2 transition-all flex items-center justify-center shrink-0 ${
+                                className={`seat-btn seat-${statusClass} flex-1 sm:flex-initial min-w-[14px] max-w-[19px] sm:min-w-[40px] sm:max-w-[40px] h-[21px] sm:h-10 text-[8px] sm:text-sm font-bold rounded-[3px] sm:rounded-md border sm:border-2 transition-all flex items-center justify-center shrink p-0 leading-none ${
                                   isSelected 
-                                    ? 'bg-red-600 text-white font-black border-white scale-125 shadow-xl shadow-red-500/80 ring-2 ring-white z-10' 
+                                    ? 'bg-red-600 text-white font-black border-white scale-125 shadow-xl ring-1 sm:ring-2 ring-white z-10' 
                                     : seat.status === 'AVAILABLE' 
                                     ? 'bg-zinc-800 text-gray-200 border-zinc-600 hover:border-red-500 hover:bg-zinc-700 hover:text-white hover:scale-105 shadow-sm' 
                                     : 'bg-zinc-950 text-zinc-600 border-zinc-900 cursor-not-allowed opacity-40'
@@ -585,17 +541,17 @@ export default function BookingFlow({ onReturnHome }) {
                               </button>
 
                               {showAisleBreak && (
-                                <div className="w-3 sm:w-4 shrink-0" />
+                                <div className="w-[3px] sm:w-4 shrink-0" />
                               )}
 
                               {/* ENTRY / EXIT block on right side of rows K to F */}
                               {seat.seat_number === 7 && ['K','J','I','H','G','F'].includes(rowLabel) && (
-                                <div className="w-[48px] sm:w-[64px] shrink-0" />
+                                <div className="w-[6px] sm:w-[64px] shrink-0" />
                               )}
 
                               {/* Stairs aisle gap on rows E, D, C, B right where seats 6, 5 would be */}
                               {seat.seat_number === 7 && ['E','D','C','B'].includes(rowLabel) && (
-                                <div className="w-6 sm:w-8 h-8 flex items-center justify-center text-zinc-600 font-mono text-[10px] shrink-0" title="Stairs / Aisle">
+                                <div className="w-[6px] sm:w-8 h-[21px] sm:h-8 flex items-center justify-center text-zinc-600 font-mono text-[7px] sm:text-[10px] shrink-0" title="Stairs / Aisle">
                                   ||
                                 </div>
                               )}
@@ -604,7 +560,7 @@ export default function BookingFlow({ onReturnHome }) {
                         })}
                       </div>
 
-                      <span className="row-label-text font-bold text-xs w-6 text-center text-red-500 bg-zinc-900 border border-zinc-800 py-1 shrink-0 rounded">{rowLabel}</span>
+                      <span className="row-label-text font-bold text-[9px] sm:text-xs w-3.5 sm:w-6 text-center text-red-500 bg-zinc-900 border border-zinc-800 py-0.5 sm:py-1 shrink-0 rounded">{rowLabel}</span>
                     </div>
                   );
                 })}
@@ -783,13 +739,13 @@ export default function BookingFlow({ onReturnHome }) {
               
               <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-center w-full">
                 
-                {/* Left Column: Static UPI QR Code ONLY (Reduced significantly for mobile and PC) */}
-                <div className="md:col-span-3 flex flex-col items-center justify-center bg-zinc-900 border-2 border-zinc-800 p-3 sm:p-4 rounded-xl text-center shadow-xl w-full mx-auto max-w-[220px] md:max-w-none">
-                  <span className="text-red-500 font-bold text-[10px] sm:text-[11px] tracking-widest uppercase mb-2 block">
+                {/* Left Column: Static UPI QR Code ONLY (Smaller & compact in mobile and PC) */}
+                <div className="md:col-span-3 flex flex-col items-center justify-center bg-zinc-900 border border-zinc-800 p-2.5 sm:p-4 rounded-xl text-center shadow-xl w-full mx-auto max-w-[170px] sm:max-w-[200px] md:max-w-none">
+                  <span className="text-red-500 font-bold text-[9px] sm:text-[11px] tracking-widest uppercase mb-1.5 block">
                     // OFFICIAL SCANNER QR
                   </span>
                   
-                  <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 bg-white p-1.5 sm:p-2 rounded-lg sm:rounded-xl shadow-inner border-2 border-zinc-200 mx-auto flex items-center justify-center">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-white p-1 sm:p-1.5 rounded-lg shadow-inner border-2 border-zinc-200 mx-auto flex items-center justify-center">
                     <img 
                       src="/guildqr.png" 
                       alt="Official Guild UPI QR Code" 
@@ -797,7 +753,7 @@ export default function BookingFlow({ onReturnHome }) {
                     />
                   </div>
                   
-                  <span className="text-[9px] sm:text-[10px] text-gray-400 font-bold mt-2 tracking-wider uppercase block">
+                  <span className="text-[8.5px] sm:text-[10px] text-gray-400 font-bold mt-1.5 tracking-wider uppercase block">
                     GPay // PhonePe // Paytm // CRED
                   </span>
                 </div>
