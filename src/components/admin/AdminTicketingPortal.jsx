@@ -21,12 +21,29 @@ export default function AdminTicketingPortal({ onSwitchToSignups }) {
   const [reassigningBooking, setReassigningBooking] = useState(null);
   const [reassignSeatsInput, setReassignSeatsInput] = useState('');
 
-  const reloadData = () => {
+  const [isSyncing, setIsSyncing] = useState(false);
+
+  const reloadData = async () => {
+    // Instant synchronous cache load
     setTicketingData(ticketingService.getTicketingData());
+    // Background cloud database synchronization
+    setIsSyncing(true);
+    try {
+      const cloudData = await ticketingService.syncWithCloud();
+      if (cloudData) setTicketingData(cloudData);
+    } finally {
+      setIsSyncing(false);
+    }
   };
 
   useEffect(() => {
     reloadData();
+    const interval = setInterval(() => {
+      ticketingService.syncWithCloud().then(data => {
+        if (data) setTicketingData(data);
+      });
+    }, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   if (!ticketingData) return <div className="ticketing-portal-wrap text-center py-12 font-tech">LOADING INOX CONTROL MATRIX...</div>;
@@ -179,11 +196,12 @@ export default function AdminTicketingPortal({ onSwitchToSignups }) {
               ← SWITCH TO GENERAL INTEREST SIGNUPS
             </button>
             <button 
-              className="btn-brutalist text-xs py-2 px-4"
+              className="btn-brutalist text-xs py-2 px-4 flex items-center gap-1.5 cursor-pointer bg-red-600 hover:bg-red-500 text-white border-red-500"
               onClick={reloadData}
+              disabled={isSyncing}
             >
-              <RefreshCw size={13} />
-              <span>REFRESH DATA</span>
+              <RefreshCw size={13} className={isSyncing ? 'animate-spin' : ''} />
+              <span>{isSyncing ? 'SYNCING CLOUD...' : 'SYNC CLOUD MATRIX'}</span>
             </button>
           </div>
         </div>

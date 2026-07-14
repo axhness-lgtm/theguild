@@ -95,6 +95,29 @@ function saveLocalStore(state) {
   localStorage.setItem(LOCAL_TICKETING_KEY, JSON.stringify(state));
 }
 
+async function mirrorBookingToCloud(booking) {
+  if (!supabase || !booking) return;
+  try {
+    await supabase.from('bookings').upsert([{
+      id: booking.id,
+      event_id: booking.event_id,
+      user_name: booking.user_name,
+      user_phone: booking.user_phone,
+      user_email: booking.user_email,
+      total_amount: booking.total_amount,
+      status: booking.status,
+      seats: booking.seats,
+      utr: booking.utr || null,
+      screenshot_url: booking.screenshot_url || null,
+      timeline: booking.timeline || [],
+      created_at: booking.created_at,
+      expires_at: booking.expires_at
+    }]);
+  } catch (e) {
+    console.warn('Supabase sync notice during booking update', e);
+  }
+}
+
 // Clean up expired reservations right away whenever the store is queried or modified
 export function cleanupExpiredReservations(store) {
   const now = new Date();
@@ -114,11 +137,13 @@ export function cleanupExpiredReservations(store) {
         action: 'RESERVATION_EXPIRED',
         details: `Automatic timeout cleanup released seats ${booking.seats.join(', ')} for booking ${booking.id}`
       });
-      return {
+      const updated = {
         ...booking,
         status: 'EXPIRED',
         timeline: [...(booking.timeline || []), expiredEntry]
       };
+      mirrorBookingToCloud(updated);
+      return updated;
     }
     return booking;
   });
@@ -130,6 +155,36 @@ export function cleanupExpiredReservations(store) {
 }
 
 export const ticketingService = {
+  // Sync live cross-device state from Supabase cloud database into local cache
+  syncWithCloud: async () => {
+    if (!supabase) return ticketingService.getTicketingData();
+    try {
+      const { data, error } = await supabase.from('bookings').select('*').order('created_at', { ascending: false });
+      if (!error && data) {
+        const store = getLocalStore();
+        const mergedBookings = data.map(b => ({
+          id: b.id,
+          event_id: b.event_id || store.event.id,
+          user_name: b.user_name,
+          user_phone: b.user_phone,
+          user_email: b.user_email,
+          total_amount: b.total_amount,
+          status: b.status,
+          seats: Array.isArray(b.seats) ? b.seats : (typeof b.seats === 'string' ? JSON.parse(b.seats) : []),
+          utr: b.utr || null,
+          screenshot_url: b.screenshot_url || null,
+          timeline: Array.isArray(b.timeline) ? b.timeline : (typeof b.timeline === 'string' ? JSON.parse(b.timeline) : []),
+          created_at: b.created_at,
+          expires_at: b.expires_at
+        }));
+        store.bookings = mergedBookings;
+        saveLocalStore(store);
+      }
+    } catch (e) {
+      console.warn('Supabase fetch notice during cloud sync', e);
+    }
+    return ticketingService.getTicketingData();
+  },
   // Get full ticketing state (with automatic seat derivation and cleanup)
   getTicketingData: () => {
     const store = cleanupExpiredReservations(getLocalStore());
@@ -262,25 +317,7 @@ export const ticketingService = {
     });
 
     saveLocalStore(store);
-
-    // If Supabase is active, mirror asynchronously
-    if (supabase) {
-      try {
-        await supabase.from('bookings').insert([{
-          id: newBooking.id,
-          event_id: newBooking.event_id,
-          user_name: newBooking.user_name,
-          user_phone: newBooking.user_phone,
-          user_email: newBooking.user_email,
-          total_amount: newBooking.total_amount,
-          status: newBooking.status,
-          expires_at: newBooking.expires_at
-        }]);
-      } catch (e) {
-        console.warn('Supabase sync notice during atomic reservation');
-      }
-    }
-
+    await mirrorBookingToCloud(newBooking);
     return newBooking;
   },
 
@@ -324,6 +361,7 @@ export const ticketingService = {
     });
 
     saveLocalStore(store);
+    await mirrorBookingToCloud(updatedBooking);
     return updatedBooking;
   },
 
@@ -356,6 +394,7 @@ export const ticketingService = {
     });
 
     saveLocalStore(store);
+    await mirrorBookingToCloud(store.bookings[bookingIndex]);
     return store.bookings[bookingIndex];
   },
 
@@ -388,6 +427,7 @@ export const ticketingService = {
     });
 
     saveLocalStore(store);
+    await mirrorBookingToCloud(store.bookings[bookingIndex]);
     return store.bookings[bookingIndex];
   },
 
@@ -420,6 +460,7 @@ export const ticketingService = {
     });
 
     saveLocalStore(store);
+    await mirrorBookingToCloud(store.bookings[bookingIndex]);
     return store.bookings[bookingIndex];
   },
 
@@ -472,6 +513,7 @@ export const ticketingService = {
     });
 
     saveLocalStore(store);
+    await mirrorBookingToCloud(store.bookings[bookingIndex]);
     return store.bookings[bookingIndex];
   },
 

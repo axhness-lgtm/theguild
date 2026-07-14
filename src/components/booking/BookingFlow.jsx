@@ -39,14 +39,20 @@ export default function BookingFlow({ onReturnHome }) {
   const [isSubmittingPayment, setIsSubmittingPayment] = useState(false);
   const [isCompressing, setIsCompressing] = useState(false);
 
-  // Load ticketing state whenever step changes
-  const reloadTicketingData = () => {
+  // Load ticketing state whenever step changes and sync live from Supabase cloud
+  const reloadTicketingData = async () => {
+    // Instant synchronous cache load
     const data = ticketingService.getTicketingData();
     setTicketingData(data);
+    // Background live cloud synchronization
+    const cloudData = await ticketingService.syncWithCloud();
+    if (cloudData) setTicketingData(cloudData);
   };
 
   useEffect(() => {
     reloadTicketingData();
+    const interval = setInterval(reloadTicketingData, 6000);
+    return () => clearInterval(interval);
   }, [step]);
 
   // 10-Minute Countdown Timer Loop when activeBooking exists and status is HELD or PENDING_PAYMENT
