@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  ArrowLeft, ArrowRight, CheckCircle2, Clock, ShieldCheck, 
-  AlertTriangle, QrCode, Upload, Copy, Check, MapPin, 
-  Users, Ticket, Award, ChevronDown, ChevronUp, Sparkles, ShieldAlert 
-} from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle2, Clock, ShieldCheck, AlertTriangle, QrCode, Upload, RefreshCw, MapPin, Users, Ticket, Award } from 'lucide-react';
 import { ticketingService } from '../../services/ticketingService';
-import { processAndCompressImage } from '../../utils/imageHelper';
 import RollingText from '../RollingText';
 import LineReveal, { RevealItem } from '../LineReveal';
 import './BookingFlow.css';
 
 /**
  * BookingFlow — Master Controller for the INOX 147-seat FIFA World Cup Final Booking Experience.
- * Redesigned according to The Guild 8-Point Global Design System & Wizard Flow Specification.
+ * Manages 5 modular pages/steps:
+ * 1. Overview (Event info & rules)
+ * 2. Seat Map (Interactive BookMyShow-style cinema seat selection with consecutive enforcement)
+ * 3. Contact Details (Atomic seat reservation + starts 10-minute countdown)
+ * 4. UPI QR Payment (Timer countdown + UTR + Screenshot submission)
+ * 5. Confirmation & Timeline (Booking status & digital ticket preview)
  */
 export default function BookingFlow({ onReturnHome }) {
   const [step, setStep] = useState('overview'); // 'overview' | 'seatmap' | 'contact' | 'payment' | 'confirmation'
@@ -20,8 +20,6 @@ export default function BookingFlow({ onReturnHome }) {
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [targetSeatCount, setTargetSeatCount] = useState(2);
   const [ruleError, setRuleError] = useState(null);
-  const [showRulesAccordion, setShowRulesAccordion] = useState(false);
-  const [copiedUpi, setCopiedUpi] = useState(false);
   
   // Contact Form State
   const [userName, setUserName] = useState('');
@@ -83,12 +81,6 @@ export default function BookingFlow({ onReturnHome }) {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const handleCopyUpi = () => {
-    navigator.clipboard.writeText('steveoguri07-2@okicici');
-    setCopiedUpi(true);
-    setTimeout(() => setCopiedUpi(false), 2000);
-  };
-
   // Step 2: Seat Selection Handler
   const handleSeatClick = (seat) => {
     setRuleError(null);
@@ -114,7 +106,7 @@ export default function BookingFlow({ onReturnHome }) {
             return;
           }
         } else {
-          setRuleError('Maximum 4 seats allowed per booking.');
+          setRuleError('[ RULE VIOLATION ] MAXIMUM 4 SEATS ALLOWED PER BOOKING.');
           return;
         }
       }
@@ -129,7 +121,7 @@ export default function BookingFlow({ onReturnHome }) {
 
     // If more than 4, reject
     if (updatedSelection.length > 4) {
-      setRuleError('Maximum 4 seats allowed per booking.');
+      setRuleError('[ RULE VIOLATION ] MAXIMUM 4 SEATS ALLOWED PER BOOKING.');
       return;
     }
 
@@ -137,7 +129,7 @@ export default function BookingFlow({ onReturnHome }) {
     if (updatedSelection.length > 1) {
       const check = ticketingService.validateConsecutiveSelection(updatedSelection);
       if (!check.valid) {
-        setRuleError(check.error);
+        setRuleError(`[ RULE VIOLATION ] ${check.error.toUpperCase()}`);
         return;
       }
     }
@@ -212,742 +204,598 @@ export default function BookingFlow({ onReturnHome }) {
     }
   };
 
-  if (!ticketingData) {
-    return (
-      <div className="booking-root flex items-center justify-center font-tech text-zinc-400">
-        INITIALIZING INOX SEAT MATRIX...
-      </div>
-    );
-  }
+  if (!ticketingData) return <div className="booking-root text-center py-12 font-tech">INITIALIZING INOX SEAT MATRIX...</div>;
 
   const { event, seats } = ticketingData;
+  const totalSeatsSold = seats.filter(s => ['HELD', 'BOOKED'].includes(s.status)).length;
   const seatsAvailableCount = seats.filter(s => s.status === 'AVAILABLE').length;
-  const totalPayable = (selectedSeats.length > 0 ? selectedSeats.length : targetSeatCount) * (event.ticket_price || 459);
 
   return (
     <div className="booking-root">
       
-      {/* =========================================================================
-          WIZARD HEADER & PROGRESS BAR (GLOBAL DESIGN SYSTEM)
-          ========================================================================= */}
-      <div className="wizard-header-bar">
-        <div className="wizard-logo-area">
-          <span className="font-impact text-2xl tracking-widest text-white">THE GUILD</span>
-          <span className="text-zinc-600 font-tech">//</span>
-          <span className="font-tech text-xs text-red-500 font-bold tracking-wider">BOX OFFICE</span>
-        </div>
+      {/* Top Header Bar */}
+      <div className="grid-container">
+        <div className="booking-header-bar">
+          <div className="h-left">
+            <span className="booking-step-badge">
+              <Ticket size={14} />
+              <span>VARUN INOX, BEACH ROAD, VIZAG</span>
+            </span>
+            <h1 className="booking-event-title font-impact">FIFA WORLD CUP FINAL</h1>
+            <p className="booking-venue-sub font-tech font-bold text-emerald-400">20TH JULY | 00:30 AM ONWARDS — ₹{event.ticket_price} (SEATING + SNACK + BEVERAGE)</p>
+          </div>
 
-        {/* Center Progress Indicator */}
-        <div className="wizard-steps-indicator">
-          <div className={`wizard-step-item ${step === 'overview' ? 'active' : ''}`}>
-            <span>Event</span>
-            <span className="wizard-step-bullet">•</span>
+          <div className="h-right flex items-center gap-4">
+            {activeBooking && ['HELD', 'PENDING_PAYMENT'].includes(activeBooking.status) && countdown > 0 && (
+              <div className="timer-pill">
+                <Clock size={16} />
+                <span>RESERVATION EXPIRES IN: {formatCountdown(countdown)}</span>
+              </div>
+            )}
+            <button 
+              className="btn-brutalist-outline text-xs py-2 px-4"
+              onClick={onReturnHome}
+            >
+              <ArrowLeft size={14} />
+              <RollingText text="RETURN TO PUBLIC SITE" stagger={true} />
+            </button>
           </div>
-          <div className={`wizard-step-item ${step === 'seatmap' ? 'active' : ''}`}>
-            <span>Seats</span>
-            <span className="wizard-step-bullet">•</span>
-          </div>
-          <div className={`wizard-step-item ${step === 'contact' ? 'active' : ''}`}>
-            <span>Details</span>
-            <span className="wizard-step-bullet">•</span>
-          </div>
-          <div className={`wizard-step-item ${step === 'payment' ? 'active' : ''}`}>
-            <span>Payment</span>
-            <span className="wizard-step-bullet">•</span>
-          </div>
-          <div className={`wizard-step-item ${step === 'confirmation' ? 'active' : ''}`}>
-            <span>Confirmation</span>
-          </div>
-        </div>
-
-        {/* Right Actions / Back / Timer */}
-        <div className="flex items-center gap-4">
-          {activeBooking && ['HELD', 'PENDING_PAYMENT'].includes(activeBooking.status) && countdown > 0 && (
-            <div className={`wizard-timer-pill ${countdown < 180 ? 'urgent' : ''}`}>
-              <Clock size={16} />
-              <span>HELD: {formatCountdown(countdown)}</span>
-            </div>
-          )}
-          <button 
-            onClick={onReturnHome}
-            className="bg-transparent border border-zinc-700 hover:border-zinc-500 text-white py-2 px-4 rounded-lg text-xs font-tech flex items-center gap-2 transition-all"
-          >
-            <ArrowLeft size={14} />
-            <span>RETURN TO PUBLIC SITE</span>
-          </button>
         </div>
       </div>
 
       {/* =========================================================================
-          PAGE 1: EVENT INFORMATION (OVERVIEW)
+          PAGE 1: OVERVIEW & SCREENING RULES (STREAMLINED FOR FAST CHECKOUT)
           ========================================================================= */}
       {step === 'overview' && (
-        <div className="max-w-[1100px] mx-auto py-4 text-center animate-fade-in">
-          
-          {/* Top Hero Section */}
-          <div className="mb-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-red-950/40 border border-red-500/40 text-red-500 font-tech text-xs font-bold rounded-full mb-3">
-              <Ticket size={14} />
-              <span>VARUN INOX, BEACH ROAD, VIZAG</span>
-            </div>
-
-            <h1 className="overview-hero-title">FIFA WORLD CUP FINAL</h1>
-
-            <p className="font-tech text-emerald-400 text-lg md:text-xl font-bold tracking-wider my-3">
-              20TH JULY | 00:30 AM ONWARDS — ₹{event.ticket_price || 459}/- ALL INCLUSIVE
-            </p>
-
-            <div className="inline-flex items-center gap-2 bg-zinc-900 border border-zinc-800 px-4 py-1.5 rounded-lg text-xs font-tech text-zinc-300 mt-2">
-              <Users size={14} className="text-emerald-400" />
-              <span>AUDITORIUM SCREEN 3 CAPACITY: 147 SEATS</span>
-              <span className="text-zinc-600">|</span>
-              <span className="text-emerald-400 font-bold">{seatsAvailableCount} / 147 OPEN NOW</span>
-            </div>
-          </div>
-
-          {/* Two-Column Information Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-[1100px] mx-auto my-8 text-left">
+        <div className="grid-container py-8">
+          <div className="max-w-6xl mx-auto">
             
-            {/* Left Card: Event Specs & Inclusions */}
-            <div className="bg-zinc-900 border border-zinc-800 p-8 rounded-2xl shadow-xl flex flex-col justify-between">
-              <div>
-                <span className="font-tech text-xs text-zinc-400 uppercase tracking-widest block mb-2">// OFFICIAL SCREENING PACKAGE</span>
-                <h2 className="text-2xl font-impact text-white mb-4">INCLUSIONS & SCHEDULE</h2>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch text-left">
+              
+              {/* Left Column: Venue, Title, Date/Time, and Pricing/Includes in distinct colored boxes */}
+              <div className="lg:col-span-7 flex flex-col justify-between space-y-6">
                 
-                <div className="space-y-4 font-tech text-sm text-zinc-300">
-                  <div className="flex items-center gap-3 bg-[#080808] border border-zinc-800 p-3.5 rounded-xl">
-                    <MapPin size={18} className="text-red-500 shrink-0" />
-                    <div>
-                      <div className="text-xs text-zinc-400">VENUE LOCATION</div>
-                      <div className="font-bold text-white">VARUN INOX, BEACH ROAD, VISAKHAPATNAM</div>
-                    </div>
+                {/* Venue & Title Box */}
+                <div className="bg-zinc-950 border-2 border-zinc-800 p-6 md:p-8 rounded-2xl shadow-xl is-revealed reveal-active animate-fade-in">
+                  <div className="inline-block bg-red-950/80 border border-red-500/60 text-red-400 font-tech font-bold text-sm md:text-base px-4 py-2 rounded-lg uppercase tracking-wider mb-4 shadow">
+                    VARUN INOX, BEACH ROAD, VIZAG
                   </div>
+                  <h2 className="text-4xl md:text-6xl font-impact text-white uppercase tracking-tight leading-none my-2">
+                    FIFA WORLD CUP FINAL
+                  </h2>
+                </div>
 
-                  <div className="flex items-center gap-3 bg-[#080808] border border-zinc-800 p-3.5 rounded-xl">
-                    <Clock size={18} className="text-emerald-400 shrink-0" />
-                    <div>
-                      <div className="text-xs text-zinc-400">GATES OPEN & KICKOFF</div>
-                      <div className="font-bold text-white">20TH JULY | 00:30 AM ONWARDS</div>
-                    </div>
+                {/* Date & Timing Box */}
+                <div className="bg-emerald-950/30 border-2 border-emerald-500/60 p-6 rounded-2xl shadow-xl">
+                  <div className="font-tech text-xs text-emerald-400 font-bold uppercase tracking-widest mb-1">// EVENT DATE & TIMING</div>
+                  <div className="text-2xl md:text-4xl font-impact text-white tracking-wide">
+                    20TH JULY | 00:30 AM ONWARDS
                   </div>
                 </div>
 
-                <div className="mt-6">
-                  <div className="text-xs font-tech text-zinc-400 font-bold mb-3 uppercase tracking-wider">ALL-INCLUSIVE TICKET BENEFITS</div>
-                  <div className="flex flex-wrap gap-2 font-tech text-xs font-bold">
-                    <span className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-3 py-1.5 rounded-lg flex items-center gap-1.5">
-                      <CheckCircle2 size={14} /> ₹{event.ticket_price || 459} SEATING PRICE
-                    </span>
-                    <span className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-3 py-1.5 rounded-lg flex items-center gap-1.5">
-                      <CheckCircle2 size={14} /> COMPLIMENTARY SNACK
-                    </span>
-                    <span className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-3 py-1.5 rounded-lg flex items-center gap-1.5">
-                      <CheckCircle2 size={14} /> COMPLIMENTARY BEVERAGE
-                    </span>
-                    <span className="bg-zinc-800 border border-zinc-700 text-zinc-300 px-3 py-1.5 rounded-lg flex items-center gap-1.5">
-                      <Sparkles size={14} className="text-yellow-400" /> LASER PROJECTION + ATMOSPHERE
-                    </span>
+                {/* Pricing & Includes Box */}
+                <div className="bg-purple-950/30 border-2 border-purple-500/60 p-6 rounded-2xl shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+                  <div>
+                    <div className="font-tech text-xs text-purple-300 font-bold uppercase tracking-widest mb-1">// OFFICIAL PASS PRICING</div>
+                    <div className="text-5xl md:text-6xl font-impact text-white tracking-tight">₹{event.ticket_price}/-</div>
                   </div>
+                  <div className="bg-purple-900/70 border-2 border-purple-400/80 text-purple-200 font-tech text-xs md:text-sm font-bold uppercase tracking-wider py-3.5 px-5 rounded-xl shadow-lg text-left">
+                    <span className="text-purple-300 block text-[11px] mb-1">// COVERAGE INCLUDED:</span>
+                    <span className="text-white text-base md:text-lg font-black tracking-wide block">SEATING PRICE + SNACK + BEVERAGE</span>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Right Column: Booking Rules in distinct box with larger heading */}
+              <div className="lg:col-span-5 flex flex-col justify-between">
+                <div className="bg-zinc-900 border-2 border-red-500/60 p-6 md:p-8 rounded-2xl shadow-2xl flex-1 flex flex-col justify-center">
+                  
+                  <div className="text-xl md:text-2xl font-impact text-red-400 uppercase tracking-wide border-b-2 border-zinc-800 pb-4 mb-6 flex items-center gap-3">
+                    <ShieldCheck className="text-red-500 shrink-0" size={28} />
+                    <span>SEAT RESERVATION & BOOKING RULES</span>
+                  </div>
+
+                  <ul className="space-y-5 font-tech">
+                    <li className="flex items-start gap-3.5 text-sm md:text-base text-gray-200 leading-relaxed">
+                      <span className="text-red-500 font-black text-xl leading-none mt-0.5">●</span>
+                      <span>
+                        <strong className="text-white font-bold uppercase">MAX 4 SEATS:</strong> Select up to 4 seats per booking. Use our pre-select counter before or during seat map selection.
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-3.5 text-sm md:text-base text-gray-200 leading-relaxed">
+                      <span className="text-yellow-500 font-black text-xl leading-none mt-0.5">●</span>
+                      <span>
+                        <strong className="text-white font-bold uppercase">CONSECUTIVE ADJACENT:</strong> Multiple seats must be consecutive within the same row (e.g. D1 to D3 automatically picks D2).
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-3.5 text-sm md:text-base text-gray-200 leading-relaxed">
+                      <span className="text-emerald-500 font-black text-xl leading-none mt-0.5">●</span>
+                      <span>
+                        <strong className="text-white font-bold uppercase">10-MIN UPI TIMER:</strong> Complete your UPI transaction and attach screenshot within 10 minutes once seats are locked.
+                      </span>
+                    </li>
+                  </ul>
+
                 </div>
               </div>
 
-              <div className="mt-8 pt-4 border-t border-zinc-800 font-tech text-xs text-zinc-500">
-                OFFICIAL BOOKING CHANNEL BY THE GUILD VZAG
-              </div>
             </div>
 
-            {/* Right Card: Important Booking Information */}
-            <div className="bg-zinc-900 border border-zinc-800 p-8 rounded-2xl shadow-xl flex flex-col justify-between">
-              <div>
-                <span className="font-tech text-xs text-red-500 uppercase tracking-widest font-bold block mb-2">// QUICK CHECKOUT SUMMARY</span>
-                <h2 className="text-2xl font-impact text-white mb-4">IMPORTANT INFORMATION</h2>
-
-                <ul className="space-y-4 font-tech text-sm text-zinc-300">
-                  <li className="flex items-start gap-3 bg-[#080808] border border-zinc-800 p-3.5 rounded-xl">
-                    <span className="text-red-500 font-bold text-lg leading-none shrink-0">•</span>
-                    <span><strong className="text-white">MAXIMUM 4 SEATS:</strong> You can select and book up to 4 consecutive seats per transaction.</span>
-                  </li>
-                  <li className="flex items-start gap-3 bg-[#080808] border border-zinc-800 p-3.5 rounded-xl">
-                    <span className="text-amber-500 font-bold text-lg leading-none shrink-0">•</span>
-                    <span><strong className="text-white">10-MINUTE HOLD WINDOW:</strong> Once picked, your seats are reserved strictly for 10 minutes to complete UPI transfer.</span>
-                  </li>
-                  <li className="flex items-start gap-3 bg-[#080808] border border-zinc-800 p-3.5 rounded-xl">
-                    <span className="text-emerald-500 font-bold text-lg leading-none shrink-0">•</span>
-                    <span><strong className="text-white">INSTANT UPI QR PAYMENT:</strong> Pay exactly ₹{event.ticket_price || 459}/- per ticket and attach screenshot for instant digital pass issuance.</span>
-                  </li>
-                </ul>
-              </div>
-
-              <div className="mt-8 text-center sm:text-left">
-                <button 
-                  onClick={() => setStep('seatmap')}
-                  className="bg-white hover:bg-zinc-200 text-black font-bold py-4 px-8 rounded-xl text-lg transition-all shadow-xl w-full flex items-center justify-center gap-3 font-tech uppercase tracking-wider"
-                >
-                  <span>SELECT SEATS ON SCREEN 3 MAP →</span>
-                  <ArrowRight size={20} />
-                </button>
-              </div>
-            </div>
-
-          </div>
-
-          {/* Booking Rules Accordion (Does not dominate the page) */}
-          <div className="max-w-[1100px] mx-auto mt-6 text-left">
-            <div className="accordion-box">
+            {/* Bottom Centered CTA Button: BOOK YOUR SEATS */}
+            <div className="mt-10 flex justify-center">
               <button 
-                type="button"
-                onClick={() => setShowRulesAccordion(!showRulesAccordion)}
-                className="w-full py-4 px-6 flex items-center justify-between text-zinc-400 hover:text-white font-tech text-xs font-bold uppercase tracking-wider transition-colors"
+                className="btn-brutalist w-full max-w-xl py-5 px-12 text-center justify-center text-lg md:text-xl font-impact tracking-widest uppercase bg-red-600 hover:bg-red-500 text-white border-red-500 shadow-2xl transition-all hover:scale-105"
+                onClick={() => setStep('seatmap')}
               >
-                <span className="flex items-center gap-2">
-                  <ShieldCheck size={16} className="text-red-500" />
-                  <span>{showRulesAccordion ? '[ - Hide Complete Booking & Screening Rules ]' : '[ + View Complete Booking & Screening Rules Accordion ]'}</span>
-                </span>
-                {showRulesAccordion ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                <RollingText text="BOOK YOUR SEATS →" stagger={true} />
               </button>
-
-              {showRulesAccordion && (
-                <div className="p-6 border-t border-zinc-800 font-tech text-xs text-zinc-300 space-y-3 bg-[#080808]">
-                  <p>1. <strong className="text-white">Consecutive Enforcement:</strong> Single seat gaps between booked seats are not permitted to optimize auditorium sightlines and group seating.</p>
-                  <p>2. <strong className="text-white">Verification Queue:</strong> Attached UPI screenshots are verified by our automated/human queue. Any mismatch in UTR or amount results in instant seat release without refund.</p>
-                  <p>3. <strong className="text-white">Venue Check-in:</strong> Present your booking confirmation ID or WhatsApp verified phone number at the INOX Screen 3 entrance.</p>
-                </div>
-              )}
             </div>
-          </div>
 
+          </div>
         </div>
       )}
 
       {/* =========================================================================
-          PAGE 2: SEAT SELECTION (SEATMAP)
+          PAGE 2: INTERACTIVE BOOKMYSHOW-STYLE CINEMA SEAT MAP (INOX VARUN'S MALL)
           ========================================================================= */}
       {step === 'seatmap' && (
-        <div className="animate-fade-in">
-          
-          {ruleError && (
-            <div className="max-w-[1200px] mx-auto mb-6 bg-red-950/80 border border-red-500 text-red-200 p-4 rounded-xl flex items-center justify-between font-tech text-sm shadow-2xl">
-              <div className="flex items-center gap-3">
-                <AlertTriangle size={20} className="text-red-500 shrink-0" />
-                <span>{ruleError}</span>
-              </div>
-              <button onClick={() => setRuleError(null)} className="underline text-xs text-white">DISMISS</button>
-            </div>
-          )}
-
-          <div className="seatmap-layout-grid">
+        <div className="grid-container">
+          <div className="seatmap-container">
             
-            {/* Left 70%: Cinema Screen & Interactive Matrix */}
-            <div className="seatmap-matrix-panel">
-              
-              {/* Large Pre-selection Counter (Global Design System Spec) */}
-              <div className="bg-[#080808] border border-zinc-800 p-4 sm:p-6 rounded-2xl w-full max-w-[620px] mx-auto mb-8 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
-                <div className="text-center sm:text-left">
-                  <div className="font-tech text-xs text-red-500 font-bold uppercase tracking-widest">NUMBER OF SEATS TO BOOK (MAX 4)</div>
-                  <div className="font-tech text-[12px] text-zinc-400 mt-1">Select counter below, or click start & end seat directly on map</div>
-                </div>
-
-                <div className="flex items-center gap-3 bg-zinc-900 border border-zinc-700 p-2 rounded-xl">
-                  <button 
-                    type="button" 
-                    onClick={() => {
-                      const next = Math.max(1, targetSeatCount - 1);
-                      setTargetSeatCount(next);
-                      if (selectedSeats.length > next) setSelectedSeats(selectedSeats.slice(0, next));
-                    }}
-                    disabled={targetSeatCount <= 1}
-                    className="w-12 h-12 flex items-center justify-center bg-zinc-800 hover:bg-zinc-700 disabled:opacity-30 text-white font-bold text-2xl rounded-lg border border-zinc-700 transition-all"
-                  >
-                    −
-                  </button>
-                  <span className="font-impact text-3xl text-white px-5 min-w-[64px] text-center">
-                    {targetSeatCount}
-                  </span>
-                  <button 
-                    type="button" 
-                    onClick={() => setTargetSeatCount(Math.min(4, targetSeatCount + 1))}
-                    disabled={targetSeatCount >= 4}
-                    className="w-12 h-12 flex items-center justify-center bg-zinc-800 hover:bg-zinc-700 disabled:opacity-30 text-white font-bold text-2xl rounded-lg border border-zinc-700 transition-all"
-                  >
-                    +
-                  </button>
-                </div>
+            {ruleError && (
+              <div className="rule-warning-banner animate-bounce">
+                <span>{ruleError}</span>
+                <button onClick={() => setRuleError(null)} className="underline text-xs">DISMISS</button>
               </div>
+            )}
 
-              {/* Cinema Screen Representation */}
-              <div className="w-full max-w-[620px] mx-auto mb-8 text-center">
-                <div className="cinema-screen-bar" />
-                <span className="font-tech text-xs text-zinc-400 tracking-[0.25em] uppercase">
-                  // SCREEN 3 — VARUN INOX, BEACH ROAD, VIZAG // ALL SIGHTLINES UNBLOCKABLE //
-                </span>
+            {/* Target Seat Count Pre-selector Box */}
+            <div className="bg-zinc-950 border-2 border-red-500/50 p-6 md:p-8 rounded-2xl mb-8 max-w-2xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6 shadow-2xl">
+              <div className="text-left">
+                <div className="font-tech text-base md:text-lg text-red-400 font-bold uppercase tracking-wider">// NUMBER OF SEATS TO BOOK (MAX 5)</div>
+                <div className="font-tech text-xs text-gray-300 mt-1">Select your exact seat count using the +/- buttons below before picking on the map</div>
               </div>
-
-              {/* Compact Single-Row Legend */}
-              <div className="seatmap-compact-legend">
-                <div className="legend-badge"><div className="legend-box bg-zinc-800 border border-zinc-700" /><span>Available (₹{event.ticket_price || 459})</span></div>
-                <div className="legend-badge"><div className="legend-box bg-white border border-white" /><span>Selected</span></div>
-                <div className="legend-badge"><div className="legend-box bg-amber-500/20 border border-amber-500" /><span>Held</span></div>
-                <div className="legend-badge"><div className="legend-box bg-zinc-900 border border-zinc-800" /><span>Booked</span></div>
-              </div>
-
-              {/* Instruction Banner */}
-              <div className="text-xs font-tech text-zinc-400 mb-6 font-bold bg-[#080808] px-4 py-2 rounded-lg border border-zinc-800">
-                Select up to 4 adjacent seats. (Physical row layout exactly matches Screen 3)
-              </div>
-
-              {/* Seat Rows Grid (Rows K down to A) */}
-              <div className="seatmap-grid-wrap overflow-x-auto pb-4">
-                {['K','J','I','H','G','F','E','D','C','B','A'].map((rowLabel) => {
-                  const rowSeats = seats
-                    .filter(s => s.row_label === rowLabel)
-                    .sort((a, b) => b.seat_number - a.seat_number);
-
-                  return (
-                    <div key={rowLabel} className="seatmap-row">
-                      <span className="row-label-text">{rowLabel}</span>
-                      
-                      <div className="seats-in-row flex-wrap">
-                        {rowSeats.map((seat) => {
-                          const isSelected = selectedSeats.includes(seat.label);
-                          const statusClass = isSelected ? 'SELECTED' : seat.status;
-                          const showAisleBreak = seat.seat_number === 13 || seat.seat_number === 7;
-
-                          return (
-                            <React.Fragment key={seat.id}>
-                              <button
-                                type="button"
-                                className={`seat-btn seat-${statusClass}`}
-                                onClick={() => handleSeatClick(seat)}
-                                title={`${seat.label} — ${seat.status === 'AVAILABLE' ? `₹${event.ticket_price || 459}` : seat.status}`}
-                              >
-                                {seat.seat_number}
-                              </button>
-
-                              {showAisleBreak && <div className="w-4 shrink-0" />}
-                            </React.Fragment>
-                          );
-                        })}
-                      </div>
-
-                      <span className="row-label-text">{rowLabel}</span>
-                    </div>
-                  );
-                })}
-              </div>
-
-            </div>
-
-            {/* Right Sidebar 30% on Desktop: Sticky Booking Summary Card */}
-            <div className="hidden lg:block sticky top-8">
-              <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl shadow-2xl">
-                <div className="flex items-center justify-between border-b border-zinc-800 pb-3 mb-4">
-                  <h3 className="text-xl font-impact text-white uppercase tracking-wider">BOOKING SUMMARY</h3>
-                  <span className="text-[11px] font-tech font-bold bg-red-950 text-red-400 border border-red-800 px-2 py-0.5 rounded">
-                    LIVE
-                  </span>
-                </div>
-
-                <div className="space-y-4 font-tech text-sm">
-                  <div>
-                    <span className="text-xs text-zinc-400 block mb-1">EVENT</span>
-                    <strong className="text-white text-base">FIFA WORLD CUP FINAL</strong>
-                  </div>
-
-                  <div>
-                    <span className="text-xs text-zinc-400 block mb-1">VENUE</span>
-                    <strong className="text-zinc-300 text-xs">VARUN INOX, BEACH ROAD, VIZAG</strong>
-                  </div>
-
-                  <div className="pt-3 border-t border-zinc-800">
-                    <span className="text-xs text-zinc-400 block mb-1">SELECTED SEATS</span>
-                    {selectedSeats.length > 0 ? (
-                      <div className="flex flex-wrap gap-1.5 mt-1">
-                        {selectedSeats.map(s => (
-                          <span key={s} className="bg-white text-black font-bold text-xs px-2.5 py-1 rounded">
-                            {s}
-                          </span>
-                        ))}
-                      </div>
-                    ) : (
-                      <span className="text-zinc-500 italic text-xs">No seats selected yet</span>
-                    )}
-                  </div>
-
-                  <div className="flex justify-between items-center pt-3 border-t border-zinc-800">
-                    <span className="text-xs text-zinc-400">TICKETS ({selectedSeats.length || targetSeatCount})</span>
-                    <span className="font-bold text-white">₹{event.ticket_price || 459} × {selectedSeats.length || targetSeatCount}</span>
-                  </div>
-
-                  <div className="flex justify-between items-baseline pt-2">
-                    <span className="text-sm font-bold text-zinc-300">TOTAL PAYABLE</span>
-                    <span className="font-impact text-3xl text-emerald-400">₹{totalPayable}</span>
-                  </div>
-                </div>
-
+              <div className="flex items-center gap-4 bg-black border-2 border-zinc-700 p-2 rounded-xl shadow-inner">
                 <button 
-                  type="button"
-                  disabled={selectedSeats.length === 0}
-                  onClick={() => setStep('contact')}
-                  className="bg-white hover:bg-zinc-200 disabled:opacity-40 disabled:cursor-not-allowed text-black font-bold py-4 rounded-xl text-base transition-all shadow-xl w-full mt-6 flex items-center justify-center gap-2 font-tech uppercase tracking-wider"
+                  type="button" 
+                  onClick={() => setTargetSeatCount(Math.max(1, targetSeatCount - 1))}
+                  disabled={targetSeatCount <= 1}
+                  className="w-14 h-14 flex items-center justify-center bg-zinc-800 hover:bg-red-600 disabled:opacity-30 text-white font-bold text-3xl rounded-lg border border-zinc-600 transition-all cursor-pointer"
                 >
-                  <span>CONTINUE TO DETAILS →</span>
+                  -
                 </button>
+                <span className="font-impact text-4xl md:text-5xl text-white px-5 min-w-[64px] text-center">
+                  {targetSeatCount}
+                </span>
+                <button 
+                  type="button" 
+                  onClick={() => setTargetSeatCount(Math.min(5, targetSeatCount + 1))}
+                  disabled={targetSeatCount >= 5}
+                  className="w-14 h-14 flex items-center justify-center bg-zinc-800 hover:bg-red-600 disabled:opacity-30 text-white font-bold text-3xl rounded-lg border border-zinc-600 transition-all cursor-pointer"
+                >
+                  +
+                </button>
+              </div>
+            </div>
 
-                <div className="text-[11px] font-tech text-zinc-500 text-center mt-3">
-                  10-minute reservation lock begins upon proceeding.
+            {/* Cinema Screen Bar with ALL EYES THIS WAY */}
+            <div className="text-center mb-8">
+              <div className="font-impact text-xl md:text-3xl text-yellow-400 tracking-[0.3em] uppercase font-bold animate-pulse mb-3">
+                // ALL EYES THIS WAY ↓ //
+              </div>
+              <div className="cinema-screen-wrap">
+                <div className="cinema-screen-bar" />
+                <span className="cinema-screen-label font-tech text-xs text-gray-400">// VARUN INOX, BEACH ROAD, VIZAG // ALL SIGHTLINES UNBLOCKABLE //</span>
+              </div>
+            </div>
+
+            {/* Legend */}
+            <div className="seatmap-legend mb-6">
+              <div className="legend-item"><div className="legend-box legend-available" /><span>AVAILABLE (₹{event.ticket_price})</span></div>
+              <div className="legend-item"><div className="legend-box legend-selected" /><span>SELECTED</span></div>
+              <div className="legend-item"><div className="legend-box legend-held" /><span>HELD</span></div>
+              <div className="legend-item"><div className="legend-box legend-booked" /><span>BOOKED</span></div>
+            </div>
+
+            {/* Seat Rows Grid (Rows K down to A matching physical diagram exactly) */}
+            <div className="seatmap-grid-wrap overflow-x-auto pb-6">
+              {['K','J','I','H','G','F','E','D','C','B','A'].map((rowLabel) => {
+                const rowSeats = seats
+                  .filter(s => s.row_label === rowLabel)
+                  .sort((a, b) => b.seat_number - a.seat_number);
+
+                return (
+                  <div key={rowLabel} className="seatmap-row flex items-center justify-center gap-2 my-1">
+                    <span className="row-label-text font-bold text-xs w-6 text-center text-red-500 bg-zinc-900 border border-zinc-800 py-1 shrink-0">{rowLabel}</span>
+                    
+                    <div className="seats-in-row flex items-center gap-1.5 flex-wrap justify-center">
+                      {rowSeats.map((seat) => {
+                        const isSelected = selectedSeats.includes(seat.label);
+                        const statusClass = isSelected ? 'SELECTED' : seat.status;
+                        
+                        // Visual gaps corresponding to walkways & stairs
+                        const showAisleBreak = seat.seat_number === 13 || seat.seat_number === 7;
+
+                        return (
+                          <React.Fragment key={seat.id}>
+                            <button
+                              type="button"
+                              className={`seat-btn seat-${statusClass} w-8 h-8 text-[11px] font-bold rounded-sm border transition-all flex items-center justify-center shrink-0 ${isSelected ? 'bg-white text-black border-white scale-110 shadow-lg shadow-white/30' : seat.status === 'AVAILABLE' ? 'bg-zinc-800 text-gray-300 border-zinc-700 hover:border-red-500 hover:text-white' : 'bg-zinc-950 text-zinc-600 border-zinc-900 cursor-not-allowed opacity-50'}`}
+                              onClick={() => handleSeatClick(seat)}
+                              title={`${seat.label} — ${seat.status === 'AVAILABLE' ? `₹${event.ticket_price || 1}` : seat.status}`}
+                            >
+                              {seat.seat_number}
+                            </button>
+
+                            {showAisleBreak && (
+                              <div className="w-4 shrink-0" />
+                            )}
+
+                            {/* ENTRY / EXIT block on right side of rows K to F */}
+                            {seat.seat_number === 7 && ['K','J','I','H','G','F'].includes(rowLabel) && (
+                              <div className="seat-gap gap-[64px]" />
+                            )}
+
+                            {/* Stairs aisle gap on rows E, D, C, B right where seats 6, 5 would be */}
+                            {seat.seat_number === 7 && ['E','D','C','B'].includes(rowLabel) && (
+                              <div className="w-8 h-8 flex items-center justify-center text-zinc-600 font-mono text-[10px] shrink-0" title="Stairs / Aisle">
+                                ||
+                              </div>
+                            )}
+                          </React.Fragment>
+                        );
+                      })}
+                    </div>
+
+                    <span className="row-label-text font-bold text-xs w-6 text-center text-red-500 bg-zinc-900 border border-zinc-800 py-1 shrink-0">{rowLabel}</span>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Sticky Bottom Summary Bar */}
+            <div className="seatmap-bottom-bar bg-zinc-900 border-t border-zinc-800 p-4 sticky bottom-0 z-20 flex flex-wrap items-center justify-between gap-4 mt-6">
+              <div className="selection-summary font-tech text-sm">
+                <div className="summary-seats text-white">
+                  {selectedSeats.length > 0 ? (
+                    <span>SELECTED SEATS: <strong className="text-red-500 text-base">[{selectedSeats.join(', ')}]</strong> ({selectedSeats.length} SEAT{selectedSeats.length > 1 ? 'S' : ''})</span>
+                  ) : (
+                    <span className="text-gray-500">// SELECT YOUR SEATS TO PROCEED</span>
+                  )}
                 </div>
+                {selectedSeats.length > 0 && (
+                  <div className="summary-total text-gray-300 text-xs mt-0.5">
+                    TOTAL PAYABLE: <strong className="text-white text-base">₹{selectedSeats.length * event.ticket_price}</strong> (ALL INCLUSIVE)
+                  </div>
+                )}
+              </div>
+
+              <div>
+                {selectedSeats.length > 0 && (
+                  <button 
+                    className="btn-brutalist py-3 px-6 text-xs"
+                    onClick={() => setStep('contact')}
+                  >
+                    <RollingText text="PROCEED TO CONTACT DETAILS →" stagger={true} />
+                  </button>
+                )}
               </div>
             </div>
 
           </div>
-
-          {/* Sticky Bottom Bar for Mobile (Visible only on screens < lg) */}
-          <div className="lg:hidden mobile-sticky-footer">
-            <div className="font-tech">
-              <div className="text-xs text-zinc-400 uppercase">
-                {selectedSeats.length > 0 ? `Selected: ${selectedSeats.join(', ')}` : `${targetSeatCount} Seats Targeted`}
-              </div>
-              <div className="text-xl font-impact text-emerald-400">₹{totalPayable}</div>
-            </div>
-            <button 
-              type="button"
-              disabled={selectedSeats.length === 0}
-              onClick={() => setStep('contact')}
-              className="bg-white hover:bg-zinc-200 disabled:opacity-40 disabled:cursor-not-allowed text-black font-bold py-3 px-6 rounded-xl text-sm font-tech uppercase tracking-wider shadow-lg flex items-center gap-2"
-            >
-              <span>CONTINUE →</span>
-            </button>
-          </div>
-
         </div>
       )}
 
       {/* =========================================================================
-          PAGE 3: ATTENDEE DETAILS (CONTACT)
+          PAGE 3: CONTACT DETAILS & ATOMIC RESERVATION LOCK (STREAMLINED)
           ========================================================================= */}
       {step === 'contact' && (
-        <div className="animate-fade-in">
-          <div className="wizard-card-centered">
-            
-            <div className="flex items-center justify-between border-b border-zinc-800 pb-4 mb-6">
-              <div>
-                <span className="font-tech text-xs text-red-500 font-bold tracking-widest uppercase block mb-1">// STEP 03 OF 05</span>
-                <h2 className="text-3xl font-impact text-white">ATTENDEE DETAILS</h2>
-              </div>
-              <span className="font-tech text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-3 py-1 rounded-full font-bold">
-                RESERVING {selectedSeats.length} SEATS
-              </span>
+        <div className="grid-container py-8">
+          <div className="max-w-4xl mx-auto bg-zinc-900 border-2 border-zinc-800 p-8 md:p-12 rounded-2xl shadow-2xl">
+            <div className="text-center mb-8">
+              <span className="font-tech text-red-500 text-xs font-bold tracking-widest uppercase">// 02 — MANDATORY ATTENDEE INFO</span>
+              <h2 className="text-3xl md:text-5xl font-impact text-white uppercase tracking-tight mt-1">RESERVE SEATS & START TIMER</h2>
             </div>
 
-            {/* Persistent Summary Banner Inside Card */}
-            <div className="bg-[#080808] border border-zinc-800 p-4 rounded-xl mb-8 flex flex-wrap items-center justify-between gap-4 font-tech text-sm">
+            {/* Prominent Highlights for Selected Seats and Total Payable Amount */}
+            <div className="bg-zinc-950 border-2 border-red-500/60 p-6 md:p-8 rounded-2xl mb-10 flex flex-col sm:flex-row justify-between items-center gap-6 shadow-xl text-center sm:text-left">
               <div>
-                <span className="text-xs text-zinc-400 block">SELECTED SEATS</span>
-                <strong className="text-white text-base">{selectedSeats.join(', ')}</strong>
+                <span className="text-gray-400 block text-xs font-tech font-bold uppercase tracking-widest mb-1">// SELECTED SEATS HIGHLIGHT</span>
+                <div className="text-2xl md:text-4xl font-impact text-red-400 bg-red-950/60 border border-red-500/40 px-5 py-2.5 rounded-xl inline-block shadow tracking-wider">
+                  [{selectedSeats.join(', ')}]
+                </div>
               </div>
-              <div>
-                <span className="text-xs text-zinc-400 block">TOTAL PAYABLE</span>
-                <strong className="text-emerald-400 font-impact text-xl">₹{totalPayable}</strong>
-              </div>
-              <div>
-                <span className="text-xs text-zinc-400 block">HOLD WINDOW</span>
-                <strong className="text-amber-400 font-mono text-sm">Starts upon submission</strong>
+              <div className="text-center sm:text-right">
+                <span className="text-gray-400 block text-xs font-tech font-bold uppercase tracking-widest mb-1">// TOTAL PAYABLE AMOUNT (ALL INCLUSIVE)</span>
+                <div className="text-4xl md:text-5xl font-impact text-emerald-400 tracking-tight">
+                  ₹{selectedSeats.length * event.ticket_price}/-
+                </div>
               </div>
             </div>
 
-            <form onSubmit={handleCreateReservation} className="space-y-6 text-left">
-              <div>
-                <label className="text-[13px] text-zinc-400 font-bold uppercase block mb-2 font-tech tracking-wider">
-                  FULL NAME * <span className="text-zinc-600 text-xs">(Must match photo ID at entry)</span>
-                </label>
-                <input 
-                  type="text" 
-                  required
-                  placeholder="e.g. Arjun Raju"
-                  value={userName}
-                  onChange={(e) => setUserName(e.target.value)}
-                  className="w-full bg-[#080808] border border-zinc-700 text-white rounded-lg p-3.5 text-base outline-none focus:border-white transition-all font-tech"
-                />
+            {/* Separate Columns for Name, Phone, and Email */}
+            <form onSubmit={handleCreateReservation} className="space-y-8 font-tech">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
+                
+                <div>
+                  <label className="block text-xs md:text-sm font-tech font-bold text-red-400 uppercase tracking-widest mb-2.5">
+                    FULL NAME *
+                  </label>
+                  <input 
+                    type="text" 
+                    required 
+                    className="w-full p-4 bg-black border-2 border-zinc-700 focus:border-red-500 text-white font-mono text-lg rounded-xl shadow-inner outline-none transition-all placeholder:text-zinc-600"
+                    placeholder="e.g. Arjun Raju"
+                    value={userName}
+                    onChange={(e) => setUserName(e.target.value)}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs md:text-sm font-tech font-bold text-red-400 uppercase tracking-widest mb-2.5">
+                    10-DIGIT MOBILE NUMBER *
+                  </label>
+                  <input 
+                    type="tel" 
+                    required 
+                    maxLength="10"
+                    pattern="[0-9]{10}"
+                    className="w-full p-4 bg-black border-2 border-zinc-700 focus:border-red-500 text-white font-mono text-lg rounded-xl shadow-inner outline-none transition-all placeholder:text-zinc-600"
+                    placeholder="9848012345"
+                    value={userPhone}
+                    onChange={(e) => setUserPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs md:text-sm font-tech font-bold text-red-400 uppercase tracking-widest mb-2.5">
+                    EMAIL ADDRESS *
+                  </label>
+                  <input 
+                    type="email" 
+                    required 
+                    className="w-full p-4 bg-black border-2 border-zinc-700 focus:border-red-500 text-white font-mono text-lg rounded-xl shadow-inner outline-none transition-all placeholder:text-zinc-600"
+                    placeholder="arjun.raju@gmail.com"
+                    value={userEmail}
+                    onChange={(e) => setUserEmail(e.target.value)}
+                  />
+                </div>
+
               </div>
 
-              <div>
-                <label className="text-[13px] text-zinc-400 font-bold uppercase block mb-2 font-tech tracking-wider">
-                  WHATSAPP PHONE NUMBER * <span className="text-zinc-600 text-xs">(For instant ticket QR delivery)</span>
-                </label>
-                <input 
-                  type="tel" 
-                  required
-                  placeholder="+91 98480 XXXXX"
-                  value={userPhone}
-                  onChange={(e) => setUserPhone(e.target.value)}
-                  className="w-full bg-[#080808] border border-zinc-700 text-white rounded-lg p-3.5 text-base outline-none focus:border-white transition-all font-tech"
-                />
-              </div>
-
-              <div>
-                <label className="text-[13px] text-zinc-400 font-bold uppercase block mb-2 font-tech tracking-wider">
-                  EMAIL ADDRESS * <span className="text-zinc-600 text-xs">(Backup confirmation receipt)</span>
-                </label>
-                <input 
-                  type="email" 
-                  required
-                  placeholder="arjun.raju@example.com"
-                  value={userEmail}
-                  onChange={(e) => setUserEmail(e.target.value)}
-                  className="w-full bg-[#080808] border border-zinc-700 text-white rounded-lg p-3.5 text-base outline-none focus:border-white transition-all font-tech"
-                />
-              </div>
-
-              {/* Buttons Bottom */}
-              <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 mt-8 border-t border-zinc-800">
+              <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 border-t border-zinc-800">
                 <button 
                   type="button"
+                  className="text-xs md:text-sm font-bold text-gray-400 hover:text-white underline cursor-pointer"
                   onClick={() => setStep('seatmap')}
-                  className="bg-transparent border border-zinc-700 hover:border-zinc-500 text-white py-3.5 px-6 rounded-lg text-sm font-tech uppercase tracking-wider transition-all w-full sm:w-auto"
                 >
                   ← BACK TO SEAT MAP
                 </button>
-
                 <button 
-                  type="submit"
+                  type="submit" 
+                  className="btn-brutalist py-4 px-8 text-sm md:text-base font-impact tracking-wider uppercase bg-red-600 hover:bg-red-500 text-white border-red-500 shadow-2xl transition-all hover:scale-105 cursor-pointer"
                   disabled={isReserving}
-                  className="bg-white hover:bg-zinc-200 disabled:opacity-40 text-black font-bold py-3.5 px-8 rounded-lg text-base font-tech uppercase tracking-wider transition-all shadow-xl w-full sm:w-auto flex items-center justify-center gap-2"
                 >
-                  <span>{isReserving ? 'RESERVING SEATS...' : 'LOCK SEATS & CONTINUE →'}</span>
-                  <ArrowRight size={18} />
+                  <RollingText text={isReserving ? "RESERVING..." : "LOCK SEATS & CONTINUE TO PAYMENT →"} stagger={true} />
                 </button>
               </div>
             </form>
-
           </div>
         </div>
       )}
 
       {/* =========================================================================
-          PAGE 4: PAYMENT (UPI QR & SCREENSHOT UPLOAD) — REDESIGNED SPLIT LAYOUT
+          PAGE 4: STATIC UPI QR PAYMENT & UTR SUBMISSION
           ========================================================================= */}
-      {step === 'payment' && (
-        <div className="animate-fade-in">
-          <div className="payment-split-grid">
-            
-            {/* Left Column (55%): Payment Instructions & Summary Card */}
-            <div className="bg-zinc-900 border border-zinc-800 p-8 rounded-2xl shadow-2xl space-y-6 text-left">
-              <div>
-                <span className="font-tech text-xs text-red-500 font-bold uppercase tracking-widest block mb-1">// STEP 04 OF 05</span>
-                <h2 className="text-3xl font-impact text-white">PAYMENT & VERIFICATION</h2>
-              </div>
-
-              {/* Persistent Summary Box */}
-              <div className="bg-[#080808] border border-zinc-800 p-4 rounded-xl flex items-center justify-between font-tech">
-                <div>
-                  <div className="text-xs text-zinc-400">RESERVED SEATS</div>
-                  <div className="font-bold text-white text-base">{activeBooking?.seats.join(', ') || selectedSeats.join(', ')}</div>
-                </div>
-                <div className="text-right">
-                  <div className="text-xs text-zinc-400">TOTAL PAYABLE</div>
-                  <div className="font-impact text-2xl text-emerald-400">₹{activeBooking?.total_amount || totalPayable}</div>
-                </div>
-              </div>
-
-              {/* Timer Alert */}
-              <div className="flex items-center justify-between bg-amber-500/10 border border-amber-500/30 p-3.5 rounded-xl font-tech text-sm text-amber-400">
-                <div className="flex items-center gap-2 font-bold">
-                  <Clock size={18} />
-                  <span>TIME REMAINING TO COMPLETE UPI TRANSFER:</span>
-                </div>
-                <span className="font-mono text-base font-bold text-white">{formatCountdown(countdown)}</span>
-              </div>
-
-              {/* Numbered Steps */}
-              <div className="space-y-4 pt-2 font-tech text-sm text-zinc-300">
-                <div className="numbered-step-item">
-                  <div className="step-circle">1</div>
-                  <div>
-                    <strong className="text-white block mb-0.5">Scan QR or Copy Official UPI ID</strong>
-                    <span className="text-zinc-400 text-xs">Use any UPI app (GPay, PhonePe, Paytm, CRED) to make exact payment.</span>
+      {step === 'payment' && activeBooking && (
+        <div className="grid-container">
+          
+          {countdown === 0 || activeBooking.status === 'EXPIRED' ? (
+            <div className="bg-red-950 border-2 border-red-500 p-8 text-center max-w-xl mx-auto font-tech">
+              <AlertTriangle size={48} className="text-red-500 mx-auto mb-4 animate-pulse" />
+              <h2 className="text-2xl font-impact text-white mb-2">RESERVATION TIMER EXPIRED</h2>
+              <p className="text-gray-300 text-sm mb-6">
+                Your 10-minute reservation window has elapsed. To ensure zero double bookings, seats [{activeBooking.seats.join(', ')}] have been automatically released back to the available pool.
+              </p>
+              <button 
+                className="btn-brutalist py-3 px-6 mx-auto"
+                onClick={() => {
+                  setSelectedSeats([]);
+                  setActiveBooking(null);
+                  setStep('seatmap');
+                }}
+              >
+                SELECT NEW SEATS ON MAP
+              </button>
+            </div>
+          ) : (
+            <div className="max-w-5xl mx-auto bg-zinc-950 border-2 border-zinc-800 p-8 md:p-12 rounded-3xl shadow-2xl my-8 font-tech">
+              
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-center">
+                
+                {/* Left Column: Static UPI QR Code ONLY */}
+                <div className="md:col-span-5 flex flex-col items-center justify-center bg-zinc-900 border-2 border-zinc-800 p-8 rounded-2xl text-center shadow-xl w-full">
+                  <span className="text-red-500 font-bold text-xs md:text-sm tracking-widest uppercase mb-6 block">
+                    // OFFICIAL SCANNER QR
+                  </span>
+                  
+                  <div className="w-64 h-64 bg-white p-4 rounded-2xl shadow-inner border-4 border-zinc-200 mx-auto flex items-center justify-center">
+                    <img 
+                      src="/guildqr.png" 
+                      alt="Official Guild UPI QR Code" 
+                      className="w-full h-full object-contain block mx-auto"
+                    />
                   </div>
+                  
+                  <span className="text-xs text-gray-400 font-bold mt-6 tracking-wider uppercase block">
+                    GPay // PhonePe // Paytm // CRED
+                  </span>
                 </div>
 
-                <div className="numbered-step-item">
-                  <div className="step-circle">2</div>
-                  <div className="w-full">
-                    <strong className="text-white block mb-1">Copy Official UPI ID</strong>
-                    <div className="flex items-center justify-between bg-[#080808] border border-zinc-700 py-2.5 px-3.5 rounded-lg text-sm font-mono text-white">
-                      <span className="font-bold">steveoguri07-2@okicici</span>
+                {/* Right Column: Exactly the required 4 items clearly stated */}
+                <form onSubmit={handleSubmitPayment} className="md:col-span-7 flex flex-col justify-between space-y-6 text-left w-full">
+                  
+                  <div>
+                    <span className="text-red-400 font-bold text-xs uppercase tracking-widest mb-1 block">
+                      // MANDATORY PAYMENT STEP
+                    </span>
+                    <h3 className="text-2xl md:text-3xl font-impact text-white uppercase tracking-tight">
+                      COMPLETE YOUR UPI PAYMENT
+                    </h3>
+                  </div>
+
+                  {/* 1. Official UPI ID */}
+                  <div>
+                    <label className="text-xs text-gray-400 font-bold uppercase block mb-2 tracking-wider">
+                      1. OFFICIAL UPI ID
+                    </label>
+                    <div className="flex items-center justify-between bg-black border-2 border-purple-500/50 py-4 px-5 rounded-xl text-base md:text-lg font-mono text-white shadow">
+                      <span className="font-bold tracking-wide select-all">steveoguri07-2@okicici</span>
                       <button 
                         type="button" 
-                        onClick={handleCopyUpi}
-                        className="bg-zinc-800 hover:bg-zinc-700 text-red-400 px-3 py-1 rounded text-xs font-tech flex items-center gap-1.5 transition-colors"
+                        onClick={() => {
+                          navigator.clipboard.writeText('steveoguri07-2@okicici');
+                          alert('UPI ID copied to clipboard!');
+                        }} 
+                        className="text-purple-300 hover:text-white transition-colors bg-purple-950/80 border border-purple-500/50 py-1.5 px-3 rounded.lg text-xs font-tech font-bold uppercase cursor-pointer"
                       >
-                        {copiedUpi ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
-                        <span>{copiedUpi ? 'COPIED' : 'COPY ID'}</span>
+                        COPY
                       </button>
                     </div>
                   </div>
-                </div>
 
-                <div className="numbered-step-item">
-                  <div className="step-circle">3</div>
-                  <div className="w-full">
-                    <div className="flex items-center justify-between mb-1.5">
-                      <strong className="text-white block">Upload Payment Screenshot *</strong>
-                      <span className="text-xs text-red-500 font-mono font-bold">[MANDATORY]</span>
+                  {/* 2. Total Amount to Pay */}
+                  <div>
+                    <label className="text-xs text-gray-400 font-bold uppercase block mb-2 tracking-wider">
+                      2. TOTAL AMOUNT TO BE PAID
+                    </label>
+                    <div className="bg-black border-2 border-emerald-500/50 py-4 px-5 rounded-xl flex items-center justify-between">
+                      <div>
+                        <span className="text-xs text-gray-300 block font-tech">({activeBooking.seats.length} {activeBooking.seats.length === 1 ? 'Seat' : 'Seats'} × ₹{event.ticket_price})</span>
+                        <span className="text-xs text-emerald-400 font-bold tracking-wider block mt-0.5 uppercase">SEATING + SNACK + BEVERAGE</span>
+                      </div>
+                      <span className="font-impact text-4xl md:text-5xl text-emerald-400">₹{activeBooking.total_amount}/-</span>
                     </div>
-                    
-                    <div className="bg-[#080808] border-2 border-dashed border-zinc-700 hover:border-red-500 rounded-xl p-5 text-center cursor-pointer transition-all">
+                  </div>
+
+                  {/* 3. Mandatory Transaction Screenshot Upload */}
+                  <div>
+                    <label className="text-xs text-white font-bold uppercase block mb-2 tracking-wider flex items-center justify-between">
+                      <span>3. MANDATORY TRANSACTION SCREENSHOT *</span>
+                      <span className="text-xs text-red-500 font-mono bg-red-950/60 border border-red-500/40 px-2 py-0.5 rounded">[REQUIRED]</span>
+                    </label>
+                    <div className="bg-black border-2 border-dashed border-zinc-700 hover:border-red-500 rounded-xl p-6 text-center cursor-pointer transition-all">
                       <input 
                         type="file" 
                         accept="image/*" 
-                        id="master-screenshot-upload" 
-                        required 
+                        id="screenshot-input" 
+                        required
                         className="hidden" 
                         onChange={handleFileUpload}
                       />
-                      <label htmlFor="master-screenshot-upload" className="cursor-pointer block">
-                        <Upload size={24} className="mx-auto text-red-500 mb-2" />
-                        <span className="text-xs text-zinc-300 block font-bold truncate">
-                          {isCompressing ? 'COMPRESSING RECEIPT...' : screenshotName ? `ATTACHED: ${screenshotName}` : '[ CLICK OR DROP PAYMENT SCREENSHOT HERE ]'}
+                      <label htmlFor="screenshot-input" className="cursor-pointer block">
+                        <Upload size={28} className="mx-auto text-red-500 mb-2" />
+                        <span className="text-sm text-gray-200 block font-bold truncate">
+                          {isCompressing ? 'COMPRESSING & PROCESSING...' : screenshotName ? `ATTACHED: ${screenshotName}` : '[ CLICK OR DROP PAYMENT SCREENSHOT TO UPLOAD ]'}
                         </span>
                       </label>
-
                       {screenshotUrl && (
-                        <div className="mt-3 bg-zinc-900 p-2 rounded-lg border border-zinc-800 max-w-[200px] mx-auto">
-                          <img src={screenshotUrl} alt="Payment Receipt Preview" className="max-h-24 mx-auto rounded object-contain" />
+                        <div className="mt-4 bg-zinc-900 p-2 rounded-lg border border-zinc-700 inline-block">
+                          <img src={screenshotUrl} alt="Screenshot Preview" className="max-h-32 mx-auto rounded object-contain block" />
                         </div>
                       )}
                     </div>
                   </div>
-                </div>
-              </div>
 
-              {/* Submit Button */}
-              <div className="pt-4 border-t border-zinc-800">
-                <button 
-                  type="button"
-                  disabled={isSubmittingPayment || isCompressing || !screenshotUrl}
-                  onClick={handleSubmitPayment}
-                  className="bg-white hover:bg-zinc-200 disabled:opacity-40 disabled:cursor-not-allowed text-black font-bold py-4 rounded-xl w-full text-base font-tech uppercase tracking-wider transition-all shadow-xl flex items-center justify-center gap-2"
-                >
-                  <span>{isSubmittingPayment ? 'VERIFYING RECEIPT...' : `SUBMIT SCREENSHOT & CONFIRM (₹${activeBooking?.total_amount || totalPayable}) →`}</span>
-                </button>
-              </div>
+                  {/* 4. Confirm / Submit Button */}
+                  <div className="pt-2 border-t border-zinc-800">
+                    <button 
+                      type="submit" 
+                      className="btn-brutalist w-full py-5 text-center justify-center text-sm md:text-base bg-red-600 hover:bg-red-500 text-white border-red-500 font-impact tracking-widest uppercase shadow-2xl transition-all hover:scale-105 cursor-pointer mt-2"
+                      disabled={isSubmittingPayment || isCompressing || !screenshotUrl}
+                    >
+                      <RollingText text={isSubmittingPayment ? "SECURING SCREENSHOT & PASS..." : `SUBMIT SCREENSHOT & CONFIRM TICKETS (₹${activeBooking.total_amount}) →`} stagger={true} />
+                    </button>
+                  </div>
 
-              <div className="flex justify-between items-center pt-2">
-                <button 
-                  type="button"
-                  onClick={() => setStep('contact')}
-                  className="text-xs font-tech text-zinc-400 hover:text-white underline"
-                >
-                  ← Back to Attendee Details
-                </button>
-                <span className="text-xs font-tech text-emerald-400">🔒 Encrypted Verification Queue</span>
+                </form>
+
               </div>
             </div>
+          )}
 
-            {/* Right Column (45%): Large Controlled QR Card */}
-            <div className="flex flex-col items-center justify-center sticky top-8">
-              <div className="qr-white-card">
-                <div className="font-tech text-xs font-bold text-zinc-500 tracking-widest uppercase mb-4">
-                  // OFFICIAL GUILD UPI SCANNER //
-                </div>
-
-                <div className="w-[280px] h-[280px] mx-auto flex items-center justify-center my-4">
-                  <img 
-                    src="/guildqr.png" 
-                    alt="Official Guild UPI QR Code" 
-                    className="w-full h-full object-contain mx-auto"
-                  />
-                </div>
-
-                <div className="font-tech text-xs font-bold text-zinc-800 tracking-wider uppercase mt-6 pt-4 border-t border-zinc-200">
-                  SCAN WITH ANY UPI APP TO PAY EXACT AMOUNT
-                </div>
-                <div className="font-tech text-[11px] text-zinc-500 mt-1">
-                  Supported: GPay • PhonePe • Paytm • CRED • Amazon Pay
-                </div>
-              </div>
-            </div>
-
-          </div>
         </div>
       )}
 
       {/* =========================================================================
-          PAGE 5: CONFIRMATION (DIGITAL PASS & TIMELINE)
+          PAGE 5: BOOKING CONFIRMATION & TIMELINE PAGE
           ========================================================================= */}
-      {step === 'confirmation' && (
-        <div className="animate-fade-in">
-          <div className="wizard-card-centered text-center">
+      {step === 'confirmation' && activeBooking && (
+        <div className="grid-container">
+          <div className="confirmation-card">
             
-            <CheckCircle2 size={64} className="text-emerald-500 mx-auto mb-6" />
+            <div className="text-center mb-8 border-b border-zinc-800 pb-8">
+              <CheckCircle2 size={54} className="text-emerald-500 mx-auto mb-4" />
+              <LineReveal delay={0.1} className="section-index font-tech text-emerald-400">
+                // STATUS: {activeBooking.status === 'CONFIRMED' ? 'TICKETS ISSUED & VERIFIED' : 'UNDER REVIEW — WAITING FOR ADMIN VERIFICATION'}
+              </LineReveal>
+              <h2 className="text-3xl font-impact text-white mt-2 mb-4">YOUR SEATS ARE RESERVED.</h2>
+              <p className="text-gray-300 text-sm max-w-lg mx-auto">
+                Thank you, {activeBooking.user_name}. We have received your UTR #{activeBooking.utr}. Our operations team verifies payment screenshots within 30 minutes.
+              </p>
 
-            <h2 className="text-4xl font-impact text-white uppercase tracking-tight mb-2">
-              BOOKING SECURED & UNDER REVIEW!
-            </h2>
-
-            <p className="text-zinc-400 text-sm md:text-base font-tech max-w-lg mx-auto mb-6">
-              Thank you, <strong className="text-white">{activeBooking?.user_name || userName}</strong>. Your payment receipt has been received and your seats are locked.
-            </p>
-
-            <div className="bg-[#080808] border border-zinc-800 px-6 py-3 rounded-xl inline-block font-mono font-bold text-emerald-400 text-lg mb-8 shadow-inner">
-              #GLD-{activeBooking?.utr?.slice(0, 8) || Math.floor(100000 + Math.random() * 900000)}
-            </div>
-
-            {/* Grid Summary Box */}
-            <div className="bg-[#080808] border border-zinc-800 p-6 rounded-xl text-left grid grid-cols-1 sm:grid-cols-2 gap-5 font-tech text-sm my-6 shadow-xl">
-              <div>
-                <span className="text-xs text-zinc-400 block mb-1">ATTENDEE NAME</span>
-                <strong className="text-white text-base">{activeBooking?.user_name || userName}</strong>
-              </div>
-
-              <div>
-                <span className="text-xs text-zinc-400 block mb-1">RESERVED SEATS</span>
-                <strong className="text-emerald-400 font-bold text-base">{activeBooking?.seats?.join(', ') || selectedSeats.join(', ')}</strong>
-              </div>
-
-              <div>
-                <span className="text-xs text-zinc-400 block mb-1">VENUE LOCATION</span>
-                <strong className="text-red-500 text-xs font-bold">VARUN INOX, BEACH ROAD, VIZAG</strong>
-              </div>
-
-              <div>
-                <span className="text-xs text-zinc-400 block mb-1">DATE & SCHEDULE</span>
-                <strong className="text-white text-xs">20th July | 00:30 AM Onwards</strong>
-              </div>
-
-              <div>
-                <span className="text-xs text-zinc-400 block mb-1">PASS TIER</span>
-                <strong className="text-white text-xs">ALL-INCLUSIVE SCREENING PASS</strong>
-              </div>
-
-              <div>
-                <span className="text-xs text-zinc-400 block mb-1">TOTAL AMOUNT VERIFIED</span>
-                <strong className="text-emerald-400 font-bold text-base">₹{activeBooking?.total_amount || totalPayable}</strong>
+              <div className="booking-id-pill">
+                <span className="text-xs text-gray-400 block">// UNPREDICTABLE BOOKING ID</span>
+                <strong className="text-white font-impact tracking-wider">{activeBooking.id}</strong>
               </div>
             </div>
 
-            <div className="bg-emerald-500/10 border border-emerald-500/30 p-4 rounded-xl text-emerald-400 font-tech text-xs my-6 text-left flex items-center gap-3">
-              <Sparkles size={20} className="shrink-0" />
-              <span>
-                <strong>IMPORTANT:</strong> Keep this confirmation or your verified WhatsApp number ({activeBooking?.user_phone || userPhone}) ready at the Screen 3 entrance for wristband verification.
-              </span>
+            {/* Specs Grid */}
+            <div className="grid grid-cols-2 gap-4 font-tech text-sm bg-zinc-900 border border-zinc-800 p-6 mb-8">
+              <div>
+                <span className="text-gray-400 block">// AUDITORIUM & SEATS</span>
+                <strong className="text-white text-base">INOX AUD 03 — SEATS [{activeBooking.seats.join(', ')}]</strong>
+              </div>
+              <div>
+                <span className="text-gray-400 block">// AMOUNT & UTR</span>
+                <strong className="text-white text-base">₹{activeBooking.total_amount} (UTR #{activeBooking.utr})</strong>
+              </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8 pt-6 border-t border-zinc-800">
+            {/* State Machine Timeline */}
+            <div className="mt-6">
+              <h4 className="font-tech text-xs text-gray-400 tracking-widest uppercase">// BOOKING STATE MACHINE TIMELINE</h4>
+              <div className="timeline-list">
+                {activeBooking.timeline && activeBooking.timeline.map((item, idx) => {
+                  const isLatest = idx === activeBooking.timeline.length - 1;
+                  return (
+                    <div key={idx} className={`timeline-item ${isLatest ? 'timeline-active' : ''}`}>
+                      <div className="timeline-dot" />
+                      <div className="timeline-state">
+                        [{item.state}] — <span className="text-xs font-normal text-gray-400">{new Date(item.timestamp).toLocaleTimeString()}</span>
+                      </div>
+                      <div className="timeline-note">{item.note}</div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="mt-10 pt-8 border-t border-zinc-800 flex justify-between items-center">
               <button 
-                type="button"
-                onClick={() => window.print()}
-                className="bg-white hover:bg-zinc-200 text-black font-bold py-3.5 px-8 rounded-lg text-sm font-tech uppercase tracking-wider shadow-xl transition-all"
+                className="btn-brutalist-outline text-xs py-3 px-6"
+                onClick={reloadTicketingData}
               >
-                DOWNLOAD / PRINT PASS →
+                <RefreshCw size={14} />
+                <span>REFRESH TIMELINE STATUS</span>
               </button>
 
               <button 
-                type="button"
+                className="btn-brutalist py-3 px-6"
                 onClick={onReturnHome}
-                className="bg-transparent border border-zinc-700 hover:border-zinc-500 text-white py-3.5 px-6 rounded-lg text-sm font-tech uppercase tracking-wider transition-all"
               >
-                RETURN TO HOME DASHBOARD
+                <RollingText text="BACK TO HOME SCREEN" stagger={true} />
               </button>
             </div>
 

@@ -22,8 +22,8 @@ export default function Navbar({ activeView, setActiveView, activeCategory = 'f1
           <nav className="navbar-links font-tech flex items-center justify-center gap-4">
             <button 
               type="button"
-              style={{ backgroundColor: 'transparent', background: 'transparent', border: 'none', boxShadow: 'none', outline: 'none', padding: '0.35rem 0.75rem', cursor: 'pointer', fontSize: '0.82rem', letterSpacing: '0.14em', fontWeight: '700' }}
-              className={`nav-link transition-colors ${activeCategory === 'f1' ? 'text-red-500 font-extrabold' : 'text-gray-300 hover:text-white'}`}
+              style={{ backgroundColor: 'transparent', background: 'transparent', border: 'none', boxShadow: 'none', outline: 'none', padding: '0.5rem 1rem', cursor: 'pointer', fontSize: '1.05rem', letterSpacing: '0.15em', fontWeight: '800' }}
+              className={`nav-link transition-all ${activeCategory === 'f1' ? 'text-red-500 font-black scale-105' : 'text-gray-300 hover:text-white'}`}
               onClick={() => {
                 if (setActiveCategory) setActiveCategory('f1');
               }}
@@ -32,8 +32,8 @@ export default function Navbar({ activeView, setActiveView, activeCategory = 'f1
             </button>
             <button 
               type="button"
-              style={{ backgroundColor: 'transparent', background: 'transparent', border: 'none', boxShadow: 'none', outline: 'none', padding: '0.35rem 0.75rem', cursor: 'pointer', fontSize: '0.82rem', letterSpacing: '0.14em', fontWeight: '700' }}
-              className={`nav-link transition-colors ${activeCategory === 'world_cup' ? 'text-red-500 font-extrabold' : 'text-gray-300 hover:text-white'}`}
+              style={{ backgroundColor: 'transparent', background: 'transparent', border: 'none', boxShadow: 'none', outline: 'none', padding: '0.5rem 1rem', cursor: 'pointer', fontSize: '1.05rem', letterSpacing: '0.15em', fontWeight: '800' }}
+              className={`nav-link transition-all ${activeCategory === 'world_cup' ? 'text-red-500 font-black scale-105' : 'text-gray-300 hover:text-white'}`}
               onClick={() => {
                 if (setActiveCategory) setActiveCategory('world_cup');
               }}
