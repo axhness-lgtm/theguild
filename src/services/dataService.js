@@ -23,15 +23,15 @@ export const UPCOMING_SCREENINGS = [
   {
     id: 'wc-final-2026',
     category: 'world_cup',
-    name: 'FIFA WORLD CUP FINAL 2026',
+    name: 'FIFA WORLD CUP FINAL // LIVE SCREENING',
     competition: 'FIFA WORLD CUP // GRAND FINALE',
-    date: 'SUN, JUL 20',
-    time: '00:30 AM IST ONWARDS',
-    venue: 'INOX SCREEN 03 // BEACH ROAD, VIZAG',
+    date: '20TH JULY',
+    time: '00:30 AM ONWARDS',
+    venue: 'VARUN INOX, BEACH ROAD, VIZAG',
     status: 'LIVE INOX BOOKING',
     isLive: true,
-    ticket_price: 399,
-    vip_price: 599,
+    ticket_price: 459,
+    vip_price: 459,
     capacity: '147 Seats Cinema Hangar',
     atmosphere: 'The ultimate football showdown in Visakhapatnam\'s largest private cinema hangar. BookMyShow style seat reservation, 4K HDR stadium feed, and stadium acoustic volume.'
   }

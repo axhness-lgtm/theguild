@@ -15,6 +15,7 @@ export default function EventModal({ event, onClose }) {
   // Step 2: UPI QR Payment & Screenshot Upload
   // Step 3: Booking Confirmed & Digital Pass
   const [step, setStep] = useState(1);
+  const [ticketCount, setTicketCount] = useState(1);
 
   const [form, setForm] = useState({
     name: '',
@@ -69,7 +70,8 @@ export default function EventModal({ event, onClose }) {
     }
 
     setIsSubmitting(true);
-    const packageName = `[F1 RACE: ${currentOption.name}] // GENERAL SCREENING PASS x1 SEAT`;
+    const totalAmount = currentPrice * ticketCount;
+    const packageName = `[${currentOption.name}] // GENERAL SCREENING PASS (x${ticketCount} ${ticketCount === 1 ? 'SEAT' : 'SEATS'})`;
 
     await dataService.submitInterest({
       name: form.name,
@@ -77,7 +79,7 @@ export default function EventModal({ event, onClose }) {
       instagram: form.instagram || 'Not provided',
       sportCategory: initialCategory,
       selectedEvent: currentOption.name,
-      packagePreference: `${packageName} [PAID: ₹${currentPrice} // SCREENSHOT VERIFIED]`,
+      packagePreference: `${packageName} [PAID: ₹${totalAmount} // SCREENSHOT VERIFIED]`,
       paymentScreenshot: form.screenshot
     });
     setIsSubmitting(false);
@@ -137,11 +139,11 @@ export default function EventModal({ event, onClose }) {
               </div>
               <div className="flex justify-between border-b border-zinc-800 pb-2.5 mb-2.5">
                 <span className="text-gray-400">PASS TIER:</span>
-                <strong className="text-white">GENERAL SCREENING PASS</strong>
+                <strong className="text-white">GENERAL PASS ({ticketCount} {ticketCount === 1 ? 'SEAT' : 'SEATS'})</strong>
               </div>
               <div className="flex justify-between border-b border-zinc-800 pb-2.5 mb-2.5">
                 <span className="text-gray-400">TOTAL AMOUNT PAID:</span>
-                <strong className="text-emerald-400 font-bold text-sm">₹{currentPrice}</strong>
+                <strong className="text-emerald-400 font-bold text-sm">₹{currentPrice * ticketCount}</strong>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-400">PAYMENT VERIFICATION:</span>
@@ -160,109 +162,100 @@ export default function EventModal({ event, onClose }) {
             </RevealItem>
           </div>
         ) : step === 2 ? (
-          <div className="modal-body p-6 animate-fade-in is-revealed reveal-active" style={{ maxWidth: '780px', margin: '0 auto', width: '100%' }}>
-            <div className="bg-red-950/40 border border-red-500/50 py-2 px-4 rounded mb-5 font-tech text-xs text-red-400 text-center font-bold">
-              // SCAN OFFICIAL UPI QR CODE BELOW & UPLOAD PAYMENT SCREENSHOT TO SECURE PASS
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+          <div className="modal-body p-6 animate-fade-in is-revealed reveal-active font-tech" style={{ maxWidth: '780px', margin: '0 auto', width: '100%' }}>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center bg-zinc-950 border border-zinc-800 p-6 md:p-8 rounded-2xl shadow-2xl">
               
-              {/* Left Box: Compact QR & Amount */}
-              <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-5 text-center shadow-xl">
-                <div className="font-tech text-xs text-gray-400 uppercase mb-1">TOTAL PAYABLE AMOUNT</div>
-                <div className="font-impact text-4xl text-emerald-400 mb-2">₹{currentPrice}</div>
-                <div className="font-tech text-xs text-gray-300 mb-3 bg-zinc-900 border border-zinc-800 py-1.5 px-3 rounded">
-                  {currentOption.name} // GENERAL SCREENING PASS
-                </div>
-
-                {/* QR Code Box */}
-                <div 
-                  className="bg-white rounded-lg shadow-lg border-2 border-zinc-300 mx-auto mb-4 p-2"
-                  style={{ width: '170px', height: '170px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                >
+              {/* Left Column: Official UPI QR Code ONLY */}
+              <div className="flex flex-col items-center justify-center p-4 bg-zinc-900/60 border border-zinc-800 rounded-xl h-full">
+                <div className="bg-white rounded-xl shadow-2xl border-4 border-zinc-200 p-3 flex items-center justify-center" style={{ width: '220px', height: '220px' }}>
                   <img 
                     src="/guildqr.png" 
                     alt="Official Guild UPI QR Code" 
-                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                    className="w-full h-full object-contain"
                   />
                 </div>
-
-                <div className="font-tech text-[11px] text-gray-400 mb-1.5">// OFFICIAL GUILD UPI ID:</div>
-                <div className="flex items-center justify-center gap-2 bg-zinc-900 border border-zinc-700 py-2 px-3 rounded text-xs font-mono text-white">
-                  <span>steveoguri07-2@okicici</span>
-                  <button 
-                    type="button" 
-                    onClick={handleCopyUpi} 
-                    className="text-red-400 hover:text-red-300 transition-colors"
-                    title="Copy UPI ID"
-                  >
-                    {copied ? <Check size={16} className="text-emerald-400" /> : <Copy size={16} />}
-                  </button>
-                </div>
+                <span className="text-xs text-gray-400 font-bold mt-4 tracking-wider uppercase">// OFFICIAL SCANNER QR</span>
               </div>
 
-              {/* Right Box: Screenshot Form */}
-              <form onSubmit={handleSubmitPayment} className="bg-zinc-900/90 border border-zinc-800 rounded-xl p-5 text-left flex flex-col justify-between h-full shadow-xl">
+              {/* Right Column: 1. UPI ID, 2. Total Amount, 3. Mandatory Screenshot Upload, 4. Confirm Button */}
+              <form onSubmit={handleSubmitPayment} className="flex flex-col justify-between space-y-5 h-full text-left">
+                
+                {/* 1. UPI ID */}
                 <div>
-                  <div className="font-tech text-xs text-emerald-400 mb-3 flex items-center gap-2 border-b border-zinc-800 pb-2.5">
-                    <QrCode size={16} />
-                    <span>VERIFY PAYMENT VIA SCREENSHOT</span>
-                  </div>
-
-                  <p className="font-tech text-xs text-gray-300 mb-4 leading-relaxed">
-                    After completing the UPI transfer of <strong className="text-emerald-400 font-bold">₹{currentPrice}</strong>, upload a screenshot of your payment receipt below. Our sureshot verification engine compresses and locks it right into the database.
-                  </p>
-
-                  <div className="form-group mb-5">
-                    <label className="font-tech text-xs text-white block mb-1.5 font-bold">
-                      MANDATORY PAYMENT SCREENSHOT *
-                    </label>
-                    <div className="bg-black border-2 border-dashed border-zinc-700 hover:border-red-500 rounded-lg p-4 text-center cursor-pointer transition-colors">
-                      <input 
-                        type="file" 
-                        accept="image/*" 
-                        id="f1-screenshot-upload" 
-                        required 
-                        className="hidden" 
-                        onChange={handleScreenshotSelect}
-                      />
-                      <label htmlFor="f1-screenshot-upload" className="cursor-pointer block">
-                        <Upload size={24} className="mx-auto text-red-500 mb-1.5" />
-                        <span className="text-xs text-gray-200 block font-tech font-bold truncate">
-                          {isCompressing ? 'COMPRESSING IMAGE...' : form.screenshotName ? `ATTACHED: ${form.screenshotName}` : '[ CLICK OR DROP PAYMENT SCREENSHOT ]'}
-                        </span>
-                        <span className="text-[10px] text-gray-500 font-tech block mt-1">
-                          Supported: JPG, PNG, WEBP (Max sureshot compression applied automatically)
-                        </span>
-                      </label>
-                      {form.screenshot && (
-                        <div className="mt-3 bg-zinc-900 p-2 rounded border border-zinc-700">
-                          <img src={form.screenshot} alt="Payment Receipt Preview" className="max-h-32 mx-auto rounded object-contain" />
-                          <span className="text-[10px] text-emerald-400 block mt-1 font-tech">✓ SURESHOT COMPRESSED DATA READY</span>
-                        </div>
-                      )}
-                    </div>
+                  <label className="text-[11px] text-gray-400 font-bold uppercase block mb-1 tracking-wider">OFFICIAL UPI ID</label>
+                  <div className="flex items-center justify-between bg-zinc-900 border border-zinc-700 py-3 px-3.5 rounded-lg text-sm font-mono text-white shadow-inner">
+                    <span className="font-bold tracking-wide">steveoguri07-2@okicici</span>
+                    <button 
+                      type="button" 
+                      onClick={handleCopyUpi} 
+                      className="text-red-400 hover:text-red-300 transition-colors bg-zinc-800 p-1.5 rounded flex items-center gap-1.5 text-xs font-tech"
+                      title="Copy UPI ID"
+                    >
+                      {copied ? <Check size={16} className="text-emerald-400" /> : <Copy size={16} />}
+                      <span>{copied ? 'COPIED' : 'COPY'}</span>
+                    </button>
                   </div>
                 </div>
 
-                <div className="flex gap-3 pt-3 border-t border-zinc-800">
+                {/* 2. Total Amount to be Paid */}
+                <div>
+                  <label className="text-[11px] text-gray-400 font-bold uppercase block mb-1 tracking-wider">TOTAL AMOUNT TO BE PAID</label>
+                  <div className="bg-zinc-900 border border-zinc-800 py-3 px-4 rounded-lg flex items-baseline justify-between">
+                    <span className="text-xs text-gray-300 font-tech">({ticketCount} {ticketCount === 1 ? 'Seat' : 'Seats'} × ₹{currentPrice})</span>
+                    <span className="font-impact text-3xl text-emerald-400">₹{currentPrice * ticketCount}</span>
+                  </div>
+                </div>
+
+                {/* 3. Mandatory Payment Screenshot Upload */}
+                <div>
+                  <label className="text-[11px] text-white font-bold uppercase block mb-1.5 tracking-wider flex items-center justify-between">
+                    <span>MANDATORY PAYMENT SCREENSHOT *</span>
+                    <span className="text-[10px] text-red-500 font-mono">[REQUIRED]</span>
+                  </label>
+                  <div className="bg-black border-2 border-dashed border-zinc-700 hover:border-red-500 rounded-lg p-4 text-center cursor-pointer transition-colors">
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      id="f1-screenshot-upload" 
+                      required 
+                      className="hidden" 
+                      onChange={handleScreenshotSelect}
+                    />
+                    <label htmlFor="f1-screenshot-upload" className="cursor-pointer block">
+                      <Upload size={22} className="mx-auto text-red-500 mb-1.5" />
+                      <span className="text-xs text-gray-200 block font-bold truncate">
+                        {isCompressing ? 'COMPRESSING IMAGE...' : form.screenshotName ? `ATTACHED: ${form.screenshotName}` : '[ CLICK OR DROP PAYMENT SCREENSHOT ]'}
+                      </span>
+                    </label>
+                    {form.screenshot && (
+                      <div className="mt-3 bg-zinc-900 p-2 rounded border border-zinc-700">
+                        <img src={form.screenshot} alt="Payment Receipt Preview" className="max-h-24 mx-auto rounded object-contain" />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Navigation & Submit Button */}
+                <div className="flex gap-3 pt-1">
                   <button 
                     type="button" 
                     onClick={() => setStep(1)} 
-                    className="btn-brutalist bg-zinc-800 border-zinc-700 hover:bg-zinc-700 py-3 px-4 text-xs font-tech"
+                    className="btn-brutalist bg-zinc-800 border-zinc-700 hover:bg-zinc-700 py-3.5 px-4 text-xs font-tech font-bold"
                   >
                     ← BACK
                   </button>
                   
                   <button 
                     type="submit" 
-                    className="btn-brutalist flex-1 py-3 px-4 text-xs font-tech flex items-center justify-center gap-2 bg-red-600 hover:bg-red-500 text-white border-red-500"
+                    className="btn-brutalist flex-1 py-3.5 px-4 text-xs font-tech flex items-center justify-center gap-2 bg-red-600 hover:bg-red-500 text-white border-red-500 font-bold tracking-wider uppercase shadow-lg"
                     disabled={isSubmitting || isCompressing || !form.screenshot}
                   >
-                    <span>{isSubmitting ? 'SAVING SCREENSHOT...' : `CONFIRM BOOKING (₹${currentPrice})`}</span>
+                    <span>{isSubmitting ? 'VERIFYING...' : `SUBMIT & REGISTER (₹${currentPrice * ticketCount})`}</span>
                     <ArrowRight size={16} />
                   </button>
                 </div>
+
               </form>
 
             </div>
@@ -359,30 +352,57 @@ export default function EventModal({ event, onClose }) {
                       className="w-full bg-zinc-900 border border-zinc-800 text-white rounded py-2.5 px-3.5 text-xs focus:border-red-500 outline-none"
                     />
                   </div>
+
+                  <div className="form-group pt-2">
+                    <label className="font-tech text-xs text-gray-300 block mb-1.5 font-bold">
+                      NUMBER OF SEATS TO BOOK (MAX 5) *
+                    </label>
+                    <div className="flex items-center gap-3 bg-zinc-900 border border-zinc-800 p-2 rounded-lg w-fit shadow-inner">
+                      <button 
+                        type="button" 
+                        onClick={() => setTicketCount(Math.max(1, ticketCount - 1))}
+                        disabled={ticketCount <= 1}
+                        className="w-9 h-9 flex items-center justify-center bg-zinc-800 hover:bg-zinc-700 disabled:opacity-30 text-white font-bold text-lg rounded border border-zinc-700 transition-colors"
+                      >
+                        -
+                      </button>
+                      <span className="font-impact text-2xl text-white px-5 min-w-[50px] text-center">
+                        {ticketCount}
+                      </span>
+                      <button 
+                        type="button" 
+                        onClick={() => setTicketCount(Math.min(5, ticketCount + 1))}
+                        disabled={ticketCount >= 5}
+                        className="w-9 h-9 flex items-center justify-center bg-zinc-800 hover:bg-zinc-700 disabled:opacity-30 text-white font-bold text-lg rounded border border-zinc-700 transition-colors"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="bg-zinc-900/80 border border-zinc-800 p-4 rounded-lg my-4">
                   <div className="flex justify-between items-center font-tech text-xs mb-1">
                     <span className="text-gray-400">SELECTED TIER:</span>
-                    <span className="font-bold text-white">GENERAL SCREENING PASS</span>
+                    <span className="font-bold text-white">GENERAL SCREENING PASS ({ticketCount} {ticketCount === 1 ? 'SEAT' : 'SEATS'})</span>
                   </div>
                   <div className="flex justify-between items-center font-tech text-xs">
                     <span className="text-gray-400">PASS PRICE:</span>
-                    <span className="font-bold text-emerald-400 text-sm">₹{currentPrice}</span>
+                    <span className="font-bold text-emerald-400 text-sm">₹{currentPrice} per seat</span>
                   </div>
                 </div>
               </div>
 
               <div className="pt-4 border-t border-zinc-800 mt-5">
                 <div className="flex justify-between items-center mb-3 font-tech">
-                  <span className="text-xs text-gray-400">TOTAL PAYABLE:</span>
-                  <span className="text-xl font-bold text-emerald-400">₹{currentPrice}</span>
+                  <span className="text-xs text-gray-400 font-bold uppercase">TOTAL PAYABLE:</span>
+                  <span className="text-2xl font-impact text-emerald-400">₹{currentPrice * ticketCount}</span>
                 </div>
                 <button 
                   type="submit" 
-                  className="btn-brutalist submit-btn w-full py-3.5 text-xs flex items-center justify-center gap-2 bg-red-600 hover:bg-red-500 text-white font-tech font-bold"
+                  className="btn-brutalist submit-btn w-full py-3.5 text-xs flex items-center justify-center gap-2 bg-red-600 hover:bg-red-500 text-white font-tech font-bold uppercase tracking-wider"
                 >
-                  <span>PROCEED TO UPI QR PAYMENT (₹{currentPrice})</span>
+                  <span>PROCEED TO UPI QR PAYMENT (₹{currentPrice * ticketCount})</span>
                   <ArrowRight size={16} />
                 </button>
               </div>

@@ -53,10 +53,10 @@ function getInitialTicketingState() {
     event: {
       id: 'fifa-wc-final-2026',
       name: 'FIFA WORLD CUP FINAL // LIVE SCREENING',
-      venue: "INOX VARUN'S MALL — SCREEN 3 // VISAKHAPATNAM",
-      date: 'SUN, JUL 19, 2026',
-      time: '7:00 PM IST (GATES OPEN 6:00 PM)',
-      ticket_price: 1,
+      venue: 'VARUN INOX, BEACH ROAD, VIZAG',
+      date: '20TH JULY',
+      time: '00:30 AM ONWARDS',
+      ticket_price: 459,
       total_seats: 147,
       max_seats_per_booking: 4,
       upi_id: 'steveoguri07-2@okicici', // Official permanent UPI ID
@@ -76,7 +76,14 @@ function getLocalStore() {
     return initial;
   }
   try {
-    return JSON.parse(data);
+    const parsed = JSON.parse(data);
+    if (parsed && parsed.event) {
+      parsed.event.ticket_price = 459;
+      parsed.event.venue = 'VARUN INOX, BEACH ROAD, VIZAG';
+      parsed.event.date = '20TH JULY';
+      parsed.event.time = '00:30 AM ONWARDS';
+    }
+    return parsed;
   } catch (e) {
     const initial = getInitialTicketingState();
     localStorage.setItem(LOCAL_TICKETING_KEY, JSON.stringify(initial));

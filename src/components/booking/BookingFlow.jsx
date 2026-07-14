@@ -18,6 +18,7 @@ export default function BookingFlow({ onReturnHome }) {
   const [step, setStep] = useState('overview'); // 'overview' | 'seatmap' | 'contact' | 'payment' | 'confirmation'
   const [ticketingData, setTicketingData] = useState(null);
   const [selectedSeats, setSelectedSeats] = useState([]);
+  const [targetSeatCount, setTargetSeatCount] = useState(2);
   const [ruleError, setRuleError] = useState(null);
   
   // Contact Form State
@@ -85,6 +86,32 @@ export default function BookingFlow({ onReturnHome }) {
     setRuleError(null);
     if (seat.status !== 'AVAILABLE') return;
 
+    // If currently 1 seat is selected, check if user is clicking another seat on the exact same row as an end point
+    if (selectedSeats.length === 1 && !selectedSeats.includes(seat.label)) {
+      const firstSeatLabel = selectedSeats[0];
+      const firstSeatObj = ticketingData.seats.find(s => s.label === firstSeatLabel);
+      if (firstSeatObj && firstSeatObj.row_label === seat.row_label) {
+        const minNum = Math.min(firstSeatObj.seat_number, seat.seat_number);
+        const maxNum = Math.max(firstSeatObj.seat_number, seat.seat_number);
+        const rangeCount = maxNum - minNum + 1;
+        if (rangeCount <= 4) {
+          const rowRangeSeats = ticketingData.seats.filter(
+            s => s.row_label === seat.row_label && s.seat_number >= minNum && s.seat_number <= maxNum
+          );
+          const allAvailable = rowRangeSeats.every(s => s.status === 'AVAILABLE');
+          if (allAvailable && rowRangeSeats.length === rangeCount) {
+            const rangeLabels = rowRangeSeats.map(s => s.label);
+            setSelectedSeats(rangeLabels);
+            if (targetSeatCount !== rangeCount) setTargetSeatCount(rangeCount);
+            return;
+          }
+        } else {
+          setRuleError('[ RULE VIOLATION ] MAXIMUM 4 SEATS ALLOWED PER BOOKING.');
+          return;
+        }
+      }
+    }
+
     let updatedSelection = [...selectedSeats];
     if (updatedSelection.includes(seat.label)) {
       updatedSelection = updatedSelection.filter(l => l !== seat.label);
@@ -108,6 +135,7 @@ export default function BookingFlow({ onReturnHome }) {
     }
 
     setSelectedSeats(updatedSelection);
+    if (updatedSelection.length > 0) setTargetSeatCount(updatedSelection.length);
   };
 
   // Step 3: Trigger Atomic Reservation
@@ -191,10 +219,10 @@ export default function BookingFlow({ onReturnHome }) {
           <div className="h-left">
             <span className="booking-step-badge">
               <Ticket size={14} />
-              <span>INOX AUDITORIUM 03 // VISAKHAPATNAM</span>
+              <span>VARUN INOX, BEACH ROAD, VIZAG</span>
             </span>
-            <h1 className="booking-event-title font-impact">{event.name}</h1>
-            <p className="booking-venue-sub">{event.venue} — {event.date} // {event.time}</p>
+            <h1 className="booking-event-title font-impact">FIFA WORLD CUP FINAL</h1>
+            <p className="booking-venue-sub font-tech font-bold text-emerald-400">20TH JULY | 00:30 AM ONWARDS — ₹{event.ticket_price} (SEATING + SNACK + BEVERAGE)</p>
           </div>
 
           <div className="h-right flex items-center gap-4">
@@ -219,45 +247,64 @@ export default function BookingFlow({ onReturnHome }) {
           PAGE 1: OVERVIEW & SCREENING RULES (STREAMLINED FOR FAST CHECKOUT)
           ========================================================================= */}
       {step === 'overview' && (
-        <div className="grid-container">
-          <div className="booking-overview-grid max-w-4xl mx-auto">
-            <div className="overview-main w-full">
-              <div className="overview-banner-card bg-zinc-900 border border-zinc-800 p-8 is-revealed reveal-active animate-fade-in">
-                <LineReveal delay={0.1} className="section-index font-tech text-red-500 text-xs">// SCREEN 03 // INOX VARUN'S MALL</LineReveal>
-                <LineReveal delay={0.2} as="h2" className="text-3xl font-impact text-white mt-1 mb-3">FIFA WORLD CUP FINAL // LIVE SCREENING</LineReveal>
-                <RevealItem delay={0.3} className="text-gray-300 text-sm mb-6 leading-relaxed">
-                  Join Visakhapatnam's most passionate collective inside an acoustically engineered 147-seat auditorium. Synchronized stadium sound arrays and private laser projection.
-                </RevealItem>
+        <div className="grid-container py-8">
+          <div className="booking-overview-grid max-w-3xl mx-auto text-center">
+            
+            {/* Top Important Hierarchy Block */}
+            <div className="overview-main w-full bg-zinc-950 border border-zinc-800 p-8 md:p-12 rounded-2xl shadow-2xl is-revealed reveal-active animate-fade-in">
+              <LineReveal delay={0.1} className="font-tech text-red-500 text-sm font-bold tracking-widest uppercase mb-2">
+                VARUN INOX, BEACH ROAD, VIZAG
+              </LineReveal>
+              
+              <LineReveal delay={0.2} as="h2" className="text-4xl md:text-6xl font-impact text-white uppercase tracking-tight my-2">
+                FIFA WORLD CUP FINAL
+              </LineReveal>
+              
+              <LineReveal delay={0.3} className="font-tech text-emerald-400 text-lg md:text-xl font-bold uppercase tracking-wider mb-8">
+                20TH JULY | 00:30 AM ONWARDS
+              </LineReveal>
 
-                <RevealItem delay={0.4} className="grid grid-cols-2 gap-4 mb-8 bg-black/40 p-4 border border-zinc-800 font-tech text-sm">
-                  <div>
-                    <span className="text-gray-400 block text-xs">// TICKET PRICE</span>
-                    <strong className="text-white text-lg">₹{event.ticket_price}</strong> <span className="text-xs text-gray-400">ALL INCLUSIVE</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-400 block text-xs">// SEATS AVAILABLE</span>
-                    <strong className="text-red-500 text-lg">{seatsAvailableCount} / 147</strong> <span className="text-xs text-gray-400">OPEN NOW</span>
-                  </div>
-                </RevealItem>
+              {/* Price & Coverage Highlight Box */}
+              <RevealItem delay={0.4} className="bg-zinc-900 border-2 border-zinc-700/80 p-6 rounded-xl max-w-lg mx-auto mb-10 shadow-xl">
+                <div className="font-tech text-xs text-gray-400 uppercase tracking-widest mb-1">// OFFICIAL PASS TIER & PRICING</div>
+                <div className="font-impact text-5xl text-white my-2">₹{event.ticket_price}/-</div>
+                <div className="font-tech text-xs md:text-sm text-emerald-400 font-bold tracking-wider bg-black/60 border border-emerald-500/30 py-2.5 px-4 rounded-lg mt-3 inline-block">
+                  INCLUDES: SEATING PRICE + SNACK + BEVERAGE
+                </div>
+              </RevealItem>
 
-                <RevealItem delay={0.5} className="booking-rules-box bg-zinc-950 border border-zinc-800 p-4 mb-8">
-                  <div className="rules-title font-tech text-xs text-gray-400 mb-2">// QUICK BOOKING RULES</div>
-                  <ul className="text-xs text-gray-300 space-y-2 font-tech">
-                    <li className="flex items-center gap-2"><span className="text-red-500">●</span> <strong>MAX 4 SEATS:</strong> Up to 4 consecutive seats per transaction.</li>
-                    <li className="flex items-center gap-2"><span className="text-yellow-500">●</span> <strong>CONSECUTIVE ONLY:</strong> Seats must be adjacent within the exact same row.</li>
-                    <li className="flex items-center gap-2"><span className="text-emerald-500">●</span> <strong>10-MIN TIMER:</strong> Complete UPI verification within 10 mins once seats are picked.</li>
-                  </ul>
-                </RevealItem>
+              {/* Separate Booking Rules Box with clear visual hierarchy */}
+              <RevealItem delay={0.5} className="booking-rules-box bg-black/60 border border-zinc-800 p-6 rounded-xl max-w-xl mx-auto text-left mb-10">
+                <div className="rules-title font-tech text-xs text-red-500 font-bold uppercase tracking-widest border-b border-zinc-800 pb-2 mb-4 flex items-center gap-2">
+                  <ShieldCheck size={16} />
+                  <span>// SEAT RESERVATION & BOOKING RULES</span>
+                </div>
+                <ul className="text-xs md:text-sm text-gray-300 space-y-3.5 font-tech">
+                  <li className="flex items-start gap-2.5">
+                    <span className="text-red-500 font-bold text-base leading-none">●</span> 
+                    <span><strong className="text-white">MAX 4 SEATS:</strong> Select up to 4 seats per booking. Use our pre-select counter before or during seat map selection.</span>
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <span className="text-yellow-500 font-bold text-base leading-none">●</span> 
+                    <span><strong className="text-white">CONSECUTIVE ADJACENT:</strong> Multiple seats must be consecutive within the same row (e.g. D1 to D3 automatically picks D2).</span>
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <span className="text-emerald-500 font-bold text-base leading-none">●</span> 
+                    <span><strong className="text-white">10-MIN UPI TIMER:</strong> Complete your UPI transaction and attach screenshot within 10 minutes once seats are locked.</span>
+                  </li>
+                </ul>
+              </RevealItem>
 
-                <RevealItem delay={0.6}>
-                  <button 
-                    className="btn-brutalist w-full py-4 text-center justify-center text-sm"
-                    onClick={() => setStep('seatmap')}
-                  >
-                    <RollingText text="SELECT SEATS ON SCREEN 3 MAP →" stagger={true} />
-                  </button>
-                </RevealItem>
-              </div>
+              {/* Centered Action Button */}
+              <RevealItem delay={0.6} className="flex justify-center">
+                <button 
+                  className="btn-brutalist py-4 px-10 text-center justify-center text-sm uppercase tracking-wider font-bold bg-red-600 hover:bg-red-500 text-white border-red-500 shadow-2xl transition-transform hover:scale-105"
+                  onClick={() => setStep('seatmap')}
+                >
+                  <RollingText text="SELECT SEATS ON SCREEN 3 MAP →" stagger={true} />
+                </button>
+              </RevealItem>
+
             </div>
           </div>
         </div>
@@ -277,14 +324,43 @@ export default function BookingFlow({ onReturnHome }) {
               </div>
             )}
 
+            {/* Target Seat Count Pre-selector Box */}
+            <div className="bg-zinc-950 border border-zinc-800 p-4 rounded-xl mb-6 max-w-lg mx-auto flex items-center justify-between shadow-xl">
+              <div>
+                <div className="font-tech text-xs text-red-500 font-bold uppercase tracking-wider">// NUMBER OF SEATS TO BOOK (MAX 4)</div>
+                <div className="font-tech text-[11px] text-gray-400 mt-0.5">Click start & end seat (e.g. D1 then D3) to auto-select consecutive seats</div>
+              </div>
+              <div className="flex items-center gap-3 bg-black border border-zinc-700 p-1.5 rounded-lg">
+                <button 
+                  type="button" 
+                  onClick={() => setTargetSeatCount(Math.max(1, targetSeatCount - 1))}
+                  disabled={targetSeatCount <= 1}
+                  className="w-8 h-8 flex items-center justify-center bg-zinc-800 hover:bg-zinc-700 disabled:opacity-30 text-white font-bold text-base rounded border border-zinc-700"
+                >
+                  -
+                </button>
+                <span className="font-impact text-2xl text-white px-3 min-w-[36px] text-center">
+                  {targetSeatCount}
+                </span>
+                <button 
+                  type="button" 
+                  onClick={() => setTargetSeatCount(Math.min(4, targetSeatCount + 1))}
+                  disabled={targetSeatCount >= 4}
+                  className="w-8 h-8 flex items-center justify-center bg-zinc-800 hover:bg-zinc-700 disabled:opacity-30 text-white font-bold text-base rounded border border-zinc-700"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
             <div className="cinema-screen-wrap">
               <div className="cinema-screen-bar" />
-              <span className="cinema-screen-label font-tech text-xs">// SCREEN 3 — INOX VARUN'S MALL, VISAKHAPATNAM // ALL SIGHTLINES UNBLOCKABLE //</span>
+              <span className="cinema-screen-label font-tech text-xs">// SCREEN 3 — VARUN INOX, BEACH ROAD, VIZAG // ALL SIGHTLINES UNBLOCKABLE //</span>
             </div>
 
             {/* Legend */}
             <div className="seatmap-legend mb-6">
-              <div className="legend-item"><div className="legend-box legend-available" /><span>AVAILABLE (₹{event.ticket_price || 1})</span></div>
+              <div className="legend-item"><div className="legend-box legend-available" /><span>AVAILABLE (₹{event.ticket_price})</span></div>
               <div className="legend-item"><div className="legend-box legend-selected" /><span>SELECTED</span></div>
               <div className="legend-item"><div className="legend-box legend-held" /><span>HELD</span></div>
               <div className="legend-item"><div className="legend-box legend-booked" /><span>BOOKED</span></div>
@@ -484,78 +560,95 @@ export default function BookingFlow({ onReturnHome }) {
               </button>
             </div>
           ) : (
-            <div className="payment-grid max-w-4xl mx-auto my-6 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center bg-zinc-950 border border-zinc-800 p-6 md:p-8 rounded-2xl shadow-2xl max-w-4xl mx-auto my-6 font-tech">
               
-              {/* Left: Static UPI QR Code */}
-              <div className="upi-qr-card bg-zinc-900 border border-zinc-800 p-6 text-center font-tech">
-                <span className="section-index text-red-500 text-xs">// 03 — PAY VIA UPI QR</span>
-                <h3 className="text-xl font-impact mt-1 mb-1">SCAN & PAY ₹{activeBooking.total_amount}</h3>
-                <p className="text-xs text-gray-400 mb-4">GPay // PhonePe // Paytm // CRED</p>
-
-                <div className="qr-image-box bg-white p-3 inline-block rounded border border-zinc-700 mx-auto">
+              {/* Left Column: Static UPI QR Code ONLY */}
+              <div className="flex flex-col items-center justify-center p-6 bg-zinc-900/60 border border-zinc-800 rounded-xl h-full text-center">
+                <span className="text-red-500 font-bold text-xs tracking-widest uppercase mb-4">// OFFICIAL SCANNER QR</span>
+                <div className="bg-white rounded-xl shadow-2xl border-4 border-zinc-200 p-3 flex items-center justify-center" style={{ width: '220px', height: '220px' }}>
                   <img 
                     src="/guildqr.png" 
                     alt="Official Guild UPI QR Code" 
-                    className="qr-code-img w-48 h-48 mx-auto object-contain"
+                    className="w-full h-full object-contain"
                   />
                 </div>
-
-                <div className="mt-4 bg-zinc-950 p-3 border border-zinc-800 text-left">
-                  <span className="text-[10px] text-gray-400 block">// OFFICIAL UPI ID</span>
-                  <div className="upi-id-box font-mono font-bold text-sm text-purple-300">steveoguri07-2@okicici</div>
-                </div>
+                <span className="text-xs text-gray-400 font-bold mt-4 tracking-wider uppercase">GPay // PhonePe // Paytm // CRED</span>
               </div>
 
-              {/* Right: Screenshot Verification Form */}
-              <div className="utr-form-card bg-zinc-900 border border-zinc-800 p-6 font-tech">
-                <span className="section-index text-red-500 text-xs">// 04 — VERIFY PAYMENT</span>
-                <h3 className="text-xl font-impact mt-1 mb-4">UPLOAD PAYMENT SCREENSHOT</h3>
-
-                <form onSubmit={handleSubmitPayment} className="space-y-4">
-                  <p className="text-xs text-gray-300 leading-relaxed mb-2">
-                    After completing the UPI transfer of <strong className="text-emerald-400 font-bold">₹{activeBooking.total_amount}</strong>, uploading a screenshot of your transaction receipt is <strong className="text-red-500 underline">mandatory</strong>. Our sureshot image compression engine secures and embeds it right into your booking record.
-                  </p>
-
-                  <div>
-                    <label className="block text-xs text-white font-bold mb-1.5">MANDATORY TRANSACTION SCREENSHOT *</label>
-                    <div className="screenshot-dropzone bg-zinc-950 border-2 border-dashed border-zinc-700 hover:border-red-500 p-5 text-center cursor-pointer transition-all rounded-lg">
-                      <input 
-                        type="file" 
-                        accept="image/*" 
-                        id="screenshot-input" 
-                        required
-                        className="hidden" 
-                        onChange={handleFileUpload}
-                      />
-                      <label htmlFor="screenshot-input" className="cursor-pointer block">
-                        <Upload size={24} className="mx-auto text-red-500 mb-2" />
-                        <span className="text-xs text-gray-200 block font-bold truncate">
-                          {isCompressing ? 'COMPRESSING & PROCESSING...' : screenshotName ? `ATTACHED: ${screenshotName}` : '[ CLICK OR DROP PAYMENT SCREENSHOT ]'}
-                        </span>
-                        <span className="text-[10px] text-gray-500 block mt-1">
-                          Supported: JPG, PNG, WEBP (Max ~50KB sureshot compression applied automatically)
-                        </span>
-                      </label>
-                      {screenshotUrl && (
-                        <div className="mt-4 bg-zinc-900 p-2 rounded border border-zinc-700">
-                          <img src={screenshotUrl} alt="Screenshot Preview" className="max-h-36 mx-auto rounded object-contain" />
-                          <span className="text-[10px] text-emerald-400 block mt-1">✓ SURESHOT COMPRESSED DATA EMBEDDED</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="pt-4 mt-4 border-t border-zinc-800">
+              {/* Right Column: 1. UPI ID, 2. Total Amount, 3. Mandatory Screenshot Upload, 4. Confirm Button */}
+              <form onSubmit={handleSubmitPayment} className="flex flex-col justify-between space-y-5 h-full text-left">
+                
+                {/* 1. UPI ID */}
+                <div>
+                  <label className="text-[11px] text-gray-400 font-bold uppercase block mb-1 tracking-wider">OFFICIAL UPI ID</label>
+                  <div className="flex items-center justify-between bg-zinc-900 border border-zinc-700 py-3 px-3.5 rounded-lg text-sm font-mono text-white shadow-inner">
+                    <span className="font-bold tracking-wide">steveoguri07-2@okicici</span>
                     <button 
-                      type="submit" 
-                      className="btn-brutalist w-full py-3.5 text-center justify-center text-xs bg-red-600 hover:bg-red-500 text-white border-red-500"
-                      disabled={isSubmittingPayment || isCompressing || !screenshotUrl}
+                      type="button" 
+                      onClick={() => {
+                        navigator.clipboard.writeText('steveoguri07-2@okicici');
+                        alert('UPI ID copied to clipboard!');
+                      }} 
+                      className="text-red-400 hover:text-red-300 transition-colors bg-zinc-800 p-1.5 rounded text-xs font-tech font-bold"
                     >
-                      <RollingText text={isSubmittingPayment ? "SECURING SCREENSHOT & PASS..." : "SUBMIT SCREENSHOT & CONFIRM TICKETS →"} stagger={true} />
+                      COPY
                     </button>
                   </div>
-                </form>
-              </div>
+                </div>
+
+                {/* 2. Total Amount to be Paid & Coverage Note */}
+                <div>
+                  <label className="text-[11px] text-gray-400 font-bold uppercase block mb-1 tracking-wider">TOTAL AMOUNT TO BE PAID</label>
+                  <div className="bg-zinc-900 border border-zinc-800 py-3 px-4 rounded-lg flex flex-col justify-between">
+                    <div className="flex items-baseline justify-between">
+                      <span className="text-xs text-gray-300 font-tech">({activeBooking.seats.length} {activeBooking.seats.length === 1 ? 'Seat' : 'Seats'} × ₹{event.ticket_price})</span>
+                      <span className="font-impact text-3xl text-emerald-400">₹{activeBooking.total_amount}</span>
+                    </div>
+                    <span className="text-[10px] text-emerald-400 mt-1 font-bold tracking-wider uppercase">// INCLUDES: SEATING PRICE + SNACK + BEVERAGE</span>
+                  </div>
+                </div>
+
+                {/* 3. Mandatory Transaction Screenshot Upload */}
+                <div>
+                  <label className="text-[11px] text-white font-bold uppercase block mb-1.5 tracking-wider flex items-center justify-between">
+                    <span>MANDATORY TRANSACTION SCREENSHOT *</span>
+                    <span className="text-[10px] text-red-500 font-mono">[REQUIRED]</span>
+                  </label>
+                  <div className="bg-black border-2 border-dashed border-zinc-700 hover:border-red-500 rounded-lg p-4 text-center cursor-pointer transition-colors">
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      id="screenshot-input" 
+                      required
+                      className="hidden" 
+                      onChange={handleFileUpload}
+                    />
+                    <label htmlFor="screenshot-input" className="cursor-pointer block">
+                      <Upload size={22} className="mx-auto text-red-500 mb-1.5" />
+                      <span className="text-xs text-gray-200 block font-bold truncate">
+                        {isCompressing ? 'COMPRESSING & PROCESSING...' : screenshotName ? `ATTACHED: ${screenshotName}` : '[ CLICK OR DROP PAYMENT SCREENSHOT ]'}
+                      </span>
+                    </label>
+                    {screenshotUrl && (
+                      <div className="mt-3 bg-zinc-900 p-2 rounded border border-zinc-700">
+                        <img src={screenshotUrl} alt="Screenshot Preview" className="max-h-24 mx-auto rounded object-contain" />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Navigation & Submit Button */}
+                <div className="pt-2 border-t border-zinc-800">
+                  <button 
+                    type="submit" 
+                    className="btn-brutalist w-full py-3.5 text-center justify-center text-xs bg-red-600 hover:bg-red-500 text-white border-red-500 font-bold tracking-wider uppercase shadow-lg"
+                    disabled={isSubmittingPayment || isCompressing || !screenshotUrl}
+                  >
+                    <RollingText text={isSubmittingPayment ? "SECURING SCREENSHOT & PASS..." : `SUBMIT SCREENSHOT & CONFIRM TICKETS (₹${activeBooking.total_amount}) →`} stagger={true} />
+                  </button>
+                </div>
+
+              </form>
 
             </div>
           )}
