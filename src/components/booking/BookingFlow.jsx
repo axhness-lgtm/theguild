@@ -505,24 +505,41 @@ export default function BookingFlow({ onReturnHome }) {
               </div>
             </div>
 
-            {/* High-Contrast Legend */}
-            <div className="bg-zinc-950 border-2 border-zinc-800 py-4 px-6 rounded-2xl flex flex-wrap items-center justify-center gap-6 shadow-xl mx-auto mb-8 font-tech text-xs sm:text-sm font-bold">
-              <div className="flex items-center gap-2">
-                <div className="w-5 h-5 rounded bg-zinc-800 border-2 border-zinc-600" />
-                <span className="text-gray-300">AVAILABLE (₹{event.ticket_price})</span>
+            {/* High-Contrast Interactive Legend with Replica Seat Illustrations */}
+            <div className="bg-zinc-950 border-2 border-zinc-800 p-5 rounded-2xl flex flex-wrap items-center justify-center gap-3 sm:gap-4 shadow-2xl mx-auto mb-8 font-tech text-xs sm:text-sm font-bold w-full">
+              
+              {/* Available */}
+              <div className="flex items-center gap-3 bg-black/80 border border-zinc-800 px-3.5 py-2 rounded-xl shrink-0">
+                <div className="w-8 h-8 rounded-md bg-zinc-800 border-2 border-zinc-500 text-white font-bold flex items-center justify-center text-xs shrink-0 shadow">
+                  A1
+                </div>
+                <span className="text-gray-200 tracking-wide font-impact">AVAILABLE (₹{event.ticket_price})</span>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-5 h-5 rounded bg-red-600 border-2 border-white shadow-lg shadow-red-500/60" />
-                <span className="text-white font-black">SELECTED</span>
+
+              {/* Selected */}
+              <div className="flex items-center gap-3 bg-red-950/40 border border-red-600/60 px-3.5 py-2 rounded-xl shrink-0">
+                <div className="w-8 h-8 rounded-md bg-red-600 border-2 border-white text-white font-black flex items-center justify-center text-xs shrink-0 shadow-lg shadow-red-500/80 ring-1 ring-white">
+                  ✓
+                </div>
+                <span className="text-white font-impact tracking-wide">SELECTED</span>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-5 h-5 rounded bg-amber-500 border border-amber-300 opacity-60" />
-                <span className="text-amber-300">HELD / RESERVED</span>
+
+              {/* Held / Reserved */}
+              <div className="flex items-center gap-3 bg-amber-950/40 border border-amber-600/50 px-3.5 py-2 rounded-xl shrink-0">
+                <div className="w-8 h-8 rounded-md bg-amber-500/20 border-2 border-amber-500 text-amber-400 font-bold flex items-center justify-center text-xs shrink-0">
+                  🔒
+                </div>
+                <span className="text-amber-300 font-impact tracking-wide">HELD / RESERVED</span>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-5 h-5 rounded bg-zinc-950 border border-zinc-800 opacity-40 flex items-center justify-center text-[10px] text-zinc-600">✕</div>
-                <span className="text-zinc-500">BOOKED / SOLD</span>
+
+              {/* Booked / Sold */}
+              <div className="flex items-center gap-3 bg-zinc-900/60 border border-zinc-800 px-3.5 py-2 rounded-xl shrink-0">
+                <div className="w-8 h-8 rounded-md bg-zinc-950 border border-zinc-800 text-zinc-500 font-bold flex items-center justify-center text-xs shrink-0 opacity-60">
+                  ✕
+                </div>
+                <span className="text-zinc-500 font-impact tracking-wide">BOOKED / SOLD</span>
               </div>
+
             </div>
 
             {/* Seat Rows Grid (Rows K down to A matching physical diagram exactly) */}
