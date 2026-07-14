@@ -68,31 +68,65 @@ function getInitialTicketingState() {
   };
 }
 
+function ensureBlockedSeats(store) {
+  if (!store || !store.bookings) return store;
+  const blockedSeats = ['F13', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10'];
+  const vipBookingId = 'GLD-VIP-BLOCKED';
+  
+  const existingIndex = store.bookings.findIndex(b => b.id === vipBookingId);
+  const vipBooking = {
+    id: vipBookingId,
+    event_id: store.event ? store.event.id : 'fifa-wc-final-2026',
+    user_name: 'GUILD VIP / BLOCKED SEATS',
+    user_phone: '+91 99999 99999',
+    user_email: 'ops@theguild.app',
+    total_amount: 499 * blockedSeats.length,
+    status: 'CONFIRMED',
+    seats: blockedSeats,
+    utr: 'SYSTEM_HARDCODED_BLOCK',
+    screenshot_url: 'https://via.placeholder.com/400x300.png?text=VIP+BLOCKED',
+    timeline: [
+      { state: 'CONFIRMED', timestamp: new Date(2026, 6, 1, 12, 0).toISOString(), note: 'Hardcoded blocked seating: F13, A5-A10' }
+    ],
+    created_at: new Date(2026, 6, 1, 12, 0).toISOString(),
+    expires_at: new Date(2026, 11, 31, 23, 59).toISOString()
+  };
+
+  if (existingIndex === -1) {
+    store.bookings.push(vipBooking);
+  } else {
+    store.bookings[existingIndex] = vipBooking;
+  }
+  return store;
+}
+
 function getLocalStore() {
   const data = localStorage.getItem(LOCAL_TICKETING_KEY);
   if (!data) {
-    const initial = getInitialTicketingState();
+    const initial = ensureBlockedSeats(getInitialTicketingState());
     localStorage.setItem(LOCAL_TICKETING_KEY, JSON.stringify(initial));
     return initial;
   }
   try {
-    const parsed = JSON.parse(data);
+    let parsed = JSON.parse(data);
     if (parsed && parsed.event) {
       parsed.event.ticket_price = 499;
       parsed.event.venue = 'PVR INOX, BEACH ROAD, VIZAG';
       parsed.event.date = '20TH JULY';
       parsed.event.time = '00:30 AM ONWARDS';
     }
+    parsed = ensureBlockedSeats(parsed);
     return parsed;
   } catch (e) {
-    const initial = getInitialTicketingState();
+    const initial = ensureBlockedSeats(getInitialTicketingState());
     localStorage.setItem(LOCAL_TICKETING_KEY, JSON.stringify(initial));
     return initial;
   }
 }
 
 function saveLocalStore(state) {
-  localStorage.setItem(LOCAL_TICKETING_KEY, JSON.stringify(state));
+  const ensured = ensureBlockedSeats(state);
+  localStorage.setItem(LOCAL_TICKETING_KEY, JSON.stringify(ensured));
 }
 
 async function mirrorBookingToCloud(booking) {
@@ -197,6 +231,7 @@ export const ticketingService = {
         });
 
         store.bookings = Array.from(cloudBookingsMap.values()).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        ensureBlockedSeats(store);
         saveLocalStore(store);
       }
     } catch (e) {
@@ -220,6 +255,16 @@ export const ticketingService = {
         status: 'AVAILABLE',
         booking_id: null
       };
+    });
+
+    // Hardcode mandatory blocked seats directly on seatMap just in case
+    const hardcodedBlockedSeats = ['F13', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10'];
+    hardcodedBlockedSeats.forEach(seatLabel => {
+      if (seatMap[seatLabel]) {
+        seatMap[seatLabel].status = 'BOOKED';
+        seatMap[seatLabel].booking_id = 'GLD-VIP-BLOCKED';
+        seatMap[seatLabel].booking_status = 'CONFIRMED';
+      }
     });
 
     activeBookings.forEach(booking => {
