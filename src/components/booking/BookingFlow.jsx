@@ -542,24 +542,24 @@ export default function BookingFlow({ onReturnHome }) {
 
             </div>
 
-            {/* Mobile Swipe / Scale Guide Banner */}
-            <div className="w-full max-w-4xl mx-auto bg-yellow-400 text-black font-impact text-[11px] sm:text-sm md:text-base text-center py-2 px-2 sm:px-3 rounded-xl mb-4 shadow-lg flex items-center justify-center gap-1.5 sm:gap-2 animate-pulse tracking-wide border-2 border-yellow-500">
-              <span>📱 ALL SEATS (ROWS A–K, SEATS 1–16) ARE COMPACTLY SCALED TO FIT PORTRAIT VIEW ON YOUR PHONE! TAP TO SELECT ↓</span>
+            {/* Mobile Swipe Guide Banner */}
+            <div className="w-full max-w-4xl mx-auto bg-yellow-400 text-black font-impact text-xs sm:text-sm md:text-base text-center py-2.5 px-3 rounded-xl mb-4 shadow-lg flex items-center justify-center gap-2 animate-pulse tracking-wide border-2 border-yellow-500">
+              <span>⬅️ SWIPE / SCROLL HORIZONTALLY TO VIEW & SELECT SEATS ACROSS ALL ROWS (1 TO 16) ➡️</span>
             </div>
 
             {/* Seat Rows Grid (Rows K down to A matching physical diagram exactly) */}
             <div className="seatmap-grid-wrap overflow-x-auto pb-6 w-full">
-              <div className="seatmap-inner-track min-w-max sm:min-w-0 mx-auto px-1 sm:px-8 flex flex-col items-center">
+              <div className="seatmap-inner-track min-w-max mx-auto px-4 sm:px-8 flex flex-col items-start md:items-center">
                 {['K','J','I','H','G','F','E','D','C','B','A'].map((rowLabel) => {
                   const rowSeats = seats
                     .filter(s => s.row_label === rowLabel)
                     .sort((a, b) => b.seat_number - a.seat_number);
 
                   return (
-                    <div key={rowLabel} className="seatmap-row flex items-center justify-center gap-0.5 sm:gap-2 my-1 sm:my-1.5 w-full max-w-full">
-                      <span className="row-label-text font-impact text-[10px] sm:text-base w-4 sm:w-8 text-center text-red-500 bg-zinc-900 border sm:border-2 border-zinc-800 py-0.5 sm:py-1 rounded shrink-0 shadow sticky left-0 z-20">{rowLabel}</span>
+                    <div key={rowLabel} className="seatmap-row flex items-center justify-start gap-1.5 sm:gap-2 my-1.5 min-w-max">
+                      <span className="row-label-text font-impact text-xs sm:text-base w-6 sm:w-8 text-center text-red-500 bg-zinc-900 border-2 border-zinc-800 py-1 rounded shrink-0 shadow sticky left-0 z-20">{rowLabel}</span>
                       
-                      <div className="seats-in-row flex items-center gap-[2px] sm:gap-2 flex-nowrap justify-center">
+                      <div className="seats-in-row flex items-center gap-1.5 sm:gap-2 flex-nowrap justify-start">
                         {rowSeats.map((seat) => {
                           const isSelected = selectedSeats.includes(seat.label);
                           const statusClass = isSelected ? 'SELECTED' : seat.status;
@@ -571,9 +571,9 @@ export default function BookingFlow({ onReturnHome }) {
                             <React.Fragment key={seat.id}>
                               <button
                                 type="button"
-                                className={`seat-btn seat-${statusClass} w-[16px] h-[22px] sm:w-10 sm:h-10 text-[9px] sm:text-sm font-bold rounded-[3px] sm:rounded-md border sm:border-2 transition-all flex items-center justify-center shrink-0 p-0 leading-none ${
+                                className={`seat-btn seat-${statusClass} w-8 h-8 sm:w-10 sm:h-10 text-xs sm:text-sm font-bold rounded-md border-2 transition-all flex items-center justify-center shrink-0 ${
                                   isSelected 
-                                    ? 'bg-red-600 text-white font-black border-white scale-125 shadow-xl shadow-red-500/80 ring-1 sm:ring-2 ring-white z-10' 
+                                    ? 'bg-red-600 text-white font-black border-white scale-125 shadow-xl shadow-red-500/80 ring-2 ring-white z-10' 
                                     : seat.status === 'AVAILABLE' 
                                     ? 'bg-zinc-800 text-gray-200 border-zinc-600 hover:border-red-500 hover:bg-zinc-700 hover:text-white hover:scale-105 shadow-sm' 
                                     : 'bg-zinc-950 text-zinc-600 border-zinc-900 cursor-not-allowed opacity-40'
@@ -585,17 +585,17 @@ export default function BookingFlow({ onReturnHome }) {
                               </button>
 
                               {showAisleBreak && (
-                                <div className="w-1.5 sm:w-4 shrink-0" />
+                                <div className="w-3 sm:w-4 shrink-0" />
                               )}
 
                               {/* ENTRY / EXIT block on right side of rows K to F */}
                               {seat.seat_number === 7 && ['K','J','I','H','G','F'].includes(rowLabel) && (
-                                <div className="w-4 sm:w-[64px] shrink-0" />
+                                <div className="w-[48px] sm:w-[64px] shrink-0" />
                               )}
 
                               {/* Stairs aisle gap on rows E, D, C, B right where seats 6, 5 would be */}
                               {seat.seat_number === 7 && ['E','D','C','B'].includes(rowLabel) && (
-                                <div className="w-4 sm:w-8 h-[22px] sm:h-8 flex items-center justify-center text-zinc-600 font-mono text-[8px] sm:text-[10px] shrink-0" title="Stairs / Aisle">
+                                <div className="w-6 sm:w-8 h-8 flex items-center justify-center text-zinc-600 font-mono text-[10px] shrink-0" title="Stairs / Aisle">
                                   ||
                                 </div>
                               )}
@@ -604,7 +604,7 @@ export default function BookingFlow({ onReturnHome }) {
                         })}
                       </div>
 
-                      <span className="row-label-text font-bold text-[10px] sm:text-xs w-4 sm:w-6 text-center text-red-500 bg-zinc-900 border border-zinc-800 py-0.5 sm:py-1 shrink-0 rounded">{rowLabel}</span>
+                      <span className="row-label-text font-bold text-xs w-6 text-center text-red-500 bg-zinc-900 border border-zinc-800 py-1 shrink-0 rounded">{rowLabel}</span>
                     </div>
                   );
                 })}
@@ -783,13 +783,13 @@ export default function BookingFlow({ onReturnHome }) {
               
               <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-center w-full">
                 
-                {/* Left Column: Static UPI QR Code ONLY (Reduced significantly for mobile) */}
-                <div className="md:col-span-4 flex flex-col items-center justify-center bg-zinc-900 border-2 border-zinc-800 p-4 sm:p-6 rounded-2xl text-center shadow-xl w-full">
-                  <span className="text-red-500 font-bold text-[11px] sm:text-xs tracking-widest uppercase mb-2 sm:mb-4 block">
+                {/* Left Column: Static UPI QR Code ONLY (Reduced significantly for mobile and PC) */}
+                <div className="md:col-span-3 flex flex-col items-center justify-center bg-zinc-900 border-2 border-zinc-800 p-3 sm:p-4 rounded-xl text-center shadow-xl w-full mx-auto max-w-[220px] md:max-w-none">
+                  <span className="text-red-500 font-bold text-[10px] sm:text-[11px] tracking-widest uppercase mb-2 block">
                     // OFFICIAL SCANNER QR
                   </span>
                   
-                  <div className="w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 bg-white p-2 sm:p-3 rounded-xl sm:rounded-2xl shadow-inner border-2 sm:border-4 border-zinc-200 mx-auto flex items-center justify-center">
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 bg-white p-1.5 sm:p-2 rounded-lg sm:rounded-xl shadow-inner border-2 border-zinc-200 mx-auto flex items-center justify-center">
                     <img 
                       src="/guildqr.png" 
                       alt="Official Guild UPI QR Code" 
@@ -797,13 +797,13 @@ export default function BookingFlow({ onReturnHome }) {
                     />
                   </div>
                   
-                  <span className="text-[10px] sm:text-[11px] text-gray-400 font-bold mt-2 sm:mt-4 tracking-wider uppercase block">
+                  <span className="text-[9px] sm:text-[10px] text-gray-400 font-bold mt-2 tracking-wider uppercase block">
                     GPay // PhonePe // Paytm // CRED
                   </span>
                 </div>
 
                 {/* Right Column: Exactly the required 4 items clearly stated */}
-                <form onSubmit={handleSubmitPayment} className="md:col-span-8 flex flex-col justify-between space-y-6 text-left w-full">
+                <form onSubmit={handleSubmitPayment} className="md:col-span-9 flex flex-col justify-between space-y-6 text-left w-full">
                   
                   <div>
                     <span className="text-red-400 font-bold text-xs uppercase tracking-widest mb-1 block">
