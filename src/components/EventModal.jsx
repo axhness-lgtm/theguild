@@ -1,33 +1,32 @@
 import React, { useState } from 'react';
-import { X, CheckCircle, ShieldAlert, Sparkles, Users, Flag, Copy, Check, ArrowRight, QrCode } from 'lucide-react';
-import { dataService } from '../services/dataService';
+import { X, CheckCircle, ShieldAlert, Sparkles, Users, Copy, Check, ArrowRight, QrCode } from 'lucide-react';
+import { dataService, UPCOMING_SCREENINGS } from '../services/dataService';
 import LineReveal, { RevealItem } from './LineReveal';
 import './EventModal.css';
 
 export default function EventModal({ event, onClose }) {
   if (!event) return null;
 
-  const isWorldCup = event.category === 'world_cup';
-  const isF1 = event.category === 'f1';
+  const initialCategory = event.category || 'f1';
+  const isF1 = initialCategory === 'f1';
 
-  // Step 1: Registration Form & Package Selection
-  // Step 2: QR Code Payment & UTR Entry
-  // Step 3: Confirmation
+  // Step 1: Selection & Registration
+  // Step 2: UPI QR Payment & UTR Entry
+  // Step 3: Booking Confirmed & Digital Pass
   const [step, setStep] = useState(1);
 
   const [form, setForm] = useState({
     name: '',
     phone: '',
     instagram: '',
-    packagePreference: isWorldCup ? `SINGLE MATCH PASS // ${event.name} (₹199)` : `BELGIAN GRAND PRIX GENERAL PASS // BREW N CUE (₹199)`,
     utr: ''
   });
 
   const [copied, setCopied] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Determine current price based on selected package
-  const currentPrice = form.packagePreference.includes('BOTH SEMI-FINALS BUNDLE') ? 349 : 199;
+  const currentOption = UPCOMING_SCREENINGS.find(item => item.id === event.id) || event;
+  const currentPrice = 199; // Fixed normal pass price as requested
 
   const handleCopyUpi = () => {
     navigator.clipboard.writeText('steveoguri07-2@okicici');
@@ -44,18 +43,20 @@ export default function EventModal({ event, onClose }) {
   const handleSubmitPayment = async (e) => {
     e.preventDefault();
     if (!form.utr || form.utr.trim().length < 6) {
-      alert('Please enter a valid UTR / Transaction ID after making payment.');
+      alert('Please enter a valid 12-digit UTR / Transaction ID after making payment.');
       return;
     }
 
     setIsSubmitting(true);
+    const packageName = `[F1 RACE: ${currentOption.name}] // GENERAL SCREENING PASS x1 SEAT`;
+
     await dataService.submitInterest({
       name: form.name,
       phone: form.phone,
-      instagram: form.instagram,
-      sportCategory: event.category || 'f1',
-      selectedEvent: form.packagePreference,
-      packagePreference: `${form.packagePreference} [PAID: ₹${currentPrice} // UTR: ${form.utr}]`
+      instagram: form.instagram || 'Not provided',
+      sportCategory: initialCategory,
+      selectedEvent: currentOption.name,
+      packagePreference: `${packageName} [PAID: ₹${currentPrice} // UTR: ${form.utr}]`
     });
     setIsSubmitting(false);
     setStep(3);
@@ -67,82 +68,95 @@ export default function EventModal({ event, onClose }) {
         
         {/* Modal Header */}
         <div className="modal-header">
-          <div className="modal-tag font-tech">
-            <span>
-              {step === 1 ? '[ STEP 01 // REGISTRATION & TICKET SELECTION ]' : 
-               step === 2 ? '[ STEP 02 // UPI QR PAYMENT & UTR SUBMISSION ]' : 
-               '[ STEP 03 // BOOKING CONFIRMED ]'}
+          <div className="modal-tag font-tech flex items-center gap-2">
+            <span className="text-red-500 border border-red-500/40 bg-red-950/30 px-2 py-0.5 rounded text-[11px] font-bold">
+              [ FORMULA 1 RACE REGISTRATION CENTER ]
+            </span>
+            <span className="text-gray-400">
+              {step === 1 ? '// STEP 01: ATTENDEE REGISTRATION' : 
+               step === 2 ? '// STEP 02: UPI QR PAYMENT & UTR SUBMISSION' : 
+               '// STEP 03: PASS SECURED & CONFIRMED'}
             </span>
           </div>
-          <button className="btn-close font-tech" onClick={onClose} aria-label="Close modal">
+          <button type="button" className="btn-close font-tech" onClick={onClose} aria-label="Close modal">
             <span>CLOSE</span>
             <X size={18} />
           </button>
         </div>
 
         {step === 3 ? (
-          <div className="modal-success animate-fade-in is-revealed reveal-active">
-            <RevealItem delay={0.1} className="success-icon">
-              <CheckCircle size={56} color="#00FF66" />
+          <div className="modal-success animate-fade-in is-revealed reveal-active p-8 text-center">
+            <RevealItem delay={0.1} className="success-icon mx-auto flex justify-center">
+              <CheckCircle size={64} color="#00FF66" />
             </RevealItem>
-            <LineReveal delay={0.2} as="h3" className="success-title font-impact text-2xl text-white mt-4">REGISTRATION CONFIRMED!</LineReveal>
-            <RevealItem delay={0.3} className="success-message text-gray-300 max-w-md mx-auto text-center mt-2 font-tech">
-              Your pass for <strong className="text-white">{form.packagePreference}</strong> has been secured and logged into the verification queue.
+            <LineReveal delay={0.2} as="h3" className="success-title font-impact text-3xl text-white mt-4">
+              DIGITAL PASS SECURED!
+            </LineReveal>
+            <RevealItem delay={0.3} className="success-message text-gray-300 max-w-lg mx-auto text-center mt-2 font-tech text-sm">
+              Your registration for <strong className="text-white">{currentOption.name}</strong> has been logged into The Guild verification queue.
             </RevealItem>
             
-            <RevealItem delay={0.4} className="bg-zinc-900/90 border border-zinc-800 p-4 rounded mt-6 w-full max-w-sm mx-auto font-tech text-xs text-left">
-              <div className="flex justify-between border-b border-zinc-800 pb-2 mb-2">
-                <span className="text-gray-400">ATTENDEE:</span>
+            <RevealItem delay={0.4} className="bg-zinc-900/90 border border-zinc-800 p-5 rounded-lg mt-6 w-full max-w-md mx-auto font-tech text-xs text-left shadow-2xl">
+              <div className="flex justify-between border-b border-zinc-800 pb-2.5 mb-2.5">
+                <span className="text-gray-400">BOOKING ID:</span>
+                <strong className="text-emerald-400 font-mono">GLD-{Math.floor(100000 + Math.random() * 900000)}</strong>
+              </div>
+              <div className="flex justify-between border-b border-zinc-800 pb-2.5 mb-2.5">
+                <span className="text-gray-400">ATTENDEE NAME:</span>
                 <strong className="text-white">{form.name}</strong>
               </div>
-              <div className="flex justify-between border-b border-zinc-800 pb-2 mb-2">
-                <span className="text-gray-400">PHONE:</span>
+              <div className="flex justify-between border-b border-zinc-800 pb-2.5 mb-2.5">
+                <span className="text-gray-400">PHONE CONTACT:</span>
                 <strong className="text-white">{form.phone}</strong>
               </div>
-              <div className="flex justify-between border-b border-zinc-800 pb-2 mb-2">
-                <span className="text-gray-400">VENUE & CAPACITY:</span>
-                <strong className="text-red-500">BREW N CUE CAFE (40 SEATS MAX)</strong>
+              <div className="flex justify-between border-b border-zinc-800 pb-2.5 mb-2.5">
+                <span className="text-gray-400">VENUE:</span>
+                <strong className="text-red-500">{currentOption.venue}</strong>
               </div>
-              <div className="flex justify-between border-b border-zinc-800 pb-2 mb-2">
-                <span className="text-gray-400">AMOUNT PAID:</span>
-                <strong className="text-emerald-400 font-bold">₹{currentPrice}</strong>
+              <div className="flex justify-between border-b border-zinc-800 pb-2.5 mb-2.5">
+                <span className="text-gray-400">PASS TIER:</span>
+                <strong className="text-white">GENERAL SCREENING PASS</strong>
+              </div>
+              <div className="flex justify-between border-b border-zinc-800 pb-2.5 mb-2.5">
+                <span className="text-gray-400">TOTAL AMOUNT PAID:</span>
+                <strong className="text-emerald-400 font-bold text-sm">₹{currentPrice}</strong>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-400">VERIFIED UTR:</span>
+                <span className="text-gray-400">VERIFIED UTR REF:</span>
                 <strong className="text-white font-mono">{form.utr}</strong>
               </div>
             </RevealItem>
 
-            <RevealItem delay={0.5} className="success-notice font-tech mt-6 text-emerald-400">
-              <span>// SHOW THIS SCREEN OR VERIFIED PHONE NUMBER AT ENTRY //</span>
+            <RevealItem delay={0.5} className="success-notice font-tech mt-6 text-emerald-400 text-xs">
+              <span>// KEEP THIS SCREENSHOT OR VERIFIED PHONE NUMBER READY AT VENUE ENTRY //</span>
             </RevealItem>
 
             <RevealItem delay={0.6}>
-              <button className="btn-brutalist success-btn mt-6" onClick={onClose}>
-                <span>RETURN TO CURATED CALENDAR</span>
+              <button type="button" className="btn-brutalist success-btn mt-6 py-3 px-6 text-xs" onClick={onClose}>
+                <span>← RETURN TO THE GUILD DASHBOARD</span>
               </button>
             </RevealItem>
           </div>
         ) : step === 2 ? (
-          <div className="modal-body p-4 animate-fade-in is-revealed reveal-active" style={{ maxWidth: '640px', margin: '0 auto' }}>
-            <LineReveal delay={0.1} className="bg-red-950/30 border border-red-500/40 py-1.5 px-3 rounded mb-3 font-tech text-xs text-red-400 text-center">
-              // EXACTLY 40 SEATS MAX AT BREW N CUE — SCAN & PAY TO SECURE PASS
-            </LineReveal>
+          <div className="modal-body p-6 animate-fade-in is-revealed reveal-active" style={{ maxWidth: '780px', margin: '0 auto', width: '100%' }}>
+            <div className="bg-red-950/40 border border-red-500/50 py-2 px-4 rounded mb-5 font-tech text-xs text-red-400 text-center font-bold">
+              // SCAN OFFICIAL UPI QR CODE BELOW AND SUBMIT 12-DIGIT UTR TO SECURE RESERVATION
+            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
               
               {/* Left Box: Compact QR & Amount */}
-              <RevealItem delay={0.2} className="bg-zinc-950 border border-zinc-800 rounded-lg p-4 text-center shadow-lg">
-                <div className="font-tech text-[11px] text-gray-400 uppercase mb-1">TOTAL AMOUNT PAYABLE</div>
-                <div className="font-impact text-3xl text-emerald-400 mb-2">₹{currentPrice}</div>
-                <div className="font-tech text-[11px] text-gray-400 mb-2 truncate" title={form.packagePreference}>
-                  {form.packagePreference}
+              <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-5 text-center shadow-xl">
+                <div className="font-tech text-xs text-gray-400 uppercase mb-1">TOTAL PAYABLE AMOUNT</div>
+                <div className="font-impact text-4xl text-emerald-400 mb-2">₹{currentPrice}</div>
+                <div className="font-tech text-xs text-gray-300 mb-3 bg-zinc-900 border border-zinc-800 py-1.5 px-3 rounded">
+                  {currentOption.name} // GENERAL SCREENING PASS
                 </div>
 
-                {/* Normal Sized Compact QR Code Box */}
+                {/* QR Code Box */}
                 <div 
-                  className="bg-white rounded shadow-md border border-zinc-300 mx-auto mb-3"
-                  style={{ width: '150px', height: '150px', padding: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  className="bg-white rounded-lg shadow-lg border-2 border-zinc-300 mx-auto mb-4 p-2"
+                  style={{ width: '170px', height: '170px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                 >
                   <img 
                     src="/guildqr.png" 
@@ -151,8 +165,8 @@ export default function EventModal({ event, onClose }) {
                   />
                 </div>
 
-                <div className="font-tech text-[10px] text-gray-400 mb-1">// OFFICIAL UPI ID:</div>
-                <div className="flex items-center justify-center gap-1.5 bg-zinc-900 border border-zinc-700 py-1.5 px-2.5 rounded text-xs font-mono text-white">
+                <div className="font-tech text-[11px] text-gray-400 mb-1.5">// OFFICIAL GUILD UPI ID:</div>
+                <div className="flex items-center justify-center gap-2 bg-zinc-900 border border-zinc-700 py-2 px-3 rounded text-xs font-mono text-white">
                   <span>steveoguri07-2@okicici</span>
                   <button 
                     type="button" 
@@ -160,26 +174,26 @@ export default function EventModal({ event, onClose }) {
                     className="text-red-400 hover:text-red-300 transition-colors"
                     title="Copy UPI ID"
                   >
-                    {copied ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
+                    {copied ? <Check size={16} className="text-emerald-400" /> : <Copy size={16} />}
                   </button>
                 </div>
-              </RevealItem>
+              </div>
 
-              {/* Right Box: UTR Form & Confirm */}
-              <RevealItem delay={0.3} as="form" onSubmit={handleSubmitPayment} className="bg-zinc-900/90 border border-zinc-800 rounded-lg p-4 text-left flex flex-col justify-between h-full">
+              {/* Right Box: UTR Form */}
+              <form onSubmit={handleSubmitPayment} className="bg-zinc-900/90 border border-zinc-800 rounded-xl p-5 text-left flex flex-col justify-between h-full shadow-xl">
                 <div>
-                  <div className="font-tech text-xs text-emerald-400 mb-2 flex items-center gap-1.5 border-b border-zinc-800 pb-2">
-                    <QrCode size={14} />
-                    <span>STEP 2: SUBMIT VERIFICATION UTR</span>
+                  <div className="font-tech text-xs text-emerald-400 mb-3 flex items-center gap-2 border-b border-zinc-800 pb-2.5">
+                    <QrCode size={16} />
+                    <span>VERIFY UPI TRANSACTION (UTR)</span>
                   </div>
 
-                  <p className="font-tech text-[11px] text-gray-300 mb-3 leading-relaxed">
-                    Once you have completed the UPI payment of <strong className="text-emerald-400">₹{currentPrice}</strong>, please input your 12-digit transaction reference (UTR) below to instantly confirm your seat.
+                  <p className="font-tech text-xs text-gray-300 mb-4 leading-relaxed">
+                    After completing the UPI transfer of <strong className="text-emerald-400 font-bold">₹{currentPrice}</strong>, input your 12-digit bank reference (UTR / UPI Transaction ID) below. Our automated system will verify and issue your pass instantly.
                   </p>
 
-                  <div className="form-group mb-4">
-                    <label className="font-tech text-xs text-white block mb-1" htmlFor="utr">
-                      12-DIGIT UTR / TRANSACTION ID *
+                  <div className="form-group mb-5">
+                    <label className="font-tech text-xs text-white block mb-1.5 font-bold" htmlFor="utr">
+                      12-DIGIT UTR / TRANSACTION REF NUMBER *
                     </label>
                     <input 
                       type="text" 
@@ -188,173 +202,157 @@ export default function EventModal({ event, onClose }) {
                       placeholder="e.g. 319482710492"
                       value={form.utr}
                       onChange={(e) => setForm({ ...form, utr: e.target.value })}
-                      style={{ padding: '0.6rem 0.75rem', fontSize: '0.85rem' }}
-                      className="w-full bg-black border border-zinc-700 text-white font-mono rounded focus:border-red-500 outline-none transition-colors"
+                      style={{ padding: '0.75rem 0.85rem', fontSize: '0.95rem' }}
+                      className="w-full bg-black border-2 border-zinc-700 text-white font-mono rounded-lg focus:border-red-500 outline-none transition-colors"
                     />
-                    <span className="text-[10px] text-gray-500 font-tech mt-1 block">
-                      Found in GPay, PhonePe, or Paytm history.
+                    <span className="text-[11px] text-gray-500 font-tech mt-1.5 block">
+                      Found in GPay, PhonePe, Paytm, or bank SMS history under "UTR" or "UPI Ref No".
                     </span>
                   </div>
                 </div>
 
-                <div className="flex gap-2 pt-2 border-t border-zinc-800/80">
+                <div className="flex gap-3 pt-3 border-t border-zinc-800">
                   <button 
                     type="button" 
                     onClick={() => setStep(1)} 
-                    className="btn-brutalist bg-zinc-800 border-zinc-700 hover:bg-zinc-700 py-2.5 px-3 text-xs"
+                    className="btn-brutalist bg-zinc-800 border-zinc-700 hover:bg-zinc-700 py-3 px-4 text-xs font-tech"
                   >
                     ← BACK
                   </button>
                   
                   <button 
                     type="submit" 
-                    className="btn-brutalist flex-1 py-2.5 px-2 text-xs flex items-center justify-center gap-1.5"
+                    className="btn-brutalist flex-1 py-3 px-4 text-xs font-tech flex items-center justify-center gap-2 bg-red-600 hover:bg-red-500 text-white border-red-500"
                     disabled={isSubmitting || !form.utr}
                   >
-                    <span>{isSubmitting ? 'VERIFYING...' : `CONFIRM (₹${currentPrice})`}</span>
-                    <ArrowRight size={14} />
+                    <span>{isSubmitting ? 'VERIFYING UTR...' : `CONFIRM BOOKING (₹${currentPrice})`}</span>
+                    <ArrowRight size={16} />
                   </button>
                 </div>
-              </RevealItem>
+              </form>
 
             </div>
           </div>
         ) : (
           <div className="modal-body is-revealed reveal-active animate-fade-in">
             
-            {/* Event Specs Panel */}
+            {/* Left Specs Panel */}
             <div className="event-specs-panel">
-              <div className="spec-item">
-                <span className="spec-label font-tech">COMPETITION</span>
-                <LineReveal delay={0.1} className="spec-val font-editorial">{event.competition}</LineReveal>
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="spec-label font-tech">{currentOption.competition}</span>
+                  <span className="font-tech text-xs px-2 py-0.5 bg-red-950 text-red-400 border border-red-800 rounded">
+                    {currentOption.status}
+                  </span>
+                </div>
+                
+                <h2 className="modal-event-title font-editorial text-3xl md:text-4xl">
+                  {currentOption.name}
+                </h2>
+
+                <div className="spec-grid font-tech grid grid-cols-2 gap-3 my-4">
+                  <div className="spec-box bg-zinc-900/60 border border-zinc-800 p-3 rounded">
+                    <span className="s-label text-[11px] text-gray-400 block mb-1">DATE & SCHEDULE</span>
+                    <span className="s-val text-xs font-bold text-white block">{currentOption.date} // {currentOption.time}</span>
+                  </div>
+                  <div className="spec-box bg-zinc-900/60 border border-zinc-800 p-3 rounded">
+                    <span className="s-label text-[11px] text-gray-400 block mb-1">VENUE & CAPACITY</span>
+                    <span className="s-val text-xs font-bold text-red-500 flex items-center gap-1">
+                      <Users size={14} />
+                      {currentOption.capacity}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="spec-atmosphere bg-zinc-900/40 border border-zinc-800/80 p-3.5 rounded my-4">
+                  <span className="spec-label font-tech text-xs text-gray-300 flex items-center gap-1.5 mb-1.5 font-bold">
+                    <Sparkles size={14} className="text-yellow-400" />
+                    ATMOSPHERE & SETUP SPECS
+                  </span>
+                  <p className="atmosphere-desc text-xs text-gray-300 leading-relaxed">{currentOption.atmosphere}</p>
+                </div>
               </div>
-              <LineReveal delay={0.2} as="h2" className="modal-event-title font-editorial">{event.name}</LineReveal>
-              
-              <RevealItem delay={0.25} className="spec-grid font-tech">
-                <div className="spec-box">
-                  <span className="s-label">DATE & TIME</span>
-                  <span className="s-val">{event.date} // {event.time}</span>
-                </div>
-                <div className="spec-box">
-                  <span className="s-label">VENUE CAPACITY</span>
-                  <span className="s-val text-red-500 font-bold"><Users size={14} style={{display:'inline', marginRight:4}}/>{event.capacity}</span>
-                </div>
-              </RevealItem>
 
-              <RevealItem delay={0.32} className="spec-atmosphere">
-                <span className="spec-label font-tech"><Sparkles size={13} style={{display:'inline', marginRight:4}}/> EXPECTED ATMOSPHERE</span>
-                <p className="atmosphere-desc">{event.atmosphere}</p>
-              </RevealItem>
-
-              <RevealItem delay={0.38} className="specs-disclaimer font-tech">
-                <ShieldAlert size={14} />
-                <span>LIMITED TO 40 SEATS AT BREW N CUE — REGISTER NOW</span>
-              </RevealItem>
+              <div className="specs-disclaimer font-tech text-xs bg-red-950/40 border border-red-500/30 p-3 rounded flex items-center gap-2 text-red-300 mt-4">
+                <ShieldAlert size={16} className="text-red-400 flex-shrink-0" />
+                <span>LIMITED TO 40 SEATS AT BREW N CUE — REGISTRATION & UPI VERIFICATION REQUIRED</span>
+              </div>
             </div>
 
-            {/* Interest Form Panel */}
-            <RevealItem delay={0.25} as="form" className="interest-form" onSubmit={handleProceedToPayment}>
-              <div className="form-header font-tech">
-                <span>ATTENDEE REGISTRATION</span>
-              </div>
+            {/* Right Registration Panel */}
+            <form className="interest-form p-6 bg-zinc-950 flex flex-col justify-between" onSubmit={handleProceedToPayment}>
+              <div>
+                <div className="form-header font-tech text-sm text-white font-bold border-b border-zinc-800 pb-3 mb-4 flex justify-between items-center">
+                  <span>ATTENDEE PASS REGISTRATION</span>
+                  <span className="text-xs text-emerald-400 font-mono">LIVE BOOKING</span>
+                </div>
 
-              <div className="form-group">
-                <label className="font-tech" htmlFor="name">FULL NAME *</label>
-                <input 
-                  type="text" 
-                  id="name" 
-                  required 
-                  placeholder="E.G. ARJUN RAJU"
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                />
-              </div>
+                <div className="space-y-4 mb-6">
+                  <div className="form-group">
+                    <label className="font-tech text-xs text-gray-300 block mb-1 font-bold" htmlFor="name">ATTENDEE FULL NAME *</label>
+                    <input 
+                      type="text" 
+                      id="name" 
+                      required 
+                      placeholder="E.g. Arjun Raju"
+                      value={form.name}
+                      onChange={(e) => setForm({ ...form, name: e.target.value })}
+                      className="w-full bg-zinc-900 border border-zinc-800 text-white rounded py-2.5 px-3.5 text-xs focus:border-red-500 outline-none"
+                    />
+                  </div>
 
-              <div className="form-group">
-                <label className="font-tech" htmlFor="phone">PHONE NUMBER *</label>
-                <input 
-                  type="tel" 
-                  id="phone" 
-                  required 
-                  placeholder="+91 98480 XXXXX"
-                  value={form.phone}
-                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                />
-              </div>
+                  <div className="form-group">
+                    <label className="font-tech text-xs text-gray-300 block mb-1 font-bold" htmlFor="phone">PHONE NUMBER (WHATSAPP VERIFIED) *</label>
+                    <input 
+                      type="tel" 
+                      id="phone" 
+                      required 
+                      placeholder="+91 98480 XXXXX"
+                      value={form.phone}
+                      onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                      className="w-full bg-zinc-900 border border-zinc-800 text-white rounded py-2.5 px-3.5 text-xs focus:border-red-500 outline-none"
+                    />
+                  </div>
 
-              <div className="form-group">
-                <label className="font-tech" htmlFor="instagram">INSTAGRAM HANDLE (OPTIONAL)</label>
-                <input 
-                  type="text" 
-                  id="instagram" 
-                  placeholder="@yourhandle"
-                  value={form.instagram}
-                  onChange={(e) => setForm({ ...form, instagram: e.target.value })}
-                />
-              </div>
-
-              {/* Package & Ticket Type Selection */}
-              {isWorldCup ? (
-                <div className="form-group package-selection-box animate-fade-in">
-                  <label className="font-tech package-label">
-                    <Flag size={13} style={{display:'inline', marginRight:5, color:'#FF2E2E'}}/>
-                    CHOOSE WORLD CUP SEMI-FINAL PASS *
-                  </label>
-                  <div className="package-options">
-                    <label className={`package-card ${form.packagePreference.includes('SINGLE MATCH PASS') ? 'package-active' : ''}`}>
-                      <input 
-                        type="radio" 
-                        name="packagePref" 
-                        value={`SINGLE MATCH PASS // ${event.name} (₹199)`}
-                        checked={form.packagePreference.includes('SINGLE MATCH PASS')}
-                        onChange={(e) => setForm({ ...form, packagePreference: e.target.value })}
-                      />
-                      <div className="package-info">
-                        <span className="p-title font-tech">SINGLE MATCH PASS (₹199)</span>
-                        <span className="p-sub">{event.name} ({event.date} // {event.time})</span>
-                      </div>
-                    </label>
-
-                    <label className={`package-card ${form.packagePreference.includes('BOTH SEMI-FINALS BUNDLE') ? 'package-active' : ''}`}>
-                      <input 
-                        type="radio" 
-                        name="packagePref" 
-                        value="BOTH SEMI-FINALS BUNDLE PASS // SPAIN VS FRANCE + ENGLAND VS ARGENTINA (₹349)"
-                        checked={form.packagePreference.includes('BOTH SEMI-FINALS BUNDLE')}
-                        onChange={(e) => setForm({ ...form, packagePreference: e.target.value })}
-                      />
-                      <div className="package-info">
-                        <span className="p-title font-tech text-emerald-400">BOTH SEMI-FINALS BUNDLE (₹349) 🔥</span>
-                        <span className="p-sub">ACCESS BOTH MATCHES (JUL 15 & JUL 16) AT BREW N CUE // SAVE ₹49!</span>
-                      </div>
-                    </label>
+                  <div className="form-group">
+                    <label className="font-tech text-xs text-gray-300 block mb-1 font-bold" htmlFor="instagram">INSTAGRAM / TWITTER HANDLE (OPTIONAL)</label>
+                    <input 
+                      type="text" 
+                      id="instagram" 
+                      placeholder="@arjun.vz"
+                      value={form.instagram}
+                      onChange={(e) => setForm({ ...form, instagram: e.target.value })}
+                      className="w-full bg-zinc-900 border border-zinc-800 text-white rounded py-2.5 px-3.5 text-xs focus:border-red-500 outline-none"
+                    />
                   </div>
                 </div>
-              ) : (
-                <div className="form-group package-selection-box animate-fade-in">
-                  <label className="font-tech package-label">
-                    <Flag size={13} style={{display:'inline', marginRight:5, color:'#FF2E2E'}}/>
-                    SELECTED SCREENING TICKET *
-                  </label>
-                  <div className="package-options">
-                    <div className="package-card package-active">
-                      <div className="package-info">
-                        <span className="p-title font-tech">BELGIAN GRAND PRIX GENERAL PASS (₹199)</span>
-                        <span className="p-sub">SPA-FRANCORCHAMPS AT BREW N CUE // LIMITED TO 40 SEATS</span>
-                      </div>
-                    </div>
+
+                <div className="bg-zinc-900/80 border border-zinc-800 p-4 rounded-lg my-4">
+                  <div className="flex justify-between items-center font-tech text-xs mb-1">
+                    <span className="text-gray-400">SELECTED TIER:</span>
+                    <span className="font-bold text-white">GENERAL SCREENING PASS</span>
+                  </div>
+                  <div className="flex justify-between items-center font-tech text-xs">
+                    <span className="text-gray-400">PASS PRICE:</span>
+                    <span className="font-bold text-emerald-400 text-sm">₹{currentPrice}</span>
                   </div>
                 </div>
-              )}
+              </div>
 
-              <button 
-                type="submit" 
-                className="btn-brutalist submit-btn mt-4 flex items-center justify-center gap-2"
-              >
-                <span>PROCEED TO PAYMENT (₹{currentPrice})</span>
-                <ArrowRight size={16} />
-              </button>
-            </RevealItem>
+              <div className="pt-4 border-t border-zinc-800 mt-5">
+                <div className="flex justify-between items-center mb-3 font-tech">
+                  <span className="text-xs text-gray-400">TOTAL PAYABLE:</span>
+                  <span className="text-xl font-bold text-emerald-400">₹{currentPrice}</span>
+                </div>
+                <button 
+                  type="submit" 
+                  className="btn-brutalist submit-btn w-full py-3.5 text-xs flex items-center justify-center gap-2 bg-red-600 hover:bg-red-500 text-white font-tech font-bold"
+                >
+                  <span>PROCEED TO UPI QR PAYMENT (₹{currentPrice})</span>
+                  <ArrowRight size={16} />
+                </button>
+              </div>
+            </form>
 
           </div>
         )}

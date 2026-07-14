@@ -27,6 +27,7 @@ export function useScrollReveal() {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           entry.target.classList.add('is-revealed');
+          entry.target.dataset.revealed = 'true';
           observer.unobserve(entry.target);
         }
       });
@@ -45,12 +46,16 @@ export function useScrollReveal() {
       const viewportBottom = window.innerHeight + 150;
 
       elements.forEach((el) => {
+        if (el.dataset.revealed === 'true' && !el.classList.contains('is-revealed')) {
+          el.classList.add('is-revealed');
+        }
         if (!el.classList.contains('is-revealed')) {
           const rect = el.getBoundingClientRect();
           // If element or section is in viewport or close to top fold on initial render, reveal immediately
           if (rect.top <= viewportBottom) {
             setTimeout(() => {
               el.classList.add('is-revealed');
+              el.dataset.revealed = 'true';
             }, 50);
           } else {
             observer.observe(el);
@@ -71,6 +76,12 @@ export function useScrollReveal() {
         if (mutation.addedNodes.length > 0) {
           shouldScan = true;
         }
+        if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+          const target = mutation.target;
+          if (target && target.dataset && target.dataset.revealed === 'true' && !target.classList.contains('is-revealed')) {
+            target.classList.add('is-revealed');
+          }
+        }
       });
       if (shouldScan) {
         observeElements();
@@ -79,7 +90,9 @@ export function useScrollReveal() {
 
     mutationObserver.observe(document.body, {
       childList: true,
-      subtree: true
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['class']
     });
 
     return () => {

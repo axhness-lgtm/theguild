@@ -2,7 +2,7 @@ import { supabase } from './supabase';
 
 // Initial Curated Screenings for The Guild (Visakhapatnam)
 export const UPCOMING_SCREENINGS = [
-  // FORMULA 1
+  // FORMULA 1 - BELGIAN GRAND PRIX
   {
     id: 'f1-belgian-2026',
     category: 'f1',
@@ -14,40 +14,26 @@ export const UPCOMING_SCREENINGS = [
     status: 'LIVE BOOKINGS',
     isLive: true,
     ticket_price: 199,
+    vip_price: 349,
     capacity: '40 Seats Max',
     atmosphere: 'High-speed Spa-Francorchamps heritage screening at Brew N Cue. Live telemetry timing screens, surround F1 engine acoustics, and intimate 40-seat racing community.'
   },
 
-  // WORLD CUP
+  // WORLD CUP - GRAND FINALE (INOX AUD 3)
   {
-    id: 'wc-spain-france-2026',
+    id: 'wc-final-2026',
     category: 'world_cup',
-    name: 'SPAIN VS FRANCE',
-    competition: 'FIFA WORLD CUP // SEMI FINAL 01',
-    date: 'TUE, JUL 15',
+    name: 'FIFA WORLD CUP FINAL 2026',
+    competition: 'FIFA WORLD CUP // GRAND FINALE',
+    date: 'SUN, JUL 20',
     time: '00:30 AM IST ONWARDS',
-    venue: 'BREW N CUE CAFE // VIZAG',
-    status: 'LIVE BOOKINGS',
+    venue: 'INOX SCREEN 03 // BEACH ROAD, VIZAG',
+    status: 'LIVE INOX BOOKING',
     isLive: true,
-    ticket_price: 199,
-    bundle_price: 349,
-    capacity: '40 Seats Max',
-    atmosphere: 'High-stakes World Cup Semi-Final midnight screening at Brew N Cue. Acoustic pitch immersion, synchronized chant feeds, and late-night football passion.'
-  },
-  {
-    id: 'wc-england-argentina-2026',
-    category: 'world_cup',
-    name: 'ENGLAND VS ARGENTINA',
-    competition: 'FIFA WORLD CUP // SEMI FINAL 02',
-    date: 'WED, JUL 16',
-    time: '00:30 AM IST ONWARDS',
-    venue: 'BREW N CUE CAFE // VIZAG',
-    status: 'LIVE BOOKINGS',
-    isLive: true,
-    ticket_price: 199,
-    bundle_price: 349,
-    capacity: '40 Seats Max',
-    atmosphere: 'Intense World Cup Semi-Final clash at Brew N Cue. High-energy collective screening, espresso bar open till dawn, and uninhibited stadium atmosphere.'
+    ticket_price: 399,
+    vip_price: 599,
+    capacity: '147 Seats Cinema Hangar',
+    atmosphere: 'The ultimate football showdown in Visakhapatnam\'s largest private cinema hangar. BookMyShow style seat reservation, 4K HDR stadium feed, and stadium acoustic volume.'
   }
 ];
 

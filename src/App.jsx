@@ -63,11 +63,16 @@ export default function App() {
 
       {activeView === 'public' && (
         <main>
-          <Hero activeCategory={activeCategory} setActiveView={handleSetView} />
+          <Hero 
+            activeCategory={activeCategory} 
+            setActiveView={handleSetView} 
+            onSelectEvent={(ev) => setSelectedEvent(ev)} 
+          />
           <Marquee />
           <Screenings 
             activeCategory={activeCategory} 
             setActiveCategory={setActiveCategory} 
+            setActiveView={handleSetView}
             onSelectEvent={(ev) => setSelectedEvent(ev)} 
           />
           <Footer setActiveView={handleSetView} />
