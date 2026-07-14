@@ -162,7 +162,7 @@ export const ticketingService = {
       const { data, error } = await supabase.from('bookings').select('*').order('created_at', { ascending: false });
       if (!error && data) {
         const store = getLocalStore();
-        const mergedBookings = data.map(b => ({
+        const cloudBookingsMap = new Map(data.map(b => [b.id, {
           id: b.id,
           event_id: b.event_id || store.event.id,
           user_name: b.user_name,
@@ -176,8 +176,17 @@ export const ticketingService = {
           timeline: Array.isArray(b.timeline) ? b.timeline : (typeof b.timeline === 'string' ? JSON.parse(b.timeline) : []),
           created_at: b.created_at,
           expires_at: b.expires_at
-        }));
-        store.bookings = mergedBookings;
+        }]));
+
+        // Preserve active local bookings (HELD/PENDING_PAYMENT/UNDER_REVIEW) that haven't pushed to cloud yet
+        store.bookings.forEach(localB => {
+          if (!cloudBookingsMap.has(localB.id) && ['HELD', 'PENDING_PAYMENT', 'UNDER_REVIEW', 'CONFIRMED'].includes(localB.status)) {
+            cloudBookingsMap.set(localB.id, localB);
+            mirrorBookingToCloud(localB);
+          }
+        });
+
+        store.bookings = Array.from(cloudBookingsMap.values()).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
         saveLocalStore(store);
       }
     } catch (e) {
@@ -321,11 +330,42 @@ export const ticketingService = {
     return newBooking;
   },
 
-  // Submit UPI Payment (Mandatory Screenshot) -> transition to UNDER_REVIEW
   submitPayment: async (bookingId, { utr = 'SCREENSHOT_VERIFIED', screenshotUrl }) => {
-    const store = cleanupExpiredReservations(getLocalStore());
-    const bookingIndex = store.bookings.findIndex(b => b.id === bookingId);
-    if (bookingIndex === -1) throw new Error('Booking not found');
+    let store = cleanupExpiredReservations(getLocalStore());
+    let bookingIndex = store.bookings.findIndex(b => b.id === bookingId);
+    
+    // If not found locally, attempt to fetch directly from cloud database before failing
+    if (bookingIndex === -1 && supabase) {
+      try {
+        const { data } = await supabase.from('bookings').select('*').eq('id', bookingId).maybeSingle();
+        if (data) {
+          const restored = {
+            id: data.id,
+            event_id: data.event_id || store.event.id,
+            user_name: data.user_name,
+            user_phone: data.user_phone,
+            user_email: data.user_email,
+            total_amount: data.total_amount,
+            status: data.status,
+            seats: Array.isArray(data.seats) ? data.seats : (typeof data.seats === 'string' ? JSON.parse(data.seats) : []),
+            utr: data.utr || null,
+            screenshot_url: data.screenshot_url || null,
+            timeline: Array.isArray(data.timeline) ? data.timeline : (typeof data.timeline === 'string' ? JSON.parse(data.timeline) : []),
+            created_at: data.created_at,
+            expires_at: data.expires_at
+          };
+          store.bookings.unshift(restored);
+          saveLocalStore(store);
+          bookingIndex = 0;
+        }
+      } catch (e) {
+        console.warn('Could not fetch missing booking from cloud during payment submission', e);
+      }
+    }
+
+    if (bookingIndex === -1) {
+      throw new Error('Your reservation session was not found or has expired. Please click "← CHANGE SEATS" to select your seats again.');
+    }
 
     const booking = store.bookings[bookingIndex];
     if (booking.status === 'EXPIRED' || booking.status === 'CANCELLED') {
