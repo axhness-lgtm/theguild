@@ -51,7 +51,7 @@ export default function BookingFlow({ onReturnHome }) {
 
   useEffect(() => {
     reloadTicketingData();
-    const interval = setInterval(reloadTicketingData, 6000);
+    const interval = setInterval(reloadTicketingData, 2000);
     return () => clearInterval(interval);
   }, [step]);
 

@@ -42,7 +42,7 @@ export default function AdminTicketingPortal({ onSwitchToSignups }) {
       ticketingService.syncWithCloud().then(data => {
         if (data) setTicketingData(data);
       });
-    }, 5000);
+    }, 2000);
     return () => clearInterval(interval);
   }, []);
 

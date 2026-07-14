@@ -223,10 +223,33 @@ export const ticketingService = {
           expires_at: b.expires_at
         }]));
 
-        // Preserve active local bookings that haven't pushed to cloud yet
+        // Preserve active local bookings and merge screenshots or newer statuses to cloud
         store.bookings.forEach(localB => {
           if (!cloudBookingsMap.has(localB.id) && ['HELD', 'PENDING_PAYMENT', 'UNDER_REVIEW', 'CONFIRMED'].includes(localB.status)) {
             cloudBookingsMap.set(localB.id, localB);
+          } else if (cloudBookingsMap.has(localB.id)) {
+            const cloudB = cloudBookingsMap.get(localB.id);
+            let needsCloudMirror = false;
+            // If local has a screenshot URL but cloud doesn't, merge and upload
+            if (!cloudB.screenshot_url && localB.screenshot_url) {
+              cloudB.screenshot_url = localB.screenshot_url;
+              needsCloudMirror = true;
+            }
+            if (!cloudB.utr && localB.utr) {
+              cloudB.utr = localB.utr;
+              needsCloudMirror = true;
+            }
+            // If local status progressed further (e.g., UNDER_REVIEW or CANCELLED vs HELD), preserve local status
+            if (localB.status === 'UNDER_REVIEW' && ['HELD', 'PENDING_PAYMENT'].includes(cloudB.status)) {
+              cloudB.status = 'UNDER_REVIEW';
+              needsCloudMirror = true;
+            } else if (['CANCELLED', 'EXPIRED'].includes(localB.status) && !['CANCELLED', 'EXPIRED'].includes(cloudB.status)) {
+              cloudB.status = localB.status;
+              needsCloudMirror = true;
+            }
+            if (needsCloudMirror) {
+              mirrorBookingToCloud(cloudB);
+            }
           }
         });
 
