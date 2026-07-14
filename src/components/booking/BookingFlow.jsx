@@ -355,15 +355,15 @@ export default function BookingFlow({ onReturnHome }) {
           PAGE 1.5: BOOKMYSHOW-STYLE SEAT QUANTITY MODAL (WITHOUT ILLUSTRATION)
           ========================================================================= */}
       {step === 'seatcount' && (
-        <div className="grid-container py-12 booking-step-transition flex items-center justify-center min-h-[70vh]">
-          <div className="max-w-md w-full mx-auto bg-zinc-950 border-2 border-zinc-800 p-6 sm:p-8 rounded-3xl shadow-2xl my-6 text-center font-tech relative animate-fade-in">
+        <div className="grid-container py-12 booking-step-transition flex items-center justify-center min-h-[75vh]">
+          <div className="max-w-4xl w-full mx-auto bg-zinc-950 border-4 border-zinc-800 p-6 sm:p-12 rounded-3xl shadow-2xl my-6 text-center font-tech relative animate-fade-in">
             
-            <h3 className="text-2xl sm:text-4xl font-impact font-bold text-white mb-6 uppercase tracking-tight">
+            <h3 className="text-3xl sm:text-5xl font-impact font-bold text-white mb-8 uppercase tracking-tight">
               HOW MANY SEATS?
             </h3>
             
-            {/* Big Prominent Quantity Buttons (1 to 4 max) */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 my-10 max-w-2xl mx-auto">
+            {/* Massive Prominent Quantity Buttons (+200% Size with Green Transition) */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-8 my-10 max-w-3xl mx-auto">
               {[1, 2, 3, 4].map((num) => {
                 const isActive = targetSeatCount === num;
                 return (
@@ -371,14 +371,14 @@ export default function BookingFlow({ onReturnHome }) {
                     key={num}
                     type="button"
                     onClick={() => setTargetSeatCount(num)}
-                    className={`py-6 sm:py-8 px-4 rounded-2xl sm:rounded-3xl font-impact transition-all flex flex-col items-center justify-center cursor-pointer border-2 shadow-2xl ${
+                    className={`py-10 sm:py-16 px-4 rounded-3xl font-impact transition-all duration-300 flex flex-col items-center justify-center cursor-pointer border-4 shadow-2xl ${
                       isActive
-                        ? 'bg-red-600 border-red-400 text-white font-black shadow-red-600/60 scale-105 ring-4 ring-white/30 z-10'
-                        : 'bg-zinc-900 border-zinc-700 text-gray-300 hover:bg-zinc-800 hover:border-zinc-500 hover:text-white hover:scale-105'
+                        ? 'bg-emerald-600 border-emerald-400 text-white font-black shadow-emerald-500/80 scale-105 ring-4 ring-white/40 z-10'
+                        : 'bg-zinc-900 border-zinc-700 text-gray-300 hover:bg-emerald-700 hover:border-emerald-400 hover:text-white hover:scale-105 shadow-xl'
                     }`}
                   >
-                    <span className="text-4xl sm:text-6xl font-black tracking-tight">{num}</span>
-                    <span className="text-xs sm:text-sm font-tech font-bold uppercase tracking-wider mt-2 opacity-90">
+                    <span className="text-6xl sm:text-8xl font-black tracking-tight">{num}</span>
+                    <span className="text-sm sm:text-lg font-tech font-bold uppercase tracking-widest mt-3 opacity-95">
                       {num === 1 ? 'SEAT' : 'SEATS'}
                     </span>
                   </button>
@@ -386,42 +386,34 @@ export default function BookingFlow({ onReturnHome }) {
               })}
             </div>
 
-            {/* Category / Price Section */}
-            <div className="mt-8 pt-6 border-t border-zinc-800/80 space-y-1">
-              <span className="text-[11px] text-gray-400 font-bold uppercase tracking-widest block">
-                EXECUTIVE // EARLY BIRD PASS
+            {/* Dynamic Multiplied Price Section (Huge Font Size) */}
+            <div className="mt-10 pt-8 border-t border-zinc-800/80 space-y-3">
+              <span className="text-xs sm:text-sm text-gray-300 font-bold uppercase tracking-widest block">
+                EXECUTIVE // EARLY BIRD PASS ({targetSeatCount} {targetSeatCount === 1 ? 'SEAT' : 'SEATS'} × ₹{event.ticket_price || 499})
               </span>
-              <div className="font-impact text-3xl sm:text-4xl text-white flex items-center justify-center gap-2">
-                <span>₹{event.ticket_price}</span>
+              <div className="font-impact text-6xl sm:text-8xl text-emerald-400 bg-emerald-950/90 border-4 border-emerald-500 py-6 px-10 rounded-3xl shadow-2xl inline-block my-4 tracking-tight">
+                ₹{targetSeatCount * (event.ticket_price || 499)}/-
               </div>
-              <span className="text-[11px] font-bold text-emerald-400 uppercase block tracking-wider">
-                AVAILABLE (LIMITED TIME)
+              <span className="text-xs sm:text-sm font-bold text-emerald-400 uppercase block tracking-wider mt-1">
+                AVAILABLE (LIMITED TIME) — ALL INCLUSIVE OF SEATING + SNACK + BEVERAGE
               </span>
             </div>
 
             {/* Bestseller / Perks Banner */}
-            <div className="bg-zinc-900/90 border border-zinc-800/80 py-2.5 px-3.5 rounded-xl text-xs text-gray-300 font-medium flex items-center justify-center gap-2 mt-5 leading-snug">
+            <div className="bg-zinc-900/90 border-2 border-zinc-800 py-3.5 px-5 rounded-2xl text-sm sm:text-base text-gray-200 font-medium flex items-center justify-center gap-2 mt-6 leading-snug shadow-lg max-w-2xl mx-auto">
               <span>🍿 Book exact cinema seats + complimentary snack & beverage included!</span>
             </div>
 
-            {/* Big Action CTA Button */}
+            {/* Massive Action CTA Button (+200% Size) */}
             <button 
               type="button"
               onClick={() => {
                 setSelectedSeats([]);
                 setStep('seatmap');
               }}
-              className="w-full py-3.5 sm:py-4 bg-red-600 hover:bg-red-500 text-white font-impact font-bold text-base sm:text-lg rounded-xl shadow-xl shadow-red-600/30 transition-all hover:scale-[1.02] cursor-pointer mt-6 uppercase tracking-wider block"
+              className="w-full py-6 sm:py-8 bg-emerald-600 hover:bg-emerald-500 text-white font-impact font-bold text-2xl sm:text-4xl rounded-3xl shadow-2xl shadow-emerald-600/60 border-4 border-emerald-400 transition-all hover:scale-[1.02] cursor-pointer mt-8 uppercase tracking-wider block"
             >
-              Select Seats
-            </button>
-
-            <button 
-              type="button"
-              onClick={() => setStep('overview')}
-              className="text-xs text-gray-400 hover:text-white underline inline-block cursor-pointer mt-4 pt-1"
-            >
-              ← Back to Overview
+              SELECT SEATS ({targetSeatCount} FOR ₹{targetSeatCount * (event.ticket_price || 499)}) →
             </button>
 
           </div>
