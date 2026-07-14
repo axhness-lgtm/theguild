@@ -358,12 +358,12 @@ export default function BookingFlow({ onReturnHome }) {
         <div className="grid-container py-12 booking-step-transition flex items-center justify-center min-h-[70vh]">
           <div className="max-w-md w-full mx-auto bg-zinc-950 border-2 border-zinc-800 p-6 sm:p-8 rounded-3xl shadow-2xl my-6 text-center font-tech relative animate-fade-in">
             
-            <h3 className="text-xl sm:text-2xl font-impact font-bold text-white mb-6 uppercase tracking-tight">
-              How many seats?
+            <h3 className="text-2xl sm:text-4xl font-impact font-bold text-white mb-6 uppercase tracking-tight">
+              HOW MANY SEATS?
             </h3>
             
-            {/* Horizontal Quantity Circles (1 to 4 max) */}
-            <div className="flex items-center justify-center gap-3 sm:gap-4 my-8 flex-wrap">
+            {/* Big Prominent Quantity Buttons (1 to 4 max) */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 my-10 max-w-2xl mx-auto">
               {[1, 2, 3, 4].map((num) => {
                 const isActive = targetSeatCount === num;
                 return (
@@ -371,13 +371,16 @@ export default function BookingFlow({ onReturnHome }) {
                     key={num}
                     type="button"
                     onClick={() => setTargetSeatCount(num)}
-                    className={`w-9 h-9 sm:w-11 sm:h-11 rounded-full font-impact text-base sm:text-lg transition-all flex items-center justify-center cursor-pointer ${
+                    className={`py-6 sm:py-8 px-4 rounded-2xl sm:rounded-3xl font-impact transition-all flex flex-col items-center justify-center cursor-pointer border-2 shadow-2xl ${
                       isActive
-                        ? 'bg-red-600 text-white font-black shadow-lg shadow-red-500/50 scale-110 ring-2 ring-white z-10'
-                        : 'bg-transparent text-gray-400 hover:bg-zinc-800 hover:text-white'
+                        ? 'bg-red-600 border-red-400 text-white font-black shadow-red-600/60 scale-105 ring-4 ring-white/30 z-10'
+                        : 'bg-zinc-900 border-zinc-700 text-gray-300 hover:bg-zinc-800 hover:border-zinc-500 hover:text-white hover:scale-105'
                     }`}
                   >
-                    {num}
+                    <span className="text-4xl sm:text-6xl font-black tracking-tight">{num}</span>
+                    <span className="text-xs sm:text-sm font-tech font-bold uppercase tracking-wider mt-2 opacity-90">
+                      {num === 1 ? 'SEAT' : 'SEATS'}
+                    </span>
                   </button>
                 );
               })}
@@ -388,9 +391,8 @@ export default function BookingFlow({ onReturnHome }) {
               <span className="text-[11px] text-gray-400 font-bold uppercase tracking-widest block">
                 EXECUTIVE // EARLY BIRD PASS
               </span>
-              <div className="font-impact text-2xl sm:text-3xl text-white flex items-center justify-center gap-2">
+              <div className="font-impact text-3xl sm:text-4xl text-white flex items-center justify-center gap-2">
                 <span>₹{event.ticket_price}</span>
-                <span className="line-through text-gray-500 text-base font-normal font-tech">₹599</span>
               </div>
               <span className="text-[11px] font-bold text-emerald-400 uppercase block tracking-wider">
                 AVAILABLE (LIMITED TIME)
@@ -631,16 +633,16 @@ export default function BookingFlow({ onReturnHome }) {
             </div>
 
             {/* Prominent Highlights for Selected Seats and Total Payable Amount */}
-            <div className="bg-zinc-950 border-2 border-red-500/60 p-6 md:p-8 rounded-2xl mb-10 flex flex-col sm:flex-row justify-between items-center gap-6 shadow-xl text-center sm:text-left">
-              <div>
-                <span className="text-gray-400 block text-xs font-tech font-bold uppercase tracking-widest mb-1">// SELECTED SEATS HIGHLIGHT</span>
-                <div className="text-2xl md:text-4xl font-impact text-red-400 bg-red-950/60 border border-red-500/40 px-5 py-2.5 rounded-xl inline-block shadow tracking-wider">
+            <div className="bg-zinc-950 border-2 border-red-500/80 p-6 md:p-10 rounded-3xl mb-10 flex flex-col sm:flex-row justify-between items-center gap-8 shadow-2xl text-center sm:text-left">
+              <div className="w-full sm:w-auto">
+                <span className="text-gray-300 block text-sm font-tech font-bold uppercase tracking-widest mb-2">// SELECTED SEATS HIGHLIGHT</span>
+                <div className="text-4xl sm:text-6xl font-impact text-white bg-zinc-900 border-2 border-zinc-600 px-6 py-4 rounded-2xl inline-block shadow-2xl tracking-wider w-full sm:w-auto text-center">
                   [{selectedSeats.join(', ')}]
                 </div>
               </div>
-              <div className="text-center sm:text-right">
-                <span className="text-gray-400 block text-xs font-tech font-bold uppercase tracking-widest mb-1">// TOTAL PAYABLE AMOUNT (ALL INCLUSIVE)</span>
-                <div className="text-4xl md:text-5xl font-impact text-emerald-400 tracking-tight">
+              <div className="w-full sm:w-auto text-center sm:text-right">
+                <span className="text-gray-300 block text-sm font-tech font-bold uppercase tracking-widest mb-2">// TOTAL PAYABLE AMOUNT (ALL INCLUSIVE)</span>
+                <div className="text-5xl sm:text-7xl font-impact text-emerald-400 bg-emerald-950/90 border-2 border-emerald-500 px-6 py-4 rounded-2xl inline-block shadow-2xl tracking-tight w-full sm:w-auto text-center">
                   ₹{selectedSeats.length * event.ticket_price}/-
                 </div>
               </div>
@@ -651,21 +653,21 @@ export default function BookingFlow({ onReturnHome }) {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
                 
                 <div>
-                  <label className="block text-xs md:text-sm font-tech font-bold text-red-400 uppercase tracking-widest mb-2.5">
+                  <label className="block text-base sm:text-xl font-impact font-bold text-emerald-400 uppercase tracking-widest mb-3">
                     FULL NAME *
                   </label>
                   <input 
                     type="text" 
                     required 
-                    className="w-full p-4 bg-black border-2 border-zinc-700 focus:border-red-500 text-white font-mono text-lg rounded-xl shadow-inner outline-none transition-all placeholder:text-zinc-600"
-                    placeholder="e.g. Arjun Raju"
+                    className="w-full p-4.5 bg-black border-2 border-zinc-700 focus:border-emerald-500 text-white font-mono text-xl rounded-xl shadow-inner outline-none transition-all"
+                    placeholder=""
                     value={userName}
                     onChange={(e) => setUserName(e.target.value)}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs md:text-sm font-tech font-bold text-red-400 uppercase tracking-widest mb-2.5">
+                  <label className="block text-base sm:text-xl font-impact font-bold text-emerald-400 uppercase tracking-widest mb-3">
                     10-DIGIT MOBILE NUMBER *
                   </label>
                   <input 
@@ -673,22 +675,22 @@ export default function BookingFlow({ onReturnHome }) {
                     required 
                     maxLength="10"
                     pattern="[0-9]{10}"
-                    className="w-full p-4 bg-black border-2 border-zinc-700 focus:border-red-500 text-white font-mono text-lg rounded-xl shadow-inner outline-none transition-all placeholder:text-zinc-600"
-                    placeholder="9848012345"
+                    className="w-full p-4.5 bg-black border-2 border-zinc-700 focus:border-emerald-500 text-white font-mono text-xl rounded-xl shadow-inner outline-none transition-all"
+                    placeholder=""
                     value={userPhone}
                     onChange={(e) => setUserPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs md:text-sm font-tech font-bold text-red-400 uppercase tracking-widest mb-2.5">
+                  <label className="block text-base sm:text-xl font-impact font-bold text-emerald-400 uppercase tracking-widest mb-3">
                     EMAIL ADDRESS *
                   </label>
                   <input 
                     type="email" 
                     required 
-                    className="w-full p-4 bg-black border-2 border-zinc-700 focus:border-red-500 text-white font-mono text-lg rounded-xl shadow-inner outline-none transition-all placeholder:text-zinc-600"
-                    placeholder="arjun.raju@gmail.com"
+                    className="w-full p-4.5 bg-black border-2 border-zinc-700 focus:border-emerald-500 text-white font-mono text-xl rounded-xl shadow-inner outline-none transition-all"
+                    placeholder=""
                     value={userEmail}
                     onChange={(e) => setUserEmail(e.target.value)}
                   />
@@ -768,29 +770,29 @@ export default function BookingFlow({ onReturnHome }) {
                 {/* Right Column: Exactly the required 4 items clearly stated */}
                 <form onSubmit={handleSubmitPayment} className="md:col-span-9 flex flex-col justify-between space-y-6 text-left w-full">
                   
-                  <div>
-                    <span className="text-red-400 font-bold text-xs uppercase tracking-widest mb-1 block">
+                  <div className="bg-red-950/90 border-2 sm:border-4 border-red-500 p-5 sm:p-7 rounded-3xl text-center md:text-left shadow-2xl">
+                    <span className="text-yellow-400 font-bold text-xs sm:text-sm uppercase tracking-widest mb-1.5 block">
                       // MANDATORY PAYMENT STEP
                     </span>
-                    <h3 className="text-2xl md:text-3xl font-impact text-white uppercase tracking-tight">
+                    <h3 className="text-3xl sm:text-5xl font-impact text-white uppercase tracking-tight leading-tight">
                       COMPLETE YOUR UPI PAYMENT
                     </h3>
                   </div>
 
                   {/* 1. Official UPI ID */}
-                  <div>
-                    <label className="text-xs text-gray-400 font-bold uppercase block mb-2 tracking-wider">
-                      1. OFFICIAL UPI ID
+                  <div className="bg-purple-950/80 border-2 sm:border-4 border-purple-500 p-5 sm:p-7 rounded-3xl shadow-2xl">
+                    <label className="text-sm sm:text-lg text-purple-300 font-impact tracking-wider uppercase block mb-3">
+                      1. OFFICIAL UPI ID (EXACT ADDRESS)
                     </label>
-                    <div className="flex items-center justify-between bg-black border-2 border-purple-500/50 py-4 px-5 rounded-xl text-base md:text-lg font-mono text-white shadow">
-                      <span className="font-bold tracking-wide select-all">steveoguri07-2@okicici</span>
+                    <div className="flex items-center justify-between bg-black border-2 border-purple-400 py-5 px-6 rounded-2xl text-xl sm:text-3xl font-mono font-bold text-white shadow-inner">
+                      <span className="tracking-wide select-all text-purple-200 truncate">steveoguri07-2@okicici</span>
                       <button 
                         type="button" 
                         onClick={() => {
                           navigator.clipboard.writeText('steveoguri07-2@okicici');
                           alert('UPI ID copied to clipboard!');
                         }} 
-                        className="text-purple-300 hover:text-white transition-colors bg-purple-950/80 border border-purple-500/50 py-1.5 px-3 rounded-lg text-xs font-tech font-bold uppercase cursor-pointer"
+                        className="text-white hover:bg-purple-600 transition-all bg-purple-700 border-2 border-purple-400 py-2.5 px-5 rounded-xl text-sm sm:text-base font-impact tracking-wider uppercase cursor-pointer shrink-0 shadow-lg ml-3"
                       >
                         COPY
                       </button>
@@ -798,30 +800,30 @@ export default function BookingFlow({ onReturnHome }) {
                   </div>
 
                   {/* 2. Total Amount to Pay */}
-                  <div>
-                    <label className="text-xs text-gray-400 font-bold uppercase block mb-2 tracking-wider">
-                      2. TOTAL AMOUNT TO BE PAID
+                  <div className="bg-emerald-950/90 border-2 sm:border-4 border-emerald-500 p-5 sm:p-7 rounded-3xl shadow-2xl">
+                    <label className="text-sm sm:text-lg text-emerald-300 font-impact tracking-wider uppercase block mb-3">
+                      2. ACTUAL TOTAL AMOUNT TO BE PAID
                     </label>
-                    <div className="bg-black border-2 border-emerald-500/50 py-4 px-5 rounded-xl flex items-center justify-between">
-                      <div>
-                        <span className="text-xs text-gray-300 block font-tech">({activeBooking.seats.length} {activeBooking.seats.length === 1 ? 'Seat' : 'Seats'} × ₹{event.ticket_price})</span>
-                        <span className="text-xs text-emerald-400 font-bold tracking-wider block mt-0.5 uppercase">SEATING + SNACK + BEVERAGE</span>
+                    <div className="bg-black border-2 border-emerald-400 py-5 px-6 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 shadow-inner">
+                      <div className="text-center sm:text-left">
+                        <span className="text-sm sm:text-base text-gray-200 block font-tech font-bold">({activeBooking.seats.length} {activeBooking.seats.length === 1 ? 'Seat' : 'Seats'} × ₹{event.ticket_price})</span>
+                        <span className="text-xs sm:text-sm text-emerald-400 font-impact tracking-wider block mt-1 uppercase">SEATING + SNACK + BEVERAGE INCLUDED</span>
                       </div>
-                      <span className="font-impact text-4xl md:text-5xl text-emerald-400">₹{activeBooking.total_amount}/-</span>
+                      <span className="font-impact text-5xl sm:text-7xl text-emerald-300 tracking-tight">₹{activeBooking.total_amount}/-</span>
                     </div>
                   </div>
 
-                  {/* 3. Mandatory Transaction Screenshot Upload (HIGH VISIBILITY) */}
-                  <div className="pt-2">
-                    <label className="text-sm text-yellow-400 font-impact tracking-wider uppercase block mb-3 flex items-center justify-between">
+                  {/* 3. Mandatory Transaction Screenshot Upload (HIGH VISIBILITY & HIGHLIGHTED) */}
+                  <div className="bg-yellow-950/90 border-2 sm:border-4 border-yellow-400 p-5 sm:p-8 rounded-3xl shadow-2xl">
+                    <label className="text-base sm:text-2xl text-yellow-300 font-impact tracking-wider uppercase block mb-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
                       <span className="flex items-center gap-2">
-                        <span className="bg-red-600 text-white px-2.5 py-0.5 rounded text-xs">STEP 3</span>
+                        <span className="bg-red-600 text-white px-3 py-1 rounded-lg text-sm sm:text-base">STEP 3</span>
                         <span>MANDATORY PAYMENT SCREENSHOT UPLOAD *</span>
                       </span>
-                      <span className="text-xs text-red-400 font-mono bg-red-950 border border-red-500 px-2.5 py-1 rounded font-bold animate-pulse">[REQUIRED TO UNLOCK TICKETS]</span>
+                      <span className="text-xs sm:text-sm text-red-400 font-mono bg-red-950 border-2 border-red-500 px-3 py-1.5 rounded-lg font-bold animate-pulse tracking-wide shrink-0">[REQUIRED TO UNLOCK TICKETS]</span>
                     </label>
                     
-                    <div className={`rounded-2xl p-6 sm:p-8 text-center cursor-pointer transition-all ${screenshotUrl ? 'screenshot-upload-success' : 'screenshot-upload-dropzone'}`}>
+                    <div className={`rounded-2xl p-6 sm:p-10 text-center cursor-pointer transition-all border-2 border-dashed border-yellow-400/80 bg-black/60 hover:bg-black/80 ${screenshotUrl ? 'screenshot-upload-success border-emerald-500' : 'screenshot-upload-dropzone'}`}>
                       <input 
                         type="file" 
                         accept="image/*" 
@@ -832,21 +834,21 @@ export default function BookingFlow({ onReturnHome }) {
                       />
                       <label htmlFor="screenshot-input" className="cursor-pointer block w-full">
                         {!screenshotUrl && (
-                          <div className="bg-yellow-400 text-black font-impact text-xs sm:text-sm px-5 py-2 rounded-full uppercase tracking-widest mb-4 inline-block shadow-lg animate-bounce">
+                          <div className="bg-yellow-400 text-black font-impact text-sm sm:text-base px-6 py-3 rounded-full uppercase tracking-widest mb-4 inline-block shadow-xl animate-bounce">
                             CLICK HERE OR DROP PAYMENT SCREENSHOT
                           </div>
                         )}
-                        <Upload size={38} className={`mx-auto mb-3 ${screenshotUrl ? 'text-emerald-400' : 'text-yellow-400'}`} />
-                        <span className="text-base sm:text-lg text-white block font-impact tracking-wide truncate mb-1">
+                        <Upload size={48} className={`mx-auto mb-3 ${screenshotUrl ? 'text-emerald-400' : 'text-yellow-400'}`} />
+                        <span className="text-lg sm:text-2xl text-white block font-impact tracking-wide truncate mb-2">
                           {isCompressing ? 'COMPRESSING & PROCESSING...' : screenshotName ? `SUCCESSFULLY ATTACHED: ${screenshotName}` : 'TAP TO SELECT SCREENSHOT FILE'}
                         </span>
-                        <span className="text-xs text-gray-300 font-tech block max-w-md mx-auto">
+                        <span className="text-xs sm:text-sm text-gray-300 font-tech block max-w-lg mx-auto leading-relaxed">
                           {screenshotUrl ? 'Click again if you wish to replace the attached screenshot.' : 'Mandatory verification step — Your official screening pass & QR code will be generated immediately after upload.'}
                         </span>
                       </label>
                       {screenshotUrl && (
-                        <div className="mt-4 bg-black/80 p-3 rounded-xl border-2 border-emerald-500 inline-block shadow-2xl">
-                          <img src={screenshotUrl} alt="Screenshot Preview" className="max-h-36 mx-auto rounded object-contain block" />
+                        <div className="mt-5 bg-black/90 p-4 rounded-xl border-2 border-emerald-500 inline-block shadow-2xl">
+                          <img src={screenshotUrl} alt="Screenshot Preview" className="max-h-48 mx-auto rounded object-contain block" />
                         </div>
                       )}
                     </div>
