@@ -380,13 +380,14 @@ export default function BookingFlow({ onReturnHome }) {
             {/* Category / Price Section */}
             <div className="mt-8 pt-6 border-t border-zinc-800/80 space-y-1">
               <span className="text-[11px] text-gray-400 font-bold uppercase tracking-widest block">
-                EXECUTIVE // FIFA WORLD CUP PASS
+                EXECUTIVE // EARLY BIRD PASS
               </span>
-              <div className="font-impact text-2xl sm:text-3xl text-white block">
-                ₹{event.ticket_price}
+              <div className="font-impact text-2xl sm:text-3xl text-white flex items-center justify-center gap-2">
+                <span>₹{event.ticket_price}</span>
+                <span className="line-through text-gray-500 text-base font-normal font-tech">₹599</span>
               </div>
               <span className="text-[11px] font-bold text-emerald-400 uppercase block tracking-wider">
-                AVAILABLE
+                AVAILABLE (LIMITED TIME)
               </span>
             </div>
 

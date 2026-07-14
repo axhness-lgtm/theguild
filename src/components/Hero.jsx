@@ -63,7 +63,7 @@ export default function Hero({ activeCategory = 'f1', setActiveView, onSelectEve
             )}
           </div>
           
-          <div className="hero-cta-wrapper animate-fade-in is-revealed reveal-active">
+          <div className="hero-cta-wrapper animate-fade-in is-revealed reveal-active flex flex-col items-center">
             <button 
               type="button"
               className="center-cta-btn font-tech"
@@ -71,11 +71,19 @@ export default function Hero({ activeCategory = 'f1', setActiveView, onSelectEve
               style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
             >
               <RollingText 
-                text={activeCategory === 'world_cup' ? "[ BOOK TICKETS NOW ]" : "[ NEXT RACE ]"} 
+                text={activeCategory === 'world_cup' ? "[ EARLY BIRD OFFER — BOOK NOW ]" : "[ NEXT RACE ]"} 
                 stagger={true} 
               />
               <ArrowDown size={14} className="cta-arrow" />
             </button>
+
+            {activeCategory === 'world_cup' && (
+              <div className="hero-early-bird-badge font-tech text-xs sm:text-sm text-emerald-400 font-bold bg-zinc-950/90 border border-emerald-500/60 px-4 py-1.5 rounded-full mt-3 shadow-2xl flex items-center justify-center gap-2 tracking-wider">
+                <span className="text-white uppercase">// EARLY BIRD PRICE:</span>
+                <span className="text-emerald-400 font-impact text-base sm:text-lg">₹499</span>
+                <span className="line-through text-gray-400 text-xs sm:text-sm font-normal">₹599</span>
+              </div>
+            )}
           </div>
         </div>
 
