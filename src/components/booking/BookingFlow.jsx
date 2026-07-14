@@ -94,7 +94,7 @@ export default function BookingFlow({ onReturnHome }) {
         const minNum = Math.min(firstSeatObj.seat_number, seat.seat_number);
         const maxNum = Math.max(firstSeatObj.seat_number, seat.seat_number);
         const rangeCount = maxNum - minNum + 1;
-        if (rangeCount <= 4) {
+        if (rangeCount <= targetSeatCount && rangeCount <= 5) {
           const rowRangeSeats = ticketingData.seats.filter(
             s => s.row_label === seat.row_label && s.seat_number >= minNum && s.seat_number <= maxNum
           );
@@ -102,11 +102,10 @@ export default function BookingFlow({ onReturnHome }) {
           if (allAvailable && rowRangeSeats.length === rangeCount) {
             const rangeLabels = rowRangeSeats.map(s => s.label);
             setSelectedSeats(rangeLabels);
-            if (targetSeatCount !== rangeCount) setTargetSeatCount(rangeCount);
             return;
           }
         } else {
-          setRuleError('[ RULE VIOLATION ] MAXIMUM 4 SEATS ALLOWED PER BOOKING.');
+          setRuleError(`[ RULE VIOLATION ] YOU MAY SELECT UP TO ${targetSeatCount} SEAT${targetSeatCount > 1 ? 'S' : ''} (MAX 5).`);
           return;
         }
       }
@@ -119,9 +118,9 @@ export default function BookingFlow({ onReturnHome }) {
       updatedSelection.push(seat.label);
     }
 
-    // If more than 4, reject
-    if (updatedSelection.length > 4) {
-      setRuleError('[ RULE VIOLATION ] MAXIMUM 4 SEATS ALLOWED PER BOOKING.');
+    // If more than targetSeatCount (max 5), reject
+    if (updatedSelection.length > targetSeatCount || updatedSelection.length > 5) {
+      setRuleError(`[ RULE VIOLATION ] EXACTLY ${targetSeatCount} SEAT${targetSeatCount > 1 ? 'S' : ''} ALLOWED AS SELECTED IN STEP 1.`);
       return;
     }
 
@@ -135,7 +134,6 @@ export default function BookingFlow({ onReturnHome }) {
     }
 
     setSelectedSeats(updatedSelection);
-    if (updatedSelection.length > 0) setTargetSeatCount(updatedSelection.length);
   };
 
   // Step 3: Trigger Atomic Reservation
@@ -322,13 +320,100 @@ export default function BookingFlow({ onReturnHome }) {
 
             </div>
 
-            {/* Bottom Centered CTA Button: BOOK YOUR SEATS */}
-            <div className="mt-10 flex justify-center">
+            {/* Bottom Centered CTA Button: PROCEED TO SEAT QUANTITY SELECTION */}
+            <div className="mt-12 w-full flex justify-center items-center">
               <button 
-                className="btn-brutalist w-full max-w-xl py-5 px-12 text-center justify-center text-lg md:text-xl font-impact tracking-widest uppercase bg-red-600 hover:bg-red-500 text-white border-red-500 shadow-2xl transition-all hover:scale-105"
-                onClick={() => setStep('seatmap')}
+                className="btn-brutalist mx-auto block w-full max-w-lg py-5 px-10 text-center justify-center text-lg md:text-xl font-impact tracking-widest uppercase bg-red-600 hover:bg-red-500 text-white border-red-500 shadow-2xl transition-all hover:scale-105 cursor-pointer"
+                onClick={() => setStep('seatcount')}
               >
-                <RollingText text="BOOK YOUR SEATS →" stagger={true} />
+                <RollingText text="PROCEED TO SEAT SELECTION →" stagger={true} />
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* =========================================================================
+          PAGE 1.5: DEDICATED SEAT COUNT QUANTITY PICKER (BEFORE MAP)
+          ========================================================================= */}
+      {step === 'seatcount' && (
+        <div className="grid-container py-8">
+          <div className="max-w-3xl mx-auto bg-zinc-950 border-2 border-zinc-800 p-8 md:p-14 rounded-3xl shadow-2xl my-6 text-center w-full">
+            
+            <div className="inline-block bg-red-950/80 border border-red-500/60 text-red-400 font-tech font-bold text-xs md:text-sm px-4 py-1.5 rounded-lg uppercase tracking-widest mb-4 shadow">
+              // STEP 01 — SELECT TICKET QUANTITY
+            </div>
+            
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-impact text-white uppercase tracking-tight my-2">
+              HOW MANY SEATS DO YOU WANT TO BOOK?
+            </h2>
+            
+            <p className="text-gray-300 font-tech text-sm md:text-base max-w-xl mx-auto mb-8">
+              Choose between 1 and 5 seats for the FIFA World Cup Final screening at Varun INOX, Beach Road, Vizag.
+            </p>
+
+            {/* Massive Quantity Selector Box */}
+            <div className="bg-black border-2 border-red-500/80 p-8 md:p-12 rounded-2xl max-w-xl mx-auto shadow-2xl flex flex-col items-center justify-center my-8">
+              <span className="text-red-400 font-tech font-bold text-sm md:text-base tracking-widest uppercase mb-6 block">
+                // NUMBER OF TICKETS (MAX 5 SEATS)
+              </span>
+
+              <div className="flex items-center justify-center gap-6 md:gap-10">
+                <button 
+                  type="button" 
+                  onClick={() => setTargetSeatCount(Math.max(1, targetSeatCount - 1))}
+                  disabled={targetSeatCount <= 1}
+                  className="w-20 h-20 md:w-24 md:h-24 flex items-center justify-center bg-zinc-800 hover:bg-red-600 disabled:opacity-20 text-white font-bold text-4xl md:text-5xl rounded-2xl border-2 border-zinc-600 transition-all cursor-pointer shadow-xl select-none"
+                >
+                  -
+                </button>
+
+                <div className="w-36 md:w-44 py-5 bg-zinc-950 border-2 border-zinc-700 rounded-2xl text-center shadow-inner">
+                  <span className="font-impact text-6xl md:text-7xl text-white block leading-none">
+                    {targetSeatCount}
+                  </span>
+                  <span className="font-tech text-xs text-emerald-400 font-bold uppercase block mt-2">
+                    {targetSeatCount === 1 ? '1 SEAT' : `${targetSeatCount} SEATS`} SELECTED
+                  </span>
+                </div>
+
+                <button 
+                  type="button" 
+                  onClick={() => setTargetSeatCount(Math.min(5, targetSeatCount + 1))}
+                  disabled={targetSeatCount >= 5}
+                  className="w-20 h-20 md:w-24 md:h-24 flex items-center justify-center bg-zinc-800 hover:bg-red-600 disabled:opacity-20 text-white font-bold text-4xl md:text-5xl rounded-2xl border-2 border-zinc-600 transition-all cursor-pointer shadow-xl select-none"
+                >
+                  +
+                </button>
+              </div>
+
+              <div className="mt-8 pt-6 border-t border-zinc-800 w-full text-center">
+                <span className="text-xs text-gray-400 font-tech block uppercase tracking-wider">// ESTIMATED TOTAL PAYABLE</span>
+                <span className="font-impact text-3xl md:text-4xl text-emerald-400 block mt-1">₹{targetSeatCount * event.ticket_price}/-</span>
+                <span className="text-[11px] text-gray-400 block mt-0.5 font-bold tracking-wider">(INCLUDES: SEATING + SNACK + BEVERAGE)</span>
+              </div>
+            </div>
+
+            {/* Centered Transition CTA Button to Seat Map */}
+            <div className="mt-10 w-full flex flex-col items-center justify-center gap-4">
+              <button 
+                type="button"
+                onClick={() => {
+                  setSelectedSeats([]);
+                  setStep('seatmap');
+                }}
+                className="btn-brutalist mx-auto block w-full max-w-xl py-5 px-10 text-center justify-center text-lg md:text-xl font-impact tracking-widest uppercase bg-red-600 hover:bg-red-500 text-white border-red-500 shadow-2xl transition-all hover:scale-105 cursor-pointer"
+              >
+                <RollingText text={`CONTINUE TO PICK ${targetSeatCount} ${targetSeatCount === 1 ? 'SEAT' : 'SEATS'} ON MAP →`} stagger={true} />
+              </button>
+
+              <button 
+                type="button"
+                onClick={() => setStep('overview')}
+                className="text-xs text-gray-400 hover:text-white underline font-tech inline-block cursor-pointer py-2"
+              >
+                ← BACK TO OVERVIEW & RULES
               </button>
             </div>
 
@@ -340,43 +425,31 @@ export default function BookingFlow({ onReturnHome }) {
           PAGE 2: INTERACTIVE BOOKMYSHOW-STYLE CINEMA SEAT MAP (INOX VARUN'S MALL)
           ========================================================================= */}
       {step === 'seatmap' && (
-        <div className="grid-container">
-          <div className="seatmap-container">
+        <div className="grid-container py-6">
+          <div className="seatmap-container w-full max-w-6xl mx-auto">
             
             {ruleError && (
-              <div className="rule-warning-banner animate-bounce">
+              <div className="rule-warning-banner animate-bounce w-full max-w-4xl mx-auto mb-6">
                 <span>{ruleError}</span>
-                <button onClick={() => setRuleError(null)} className="underline text-xs">DISMISS</button>
+                <button onClick={() => setRuleError(null)} className="underline text-xs shrink-0 ml-4">DISMISS</button>
               </div>
             )}
 
-            {/* Target Seat Count Pre-selector Box */}
-            <div className="bg-zinc-950 border-2 border-red-500/50 p-6 md:p-8 rounded-2xl mb-8 max-w-2xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6 shadow-2xl">
-              <div className="text-left">
-                <div className="font-tech text-base md:text-lg text-red-400 font-bold uppercase tracking-wider">// NUMBER OF SEATS TO BOOK (MAX 5)</div>
-                <div className="font-tech text-xs text-gray-300 mt-1">Select your exact seat count using the +/- buttons below before picking on the map</div>
-              </div>
-              <div className="flex items-center gap-4 bg-black border-2 border-zinc-700 p-2 rounded-xl shadow-inner">
-                <button 
-                  type="button" 
-                  onClick={() => setTargetSeatCount(Math.max(1, targetSeatCount - 1))}
-                  disabled={targetSeatCount <= 1}
-                  className="w-14 h-14 flex items-center justify-center bg-zinc-800 hover:bg-red-600 disabled:opacity-30 text-white font-bold text-3xl rounded-lg border border-zinc-600 transition-all cursor-pointer"
-                >
-                  -
-                </button>
-                <span className="font-impact text-4xl md:text-5xl text-white px-5 min-w-[64px] text-center">
-                  {targetSeatCount}
+            {/* Target Seat Count Header Bar (Clean & Spaced) */}
+            <div className="w-full max-w-4xl mx-auto mb-8 bg-zinc-950 border-2 border-zinc-800 py-4 px-6 md:px-8 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 font-tech shadow-xl">
+              <div className="text-center sm:text-left">
+                <span className="text-xs text-red-400 font-bold block uppercase tracking-wider">// STEP 02 — PICK EXACT SEATS ON MAP</span>
+                <span className="text-base md:text-lg text-white font-impact tracking-wide block mt-0.5">
+                  PLEASE SELECT EXACTLY {targetSeatCount} {targetSeatCount === 1 ? 'SEAT' : 'SEATS'} ({selectedSeats.length} / {targetSeatCount} SELECTED)
                 </span>
-                <button 
-                  type="button" 
-                  onClick={() => setTargetSeatCount(Math.min(5, targetSeatCount + 1))}
-                  disabled={targetSeatCount >= 5}
-                  className="w-14 h-14 flex items-center justify-center bg-zinc-800 hover:bg-red-600 disabled:opacity-30 text-white font-bold text-3xl rounded-lg border border-zinc-600 transition-all cursor-pointer"
-                >
-                  +
-                </button>
               </div>
+              <button 
+                type="button" 
+                onClick={() => setStep('seatcount')} 
+                className="btn-brutalist-outline py-2.5 px-5 text-xs bg-zinc-900 hover:bg-zinc-800 text-gray-300 hover:text-white border-zinc-700 font-bold tracking-wider uppercase cursor-pointer shrink-0"
+              >
+                CHANGE COUNT ({targetSeatCount})
+              </button>
             </div>
 
             {/* Cinema Screen Bar with ALL EYES THIS WAY */}
@@ -455,31 +528,43 @@ export default function BookingFlow({ onReturnHome }) {
             </div>
 
             {/* Sticky Bottom Summary Bar */}
-            <div className="seatmap-bottom-bar bg-zinc-900 border-t border-zinc-800 p-4 sticky bottom-0 z-20 flex flex-wrap items-center justify-between gap-4 mt-6">
-              <div className="selection-summary font-tech text-sm">
+            <div className="seatmap-bottom-bar bg-zinc-900 border-t border-zinc-800 p-4 sticky bottom-0 z-20 flex flex-wrap items-center justify-between gap-4 mt-8 w-full max-w-6xl mx-auto rounded-xl shadow-2xl">
+              <div className="selection-summary font-tech text-sm text-left">
                 <div className="summary-seats text-white">
                   {selectedSeats.length > 0 ? (
-                    <span>SELECTED SEATS: <strong className="text-red-500 text-base">[{selectedSeats.join(', ')}]</strong> ({selectedSeats.length} SEAT{selectedSeats.length > 1 ? 'S' : ''})</span>
+                    <span>SELECTED ({selectedSeats.length}/{targetSeatCount}): <strong className="text-red-500 text-base">[{selectedSeats.join(', ')}]</strong></span>
                   ) : (
-                    <span className="text-gray-500">// SELECT YOUR SEATS TO PROCEED</span>
+                    <span className="text-yellow-400 font-bold">// PICK EXACTLY {targetSeatCount} {targetSeatCount === 1 ? 'SEAT' : 'SEATS'} ON MAP TO PROCEED</span>
                   )}
                 </div>
                 {selectedSeats.length > 0 && (
                   <div className="summary-total text-gray-300 text-xs mt-0.5">
-                    TOTAL PAYABLE: <strong className="text-white text-base">₹{selectedSeats.length * event.ticket_price}</strong> (ALL INCLUSIVE)
+                    TOTAL PAYABLE: <strong className="text-emerald-400 text-base font-impact">₹{selectedSeats.length * event.ticket_price}/-</strong> (ALL INCLUSIVE)
                   </div>
                 )}
               </div>
 
               <div>
-                {selectedSeats.length > 0 && (
-                  <button 
-                    className="btn-brutalist py-3 px-6 text-xs"
-                    onClick={() => setStep('contact')}
-                  >
-                    <RollingText text="PROCEED TO CONTACT DETAILS →" stagger={true} />
-                  </button>
-                )}
+                <button 
+                  type="button"
+                  className={`btn-brutalist py-3.5 px-8 text-xs md:text-sm cursor-pointer transition-all ${selectedSeats.length === targetSeatCount ? 'bg-red-600 hover:bg-red-500 text-white border-red-500 hover:scale-105 shadow-xl' : 'bg-zinc-800 text-gray-400 border-zinc-700 opacity-80'}`}
+                  onClick={() => {
+                    if (selectedSeats.length !== targetSeatCount) {
+                      alert(`Please select exactly ${targetSeatCount} ${targetSeatCount === 1 ? 'seat' : 'seats'} on the map before proceeding! (You currently have ${selectedSeats.length} selected).`);
+                      return;
+                    }
+                    setStep('contact');
+                  }}
+                >
+                  <RollingText 
+                    text={
+                      selectedSeats.length === targetSeatCount 
+                        ? `PROCEED TO ATTENDEE DETAILS (${selectedSeats.length} SEATS) →` 
+                        : `SELECT ${targetSeatCount - selectedSeats.length} MORE ${targetSeatCount - selectedSeats.length === 1 ? 'SEAT' : 'SEATS'} →`
+                    } 
+                    stagger={true} 
+                  />
+                </button>
               </div>
             </div>
 
@@ -492,7 +577,7 @@ export default function BookingFlow({ onReturnHome }) {
           ========================================================================= */}
       {step === 'contact' && (
         <div className="grid-container py-8">
-          <div className="max-w-4xl mx-auto bg-zinc-900 border-2 border-zinc-800 p-8 md:p-12 rounded-2xl shadow-2xl">
+          <div className="max-w-4xl mx-auto bg-zinc-900 border-2 border-zinc-800 p-8 md:p-12 rounded-2xl shadow-2xl w-full">
             <div className="text-center mb-8">
               <span className="font-tech text-red-500 text-xs font-bold tracking-widest uppercase">// 02 — MANDATORY ATTENDEE INFO</span>
               <h2 className="text-3xl md:text-5xl font-impact text-white uppercase tracking-tight mt-1">RESERVE SEATS & START TIMER</h2>
@@ -610,17 +695,17 @@ export default function BookingFlow({ onReturnHome }) {
               </button>
             </div>
           ) : (
-            <div className="max-w-5xl mx-auto bg-zinc-950 border-2 border-zinc-800 p-8 md:p-12 rounded-3xl shadow-2xl my-8 font-tech">
+            <div className="max-w-5xl mx-auto bg-zinc-950 border-2 border-zinc-800 p-8 md:p-12 rounded-3xl shadow-2xl my-8 font-tech w-full">
               
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-center">
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-center w-full">
                 
-                {/* Left Column: Static UPI QR Code ONLY */}
-                <div className="md:col-span-5 flex flex-col items-center justify-center bg-zinc-900 border-2 border-zinc-800 p-8 rounded-2xl text-center shadow-xl w-full">
-                  <span className="text-red-500 font-bold text-xs md:text-sm tracking-widest uppercase mb-6 block">
+                {/* Left Column: Static UPI QR Code ONLY (Reduced by 70%) */}
+                <div className="md:col-span-4 flex flex-col items-center justify-center bg-zinc-900 border-2 border-zinc-800 p-6 rounded-2xl text-center shadow-xl w-full">
+                  <span className="text-red-500 font-bold text-xs tracking-widest uppercase mb-4 block">
                     // OFFICIAL SCANNER QR
                   </span>
                   
-                  <div className="w-64 h-64 bg-white p-4 rounded-2xl shadow-inner border-4 border-zinc-200 mx-auto flex items-center justify-center">
+                  <div className="w-36 h-36 bg-white p-3 rounded-2xl shadow-inner border-4 border-zinc-200 mx-auto flex items-center justify-center">
                     <img 
                       src="/guildqr.png" 
                       alt="Official Guild UPI QR Code" 
@@ -628,13 +713,13 @@ export default function BookingFlow({ onReturnHome }) {
                     />
                   </div>
                   
-                  <span className="text-xs text-gray-400 font-bold mt-6 tracking-wider uppercase block">
+                  <span className="text-[11px] text-gray-400 font-bold mt-4 tracking-wider uppercase block">
                     GPay // PhonePe // Paytm // CRED
                   </span>
                 </div>
 
                 {/* Right Column: Exactly the required 4 items clearly stated */}
-                <form onSubmit={handleSubmitPayment} className="md:col-span-7 flex flex-col justify-between space-y-6 text-left w-full">
+                <form onSubmit={handleSubmitPayment} className="md:col-span-8 flex flex-col justify-between space-y-6 text-left w-full">
                   
                   <div>
                     <span className="text-red-400 font-bold text-xs uppercase tracking-widest mb-1 block">
