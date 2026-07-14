@@ -91,7 +91,8 @@
   transform: scale(1.04);
 }
 
-.hover-img.active {
+.hover-img.active,
+.hero-side:hover .hover-img {
   opacity: 1;
   transform: scale(1);
 }

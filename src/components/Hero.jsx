@@ -9,6 +9,11 @@ export default function Hero({ activeCategory = 'f1', setActiveView, onSelectEve
   const [hoverLeft, setHoverLeft] = useState(false);
   const [hoverRight, setHoverRight] = useState(false);
 
+  const leftBaseImg = activeCategory === 'world_cup' ? '/6.png' : '/2.png';
+  const leftHoverImg = activeCategory === 'world_cup' ? '/7.png' : '/4.png';
+  const rightBaseImg = activeCategory === 'world_cup' ? '/8.png' : '/3.png';
+  const rightHoverImg = activeCategory === 'world_cup' ? '/9.png' : '/5.png';
+
   const scrollToScreenings = (e) => {
     e.preventDefault();
     const elem = document.getElementById('screenings');
@@ -26,26 +31,26 @@ export default function Hero({ activeCategory = 'f1', setActiveView, onSelectEve
     <section className="hero-section split-hero-section" data-scroll-section>
       <div className="split-hero-container">
         
-        {/* Left Side: 2.png (683x768) -> 4.png on hover */}
+        {/* Left Side: 6.png -> 7.png on hover for World Cup, or 2.png -> 4.png for F1 */}
         <div 
           className={`hero-side hero-side-left ${hoverLeft ? 'is-hovered' : ''}`}
           data-scroll-section
           onMouseEnter={() => setHoverLeft(true)}
           onMouseLeave={() => setHoverLeft(false)}
         >
-          <img src="/2.png" alt="Formula 1 Atmosphere Left" className="side-img base-img" />
-          <img src="/4.png" alt="Formula 1 Atmosphere Left Active" className={`side-img hover-img ${hoverLeft ? 'active' : ''}`} />
+          <img src={leftBaseImg} alt={`${activeCategory === 'world_cup' ? 'World Cup' : 'Formula 1'} Atmosphere Left`} className="side-img base-img" />
+          <img src={leftHoverImg} alt={`${activeCategory === 'world_cup' ? 'World Cup' : 'Formula 1'} Atmosphere Left Active`} className={`side-img hover-img ${hoverLeft ? 'active' : ''}`} />
         </div>
 
-        {/* Right Side: 3.png -> 5.png on hover */}
+        {/* Right Side: 8.png -> 9.png on hover for World Cup, or 3.png -> 5.png for F1 */}
         <div 
           className={`hero-side hero-side-right ${hoverRight ? 'is-hovered' : ''}`}
           data-scroll-section
           onMouseEnter={() => setHoverRight(true)}
           onMouseLeave={() => setHoverRight(false)}
         >
-          <img src="/3.png" alt="Formula 1 Atmosphere Right" className="side-img base-img" />
-          <img src="/5.png" alt="Formula 1 Atmosphere Right Active" className={`side-img hover-img ${hoverRight ? 'active' : ''}`} />
+          <img src={rightBaseImg} alt={`${activeCategory === 'world_cup' ? 'World Cup' : 'Formula 1'} Atmosphere Right`} className="side-img base-img" />
+          <img src={rightHoverImg} alt={`${activeCategory === 'world_cup' ? 'World Cup' : 'Formula 1'} Atmosphere Right Active`} className={`side-img hover-img ${hoverRight ? 'active' : ''}`} />
         </div>
 
         {/* Central Floating Elements: F1/FIFA Logo & Compact Sporty CTA */}
