@@ -95,7 +95,7 @@ export default function BookingFlow({ onReturnHome }) {
         const minNum = Math.min(firstSeatObj.seat_number, seat.seat_number);
         const maxNum = Math.max(firstSeatObj.seat_number, seat.seat_number);
         const rangeCount = maxNum - minNum + 1;
-        if (rangeCount <= targetSeatCount && rangeCount <= 5) {
+        if (rangeCount <= targetSeatCount && rangeCount <= 4) {
           const rowRangeSeats = ticketingData.seats.filter(
             s => s.row_label === seat.row_label && s.seat_number >= minNum && s.seat_number <= maxNum
           );
@@ -106,7 +106,7 @@ export default function BookingFlow({ onReturnHome }) {
             return;
           }
         } else {
-          setRuleError(`[ RULE VIOLATION ] YOU MAY SELECT UP TO ${targetSeatCount} SEAT${targetSeatCount > 1 ? 'S' : ''} (MAX 5).`);
+          setRuleError(`[ RULE VIOLATION ] YOU MAY SELECT UP TO ${targetSeatCount} SEAT${targetSeatCount > 1 ? 'S' : ''} (MAX 4).`);
           return;
         }
       }
@@ -356,9 +356,9 @@ export default function BookingFlow({ onReturnHome }) {
               How many seats?
             </h3>
             
-            {/* Horizontal Quantity Circles (1 to 10 max or max_seats_per_booking) */}
-            <div className="flex items-center justify-center gap-1.5 sm:gap-2 my-6 flex-wrap">
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => {
+            {/* Horizontal Quantity Circles (1 to 4 max) */}
+            <div className="flex items-center justify-center gap-3 sm:gap-4 my-8 flex-wrap">
+              {[1, 2, 3, 4].map((num) => {
                 const isActive = targetSeatCount === num;
                 return (
                   <button
