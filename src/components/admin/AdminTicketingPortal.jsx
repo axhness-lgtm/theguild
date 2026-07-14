@@ -20,6 +20,7 @@ export default function AdminTicketingPortal({ onSwitchToSignups }) {
   const [selectedSeatBooking, setSelectedSeatBooking] = useState(null);
   const [reassigningBooking, setReassigningBooking] = useState(null);
   const [reassignSeatsInput, setReassignSeatsInput] = useState('');
+  const [autoConfirmReassign, setAutoConfirmReassign] = useState(true);
 
   const [isSyncing, setIsSyncing] = useState(false);
 
@@ -98,13 +99,20 @@ export default function AdminTicketingPortal({ onSwitchToSignups }) {
     e.preventDefault();
     const parsedSeats = reassignSeatsInput.split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
     try {
-      await ticketingService.adminReassignSeats(reassigningBooking.id, parsedSeats);
+      await ticketingService.adminReassignSeats(reassigningBooking.id, parsedSeats, autoConfirmReassign);
       setReassigningBooking(null);
       setReassignSeatsInput('');
       reloadData();
-      alert('Seats successfully reassigned!');
+      alert('Seats successfully assigned and locked!');
     } catch (err) {
-      alert(`Reassignment Error: ${err.message}`);
+      alert(`Assignment Error: ${err.message}`);
+    }
+  };
+
+  const handleDelete = async (bookingId) => {
+    if (window.confirm(`Are you sure you want to permanently delete Booking #${bookingId}? This waste/duplicate row will be removed forever.`)) {
+      await ticketingService.adminDeleteBooking(bookingId);
+      reloadData();
     }
   };
 
@@ -371,48 +379,55 @@ export default function AdminTicketingPortal({ onSwitchToSignups }) {
                           )}
                         </td>
                         <td className="text-right">
-                          <div className="flex justify-end items-center gap-1">
-                            {b.status === 'UNDER_REVIEW' && (
-                              <>
-                                <button 
-                                  onClick={() => handleApprove(b.id)}
-                                  className="action-btn-mini action-approve"
-                                  title="Approve UTR and confirm tickets"
-                                >
-                                  APPROVE
-                                </button>
-                                <button 
-                                  onClick={() => handleReject(b.id)}
-                                  className="action-btn-mini action-reject"
-                                  title="Reject payment and release seats"
-                                >
-                                  REJECT
-                                </button>
-                              </>
+                          <div className="flex justify-end items-center gap-1.5 flex-wrap">
+                            {b.status !== 'CONFIRMED' && (
+                              <button 
+                                onClick={() => handleApprove(b.id)}
+                                className="action-btn-mini action-approve font-bold"
+                                title="Approve & Confirm Tickets"
+                              >
+                                APPROVE
+                              </button>
                             )}
 
-                            {['HELD', 'PENDING_PAYMENT', 'CONFIRMED'].includes(b.status) && (
+                            {b.status === 'UNDER_REVIEW' && (
+                              <button 
+                                onClick={() => handleReject(b.id)}
+                                className="action-btn-mini action-reject font-bold"
+                                title="Reject payment and release seats"
+                              >
+                                REJECT
+                              </button>
+                            )}
+
+                            {['HELD', 'PENDING_PAYMENT', 'CONFIRMED', 'EXPIRED', 'CANCELLED'].includes(b.status) && b.status !== 'UNDER_REVIEW' && (
                               <button 
                                 onClick={() => handleReleaseSeats(b.id)}
-                                className="action-btn-mini text-red-400 border-red-500/40"
-                                title="Release seats / Cancel booking"
+                                className="action-btn-mini text-zinc-400 border-zinc-600/40 hover:text-white"
+                                title={b.status === 'CONFIRMED' || b.status === 'HELD' ? "Release seats / Cancel booking" : "Mark cancelled"}
                               >
-                                RELEASE
+                                {b.status === 'CONFIRMED' || b.status === 'HELD' ? 'RELEASE' : 'CANCEL'}
                               </button>
                             )}
 
-                            {['HELD', 'PENDING_PAYMENT', 'UNDER_REVIEW', 'CONFIRMED'].includes(b.status) && (
-                              <button 
-                                onClick={() => {
-                                  setReassigningBooking(b);
-                                  setReassignSeatsInput(b.seats.join(', '));
-                                }}
-                                className="action-btn-mini text-blue-400 border-blue-500/40"
-                                title="Reassign seats to another consecutive row"
-                              >
-                                REASSIGN
-                              </button>
-                            )}
+                            <button 
+                              onClick={() => {
+                                setReassigningBooking(b);
+                                setReassignSeatsInput(b.seats.join(', '));
+                              }}
+                              className="action-btn-mini text-blue-400 border-blue-500/40 hover:bg-blue-950/30"
+                              title="Manually assign or reassign seats"
+                            >
+                              ASSIGN SEATS
+                            </button>
+
+                            <button 
+                              onClick={() => handleDelete(b.id)}
+                              className="action-btn-mini text-red-500 border-red-500/40 hover:bg-red-950/40"
+                              title="Permanently delete waste/duplicate row"
+                            >
+                              DELETE
+                            </button>
                           </div>
                         </td>
                       </tr>
@@ -551,7 +566,7 @@ export default function AdminTicketingPortal({ onSwitchToSignups }) {
             />
 
             <div className="flex justify-between gap-4 mt-6">
-              {selectedScreenshotBooking.status === 'UNDER_REVIEW' && (
+              {selectedScreenshotBooking.status !== 'CONFIRMED' && (
                 <>
                   <button 
                     onClick={() => {
@@ -627,34 +642,48 @@ export default function AdminTicketingPortal({ onSwitchToSignups }) {
         <div className="screenshot-modal-overlay" onClick={() => setReassigningBooking(null)}>
           <div className="screenshot-modal-card text-left font-tech" onClick={(e) => e.stopPropagation()}>
             <div className="flex justify-between items-center border-b border-zinc-800 pb-4 mb-4">
-              <h4 className="font-impact text-lg">REASSIGN SEATS // #{reassigningBooking.id}</h4>
+              <h4 className="font-impact text-lg">MANUALLY ASSIGN / REASSIGN SEATS // #{reassigningBooking.id}</h4>
               <button onClick={() => setReassigningBooking(null)}><X size={20} /></button>
             </div>
 
-            <p className="text-xs text-gray-300 mb-4">
-              Currently assigned to: <strong>[{reassigningBooking.seats.join(', ')}]</strong> ({reassigningBooking.seats.length} seats).
-              New seat assignments must be consecutive within the same row and equal in quantity or within max 4.
-            </p>
+            <div className="text-xs text-gray-300 mb-4 space-y-1 bg-zinc-900 p-3 rounded border border-zinc-800">
+              <div>ATTENDEE: <strong className="text-white">{reassigningBooking.user_name}</strong> ({reassigningBooking.user_phone})</div>
+              <div>CURRENT STATUS: <span className={`badge-admin status-${reassigningBooking.status}`}>{reassigningBooking.status}</span></div>
+              <div>CURRENT SEATS: <strong className="text-white">[{reassigningBooking.seats.join(', ')}]</strong> ({reassigningBooking.seats.length} seats)</div>
+            </div>
 
             <form onSubmit={handleReassignSubmit}>
               <div className="mb-4">
-                <label className="block text-xs text-gray-400 mb-2">NEW CONSECUTIVE SEAT LABELS (COMMA SEPARATED)</label>
+                <label className="block text-xs text-gray-400 mb-2">ASSIGN SEAT LABELS (COMMA SEPARATED, e.g. E11, E10, E9)</label>
                 <input 
                   type="text"
                   required
-                  className="w-full p-3 bg-zinc-900 border border-zinc-700 text-white font-tech"
-                  placeholder="e.g. A4, A5, A6"
+                  className="w-full p-3 bg-zinc-900 border border-zinc-700 text-white font-tech focus:border-red-500 outline-none"
+                  placeholder="e.g. E11, E10, E9"
                   value={reassignSeatsInput}
                   onChange={(e) => setReassignSeatsInput(e.target.value)}
                 />
+              </div>
+
+              <div className="mb-6 flex items-center gap-2 bg-emerald-950/30 border border-emerald-500/30 p-3 rounded">
+                <input 
+                  type="checkbox"
+                  id="autoConfirmCheck"
+                  checked={autoConfirmReassign}
+                  onChange={(e) => setAutoConfirmReassign(e.target.checked)}
+                  className="w-4 h-4 accent-emerald-500"
+                />
+                <label htmlFor="autoConfirmCheck" className="text-xs text-emerald-300 cursor-pointer select-none">
+                  Automatically mark as <strong>CONFIRMED</strong> and permanently block seats (Fail-safe recovery)
+                </label>
               </div>
 
               <div className="flex justify-end gap-4">
                 <button type="button" onClick={() => setReassigningBooking(null)} className="btn-brutalist-outline py-2 px-6 text-xs">
                   CANCEL
                 </button>
-                <button type="submit" className="btn-brutalist py-2 px-6 text-xs">
-                  CONFIRM REASSIGNMENT
+                <button type="submit" className="btn-brutalist py-2 px-6 text-xs bg-red-600 hover:bg-red-500 border-red-500 text-white">
+                  CONFIRM SEAT ASSIGNMENT
                 </button>
               </div>
             </form>

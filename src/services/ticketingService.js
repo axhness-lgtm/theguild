@@ -191,17 +191,24 @@ export function cleanupExpiredReservations(store) {
   return store;
 }
 
+function getStatusPriority(status) {
+  switch (status) {
+    case 'CONFIRMED': return 50;
+    case 'UNDER_REVIEW': return 40;
+    case 'PENDING_PAYMENT': return 30;
+    case 'HELD': return 20;
+    case 'CANCELLED': return 10;
+    case 'EXPIRED': return 5;
+    default: return 0;
+  }
+}
+
 export const ticketingService = {
   // Sync live cross-device state from Supabase cloud database into local cache
   syncWithCloud: async () => {
     if (!supabase) return ticketingService.getTicketingData();
     const store = getLocalStore();
     try {
-      // Proactively push all existing local bookings to Supabase so other devices can discover them immediately
-      if (store.bookings && store.bookings.length > 0) {
-        await Promise.all(store.bookings.map(b => mirrorBookingToCloud(b)));
-      }
-
       const { data, error } = await supabase.from('bookings').select('*').order('created_at', { ascending: false });
       if (error) {
         console.error('Supabase fetch error during cloud sync:', error.message || error);
@@ -223,33 +230,54 @@ export const ticketingService = {
           expires_at: b.expires_at
         }]));
 
-        // Preserve active local bookings and merge screenshots or newer statuses to cloud
+        // Preserve active local bookings and intelligently merge based on status priority
         store.bookings.forEach(localB => {
-          if (!cloudBookingsMap.has(localB.id) && ['HELD', 'PENDING_PAYMENT', 'UNDER_REVIEW', 'CONFIRMED'].includes(localB.status)) {
+          if (!cloudBookingsMap.has(localB.id)) {
             cloudBookingsMap.set(localB.id, localB);
-          } else if (cloudBookingsMap.has(localB.id)) {
+            mirrorBookingToCloud(localB);
+          } else {
             const cloudB = cloudBookingsMap.get(localB.id);
             let needsCloudMirror = false;
-            // If local has a screenshot URL but cloud doesn't, merge and upload
-            if (!cloudB.screenshot_url && localB.screenshot_url) {
-              cloudB.screenshot_url = localB.screenshot_url;
-              needsCloudMirror = true;
-            }
-            if (!cloudB.utr && localB.utr) {
-              cloudB.utr = localB.utr;
-              needsCloudMirror = true;
-            }
-            // If local status progressed further (e.g., UNDER_REVIEW or CANCELLED vs HELD), preserve local status
-            if (localB.status === 'UNDER_REVIEW' && ['HELD', 'PENDING_PAYMENT'].includes(cloudB.status)) {
-              cloudB.status = 'UNDER_REVIEW';
-              needsCloudMirror = true;
-            } else if (['CANCELLED', 'EXPIRED'].includes(localB.status) && !['CANCELLED', 'EXPIRED'].includes(cloudB.status)) {
+            const localPriority = getStatusPriority(localB.status);
+            const cloudPriority = getStatusPriority(cloudB.status);
+
+            if (localPriority > cloudPriority) {
+              // Local status takes priority (e.g. Admin approved/confirmed locally or reassigned)
               cloudB.status = localB.status;
+              cloudB.seats = localB.seats;
+              cloudB.total_amount = localB.total_amount;
+              cloudB.timeline = localB.timeline;
+              cloudB.expires_at = localB.expires_at;
+              if (localB.utr) cloudB.utr = localB.utr;
+              if (localB.screenshot_url) cloudB.screenshot_url = localB.screenshot_url;
               needsCloudMirror = true;
+            } else if (cloudPriority > localPriority) {
+              // Cloud status takes priority (e.g. approved on another admin device)
+              // Keep cloudB status
+            } else {
+              // Equal priority - merge newest details
+              if (!cloudB.screenshot_url && localB.screenshot_url) {
+                cloudB.screenshot_url = localB.screenshot_url;
+                needsCloudMirror = true;
+              }
+              if (!cloudB.utr && localB.utr) {
+                cloudB.utr = localB.utr;
+                needsCloudMirror = true;
+              }
+              if (localB.timeline && localB.timeline.length > (cloudB.timeline || []).length) {
+                cloudB.timeline = localB.timeline;
+                needsCloudMirror = true;
+              }
+              if (JSON.stringify(localB.seats) !== JSON.stringify(cloudB.seats) && localPriority >= 40) {
+                cloudB.seats = localB.seats;
+                needsCloudMirror = true;
+              }
             }
+
             if (needsCloudMirror) {
               mirrorBookingToCloud(cloudB);
             }
+            cloudBookingsMap.set(localB.id, cloudB);
           }
         });
 
@@ -483,7 +511,7 @@ export const ticketingService = {
     return updatedBooking;
   },
 
-  // Admin Action: Approve Payment -> CONFIRMED
+  // Admin Action: Approve Payment -> CONFIRMED & resolve any seat overlap conflicts
   adminApprovePayment: async (bookingId, adminId = 'FOUNDER_01') => {
     const store = getLocalStore();
     const bookingIndex = store.bookings.findIndex(b => b.id === bookingId);
@@ -491,6 +519,27 @@ export const ticketingService = {
 
     const booking = store.bookings[bookingIndex];
     const now = new Date();
+
+    // If any of the target seats are currently held by another non-confirmed booking, release them so this confirmation wins cleanly
+    store.bookings.forEach((otherB, idx) => {
+      if (otherB.id !== bookingId && otherB.status !== 'CONFIRMED' && otherB.seats.some(s => booking.seats.includes(s))) {
+        const remainingSeats = otherB.seats.filter(s => !booking.seats.includes(s));
+        if (remainingSeats.length === 0) {
+          store.bookings[idx] = {
+            ...otherB,
+            status: 'CANCELLED',
+            timeline: [...(otherB.timeline || []), { state: 'CANCELLED', timestamp: now.toISOString(), note: `Seats reassigned/approved for Booking #${bookingId}` }]
+          };
+        } else {
+          store.bookings[idx] = {
+            ...otherB,
+            seats: remainingSeats,
+            total_amount: store.event.ticket_price * remainingSeats.length
+          };
+        }
+        mirrorBookingToCloud(store.bookings[idx]);
+      }
+    });
 
     const updatedTimeline = [
       ...(booking.timeline || []),
@@ -500,6 +549,7 @@ export const ticketingService = {
     store.bookings[bookingIndex] = {
       ...booking,
       status: 'CONFIRMED',
+      expires_at: new Date(now.getTime() + 10 * 365 * 24 * 3600 * 1000).toISOString(), // 10 years in future so never times out
       timeline: updatedTimeline
     };
 
@@ -582,52 +632,112 @@ export const ticketingService = {
     return store.bookings[bookingIndex];
   },
 
-  // Admin Action: Reassign Seats
-  adminReassignSeats: async (bookingId, newConsecutiveSeats, adminId = 'FOUNDER_01') => {
-    const validation = ticketingService.validateConsecutiveSelection(newConsecutiveSeats);
-    if (!validation.valid) {
-      throw new Error(validation.error);
+  // Admin Action: Permanently Delete Booking (Waste/Duplicate Rows)
+  adminDeleteBooking: async (bookingId, adminId = 'FOUNDER_01') => {
+    const store = getLocalStore();
+    const bookingIndex = store.bookings.findIndex(b => b.id === bookingId);
+    if (bookingIndex === -1) throw new Error('Booking not found');
+
+    const booking = store.bookings[bookingIndex];
+    const now = new Date();
+
+    store.bookings.splice(bookingIndex, 1);
+
+    store.activityLogs.unshift({
+      id: 'log-' + Math.random().toString(36).substring(2, 8),
+      timestamp: now.toISOString(),
+      action: 'BOOKING_DELETED',
+      admin_id: adminId,
+      details: `Permanently deleted waste/duplicate booking #${bookingId} (${booking.user_name} - [${booking.seats.join(', ')}])`
+    });
+
+    saveLocalStore(store);
+    if (supabase) {
+      try {
+        await supabase.from('bookings').delete().eq('id', bookingId);
+      } catch (e) {
+        console.warn('Supabase delete error during adminDeleteBooking', e);
+      }
+    }
+    return { success: true, bookingId };
+  },
+
+  // Admin Action: Manually Assign or Reassign Seats & Lock Permanently
+  adminReassignSeats: async (bookingId, newConsecutiveSeats, autoConfirm = true, adminId = 'FOUNDER_01') => {
+    if (!newConsecutiveSeats || newConsecutiveSeats.length === 0) {
+      throw new Error('Please specify at least 1 seat label.');
     }
 
     const store = getLocalStore();
     const bookingIndex = store.bookings.findIndex(b => b.id === bookingId);
     if (bookingIndex === -1) throw new Error('Booking not found');
 
+    // Verify that every seat exists in the auditorium
+    const invalidSeats = newConsecutiveSeats.filter(s => !store.seats.some(st => st.label === s));
+    if (invalidSeats.length > 0) {
+      throw new Error(`Invalid seat label(s): ${invalidSeats.join(', ')}. Please check row letter and seat number.`);
+    }
+
     const booking = store.bookings[bookingIndex];
 
-    // Check availability of new seats against other active bookings
-    const activeOther = store.bookings.filter(b => 
-      b.id !== bookingId && ['HELD', 'PENDING_PAYMENT', 'UNDER_REVIEW', 'CONFIRMED'].includes(b.status)
+    // Check availability of new seats against other active confirmed bookings
+    const activeConfirmedOther = store.bookings.filter(b => 
+      b.id !== bookingId && b.status === 'CONFIRMED'
     );
-    const occupied = new Set();
-    activeOther.forEach(b => b.seats.forEach(s => occupied.add(s)));
-
     for (const seatLabel of newConsecutiveSeats) {
-      if (occupied.has(seatLabel)) {
-        throw new Error(`Seat ${seatLabel} is currently occupied by another active booking.`);
+      const conflict = activeConfirmedOther.find(b => b.seats.includes(seatLabel));
+      if (conflict) {
+        throw new Error(`Seat ${seatLabel} is already CONFIRMED for Booking #${conflict.id} (${conflict.user_name}). Please release or reassign that booking first.`);
       }
     }
 
-    const oldSeats = booking.seats;
+    // For any non-confirmed conflicting active bookings, release those seats from them so the Admin override wins cleanly
     const now = new Date();
+    store.bookings.forEach((otherB, idx) => {
+      if (otherB.id !== bookingId && otherB.status !== 'CONFIRMED' && otherB.seats.some(s => newConsecutiveSeats.includes(s))) {
+        const remainingSeats = otherB.seats.filter(s => !newConsecutiveSeats.includes(s));
+        if (remainingSeats.length === 0) {
+          store.bookings[idx] = {
+            ...otherB,
+            status: 'CANCELLED',
+            timeline: [...(otherB.timeline || []), { state: 'CANCELLED', timestamp: now.toISOString(), note: `Seat(s) manually reassigned to #${bookingId}` }]
+          };
+        } else {
+          store.bookings[idx] = {
+            ...otherB,
+            seats: remainingSeats,
+            total_amount: store.event.ticket_price * remainingSeats.length
+          };
+        }
+        mirrorBookingToCloud(store.bookings[idx]);
+      }
+    });
+
+    const oldSeats = booking.seats || [];
+    const newStatus = autoConfirm || ['EXPIRED', 'CANCELLED', 'HELD', 'PENDING_PAYMENT'].includes(booking.status)
+      ? 'CONFIRMED'
+      : booking.status;
+
     const updatedTimeline = [
       ...(booking.timeline || []),
-      { state: booking.status, timestamp: now.toISOString(), note: `Seats reassigned from [${oldSeats.join(', ')}] to [${newConsecutiveSeats.join(', ')}] by Admin` }
+      { state: newStatus, timestamp: now.toISOString(), note: `Seats manually assigned from [${oldSeats.join(', ')}] to [${newConsecutiveSeats.join(', ')}] and marked ${newStatus} by Admin` }
     ];
 
     store.bookings[bookingIndex] = {
       ...booking,
+      status: newStatus,
       seats: newConsecutiveSeats,
       total_amount: store.event.ticket_price * newConsecutiveSeats.length,
+      expires_at: newStatus === 'CONFIRMED' ? new Date(now.getTime() + 10 * 365 * 24 * 3600 * 1000).toISOString() : booking.expires_at,
       timeline: updatedTimeline
     };
 
     store.activityLogs.unshift({
       id: 'log-' + Math.random().toString(36).substring(2, 8),
       timestamp: now.toISOString(),
-      action: 'SEATS_REASSIGNED',
+      action: 'SEATS_ASSIGNED_MANUAL',
       admin_id: adminId,
-      details: `Reassigned #${bookingId} (${booking.user_name}) from ${oldSeats.join(', ')} -> ${newConsecutiveSeats.join(', ')}`
+      details: `Manually assigned #${bookingId} (${booking.user_name}) to [${newConsecutiveSeats.join(', ')}] -> ${newStatus}`
     });
 
     saveLocalStore(store);
