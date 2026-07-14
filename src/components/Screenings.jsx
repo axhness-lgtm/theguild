@@ -82,10 +82,10 @@ export default function Screenings({ onSelectEvent, activeCategory = 'f1', setAc
             {activeCategory === 'f1' ? (
               <span className="banner-accent-f1 font-bold text-white">// FORMULA 1 NEXT RACE: BELGIAN GRAND PRIX AT BREW N CUE CAFE (40 SEATS MAX) — ₹199</span>
             ) : (
-              <span className="banner-accent-football font-bold text-white">// FIFA WORLD CUP FINAL 2026: INOX AUD 3 INTERACTIVE SEAT MAP — ₹459 (SEAT + SNACK + BEVERAGE)</span>
+              <span className="font-bold text-white">// FIFA WORLD CUP FINAL 2026: <span className="text-yellow-400 font-impact tracking-wider">VARUN INOX, BEACH ROAD, VIZAG</span> — <span className="text-emerald-400 font-impact text-base">₹459/-</span> (SEATING + SNACK + BEVERAGE INCLUDED)</span>
             )}
           </LineReveal>
-          <LineReveal delay={0.35} className="banner-status text-xs px-3 py-1 bg-red-950 text-red-300 border border-red-800 rounded">
+          <LineReveal delay={0.35} className="banner-status text-xs px-3 py-1 bg-red-950 text-red-300 border border-red-800 rounded font-bold uppercase tracking-wider">
             <span>{activeCategory === 'world_cup' ? 'CHOOSE SEATS & VERIFY UTR' : 'REGISTER DETAILS & PAY VIA UPI QR'}</span>
           </LineReveal>
         </div>

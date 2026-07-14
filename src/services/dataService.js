@@ -19,7 +19,7 @@ export const UPCOMING_SCREENINGS = [
     atmosphere: 'High-speed Spa-Francorchamps heritage screening at Brew N Cue. Live telemetry timing screens, surround F1 engine acoustics, and intimate 40-seat racing community.'
   },
 
-  // WORLD CUP - GRAND FINALE (INOX AUD 3)
+  // WORLD CUP - GRAND FINALE (VARUN INOX, BEACH ROAD, VIZAG)
   {
     id: 'wc-final-2026',
     category: 'world_cup',

@@ -524,3 +524,57 @@
   color: var(--text-secondary);
   margin-top: 0.2rem;
 }
+
+/* ==========================================================================
+   SMOOTH BOOKING PAGE TRANSITIONS & ENHANCED LINE SPACING
+   ========================================================================== */
+
+.booking-step-transition {
+  animation: stepFadeSlideIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  width: 100%;
+}
+
+@keyframes stepFadeSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(24px) scale(0.99);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Generous spacing and line-height between every line across all booking steps */
+.booking-step-transition p,
+.booking-step-transition li,
+.booking-step-transition label,
+.booking-step-transition .spaced-text {
+  line-height: 1.9 !important;
+  letter-spacing: 0.03em;
+}
+
+.booking-step-transition .space-y-line > * + * {
+  margin-top: 1.75rem !important;
+}
+
+/* High-Visibility Payment Screenshot Dropzone Glow */
+.screenshot-upload-dropzone {
+  background: linear-gradient(145deg, rgba(30, 15, 15, 0.95), rgba(15, 15, 20, 0.95));
+  border: 3px dashed #FF2E2E;
+  box-shadow: 0 0 30px rgba(255, 46, 46, 0.25), inset 0 0 20px rgba(255, 46, 46, 0.1);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.screenshot-upload-dropzone:hover {
+  border-color: #FACC15;
+  box-shadow: 0 0 40px rgba(250, 204, 21, 0.35), inset 0 0 25px rgba(250, 204, 21, 0.15);
+  transform: translateY(-2px);
+}
+
+.screenshot-upload-success {
+  background: linear-gradient(145deg, rgba(6, 40, 25, 0.95), rgba(10, 25, 20, 0.95));
+  border: 3px solid #10B981;
+  box-shadow: 0 0 35px rgba(16, 185, 129, 0.35);
+}
+

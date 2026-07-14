@@ -329,15 +329,17 @@ export default function EventModal({ event, onClose }) {
                   </div>
 
                   <div className="form-group">
-                    <label className="font-tech text-xs text-gray-300 block mb-1 font-bold" htmlFor="phone">PHONE NUMBER (WHATSAPP VERIFIED) *</label>
+                    <label className="font-tech text-xs text-gray-300 block mb-1 font-bold" htmlFor="phone">10-DIGIT PHONE NUMBER (WHATSAPP VERIFIED) *</label>
                     <input 
                       type="tel" 
                       id="phone" 
                       required 
-                      placeholder="+91 98480 XXXXX"
+                      maxLength="10"
+                      pattern="[0-9]{10}"
+                      placeholder="9848012345"
                       value={form.phone}
-                      onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                      className="w-full bg-zinc-900 border border-zinc-800 text-white rounded py-2.5 px-3.5 text-xs focus:border-red-500 outline-none"
+                      onChange={(e) => setForm({ ...form, phone: e.target.value.replace(/\D/g, '').slice(0, 10) })}
+                      className="w-full bg-zinc-900 border border-zinc-800 text-white rounded py-2.5 px-3.5 text-xs focus:border-red-500 outline-none font-mono"
                     />
                   </div>
 

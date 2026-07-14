@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, ArrowRight, CheckCircle2, Clock, ShieldCheck, AlertTriangle, QrCode, Upload, RefreshCw, MapPin, Users, Ticket, Award } from 'lucide-react';
 import { ticketingService } from '../../services/ticketingService';
+import { processAndCompressImage } from '../../utils/imageHelper';
 import RollingText from '../RollingText';
 import LineReveal, { RevealItem } from '../LineReveal';
 import './BookingFlow.css';
@@ -23,7 +24,7 @@ export default function BookingFlow({ onReturnHome }) {
   
   // Contact Form State
   const [userName, setUserName] = useState('');
-  const [userPhone, setUserPhone] = useState('+91 ');
+  const [userPhone, setUserPhone] = useState('');
   const [userEmail, setUserEmail] = useState('');
   const [isReserving, setIsReserving] = useState(false);
 
@@ -118,8 +119,8 @@ export default function BookingFlow({ onReturnHome }) {
       updatedSelection.push(seat.label);
     }
 
-    // If more than targetSeatCount (max 5), reject
-    if (updatedSelection.length > targetSeatCount || updatedSelection.length > 5) {
+    // If more than targetSeatCount (max 4), reject
+    if (updatedSelection.length > targetSeatCount || updatedSelection.length > 4) {
       setRuleError(`[ RULE VIOLATION ] EXACTLY ${targetSeatCount} SEAT${targetSeatCount > 1 ? 'S' : ''} ALLOWED AS SELECTED IN STEP 1.`);
       return;
     }
@@ -242,88 +243,95 @@ export default function BookingFlow({ onReturnHome }) {
       </div>
 
       {/* =========================================================================
-          PAGE 1: OVERVIEW & SCREENING RULES (STREAMLINED FOR FAST CHECKOUT)
+          PAGE 1: OVERVIEW & SCREENING RULES (HIGH-CONTRAST & USER FRIENDLY)
           ========================================================================= */}
       {step === 'overview' && (
-        <div className="grid-container py-8">
-          <div className="max-w-6xl mx-auto">
+        <div className="grid-container py-8 booking-step-transition">
+          <div className="max-w-4xl mx-auto bg-zinc-950 border-2 border-zinc-800 p-6 sm:p-10 md:p-14 rounded-3xl shadow-2xl text-center w-full space-y-line">
             
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch text-left">
-              
-              {/* Left Column: Venue, Title, Date/Time, and Pricing/Includes in distinct colored boxes */}
-              <div className="lg:col-span-7 flex flex-col justify-between space-y-6">
-                
-                {/* Venue & Title Box */}
-                <div className="bg-zinc-950 border-2 border-zinc-800 p-6 md:p-8 rounded-2xl shadow-xl is-revealed reveal-active animate-fade-in">
-                  <div className="inline-block bg-red-950/80 border border-red-500/60 text-red-400 font-tech font-bold text-sm md:text-base px-4 py-2 rounded-lg uppercase tracking-wider mb-4 shadow">
-                    VARUN INOX, BEACH ROAD, VIZAG
-                  </div>
-                  <h2 className="text-4xl md:text-6xl font-impact text-white uppercase tracking-tight leading-none my-2">
-                    FIFA WORLD CUP FINAL
-                  </h2>
-                </div>
-
-                {/* Date & Timing Box */}
-                <div className="bg-emerald-950/30 border-2 border-emerald-500/60 p-6 rounded-2xl shadow-xl">
-                  <div className="font-tech text-xs text-emerald-400 font-bold uppercase tracking-widest mb-1">// EVENT DATE & TIMING</div>
-                  <div className="text-2xl md:text-4xl font-impact text-white tracking-wide">
-                    20TH JULY | 00:30 AM ONWARDS
-                  </div>
-                </div>
-
-                {/* Pricing & Includes Box */}
-                <div className="bg-purple-950/30 border-2 border-purple-500/60 p-6 rounded-2xl shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-                  <div>
-                    <div className="font-tech text-xs text-purple-300 font-bold uppercase tracking-widest mb-1">// OFFICIAL PASS PRICING</div>
-                    <div className="text-5xl md:text-6xl font-impact text-white tracking-tight">₹{event.ticket_price}/-</div>
-                  </div>
-                  <div className="bg-purple-900/70 border-2 border-purple-400/80 text-purple-200 font-tech text-xs md:text-sm font-bold uppercase tracking-wider py-3.5 px-5 rounded-xl shadow-lg text-left">
-                    <span className="text-purple-300 block text-[11px] mb-1">// COVERAGE INCLUDED:</span>
-                    <span className="text-white text-base md:text-lg font-black tracking-wide block">SEATING PRICE + SNACK + BEVERAGE</span>
-                  </div>
-                </div>
-
-              </div>
-
-              {/* Right Column: Booking Rules in distinct box with larger heading */}
-              <div className="lg:col-span-5 flex flex-col justify-between">
-                <div className="bg-zinc-900 border-2 border-red-500/60 p-6 md:p-8 rounded-2xl shadow-2xl flex-1 flex flex-col justify-center">
-                  
-                  <div className="text-xl md:text-2xl font-impact text-red-400 uppercase tracking-wide border-b-2 border-zinc-800 pb-4 mb-6 flex items-center gap-3">
-                    <ShieldCheck className="text-red-500 shrink-0" size={28} />
-                    <span>SEAT RESERVATION & BOOKING RULES</span>
-                  </div>
-
-                  <ul className="space-y-5 font-tech">
-                    <li className="flex items-start gap-3.5 text-sm md:text-base text-gray-200 leading-relaxed">
-                      <span className="text-red-500 font-black text-xl leading-none mt-0.5">●</span>
-                      <span>
-                        <strong className="text-white font-bold uppercase">MAX 4 SEATS:</strong> Select up to 4 seats per booking. Use our pre-select counter before or during seat map selection.
-                      </span>
-                    </li>
-                    <li className="flex items-start gap-3.5 text-sm md:text-base text-gray-200 leading-relaxed">
-                      <span className="text-yellow-500 font-black text-xl leading-none mt-0.5">●</span>
-                      <span>
-                        <strong className="text-white font-bold uppercase">CONSECUTIVE ADJACENT:</strong> Multiple seats must be consecutive within the same row (e.g. D1 to D3 automatically picks D2).
-                      </span>
-                    </li>
-                    <li className="flex items-start gap-3.5 text-sm md:text-base text-gray-200 leading-relaxed">
-                      <span className="text-emerald-500 font-black text-xl leading-none mt-0.5">●</span>
-                      <span>
-                        <strong className="text-white font-bold uppercase">10-MIN UPI TIMER:</strong> Complete your UPI transaction and attach screenshot within 10 minutes once seats are locked.
-                      </span>
-                    </li>
-                  </ul>
-
-                </div>
-              </div>
-
+            {/* Top Badge */}
+            <div className="inline-block bg-red-600 text-white font-tech font-bold text-xs sm:text-sm px-5 py-2 rounded-full uppercase tracking-widest mb-6 shadow-lg">
+              // OFFICIAL SCREENING PASS //
             </div>
 
-            {/* Bottom Centered CTA Button: PROCEED TO SEAT QUANTITY SELECTION */}
-            <div className="mt-12 w-full flex justify-center items-center">
+            {/* Main Event Heading */}
+            <h2 className="text-4xl sm:text-6xl md:text-7xl font-impact text-white uppercase tracking-tight my-4 leading-none">
+              FIFA WORLD CUP FINAL 2026
+            </h2>
+
+            {/* Prominent Highlights: Venue & Date/Time */}
+            <div className="my-8 space-y-4">
+              <div className="text-2xl sm:text-4xl font-impact text-yellow-400 uppercase tracking-wide">
+                VARUN INOX, BEACH ROAD, VIZAG
+              </div>
+              <div className="text-xl sm:text-3xl font-impact text-emerald-400 uppercase tracking-wider">
+                20TH JULY | 00:30 AM ONWARDS
+              </div>
+            </div>
+
+            {/* Featured Price & Inclusion Centerpiece Card */}
+            <div className="bg-black border-2 border-emerald-500/80 p-6 sm:p-8 rounded-3xl max-w-2xl mx-auto shadow-2xl my-10 flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left space-y-4 sm:space-y-0">
+              <div>
+                <span className="font-tech text-xs text-gray-400 font-bold uppercase tracking-widest block mb-2">
+                  OFFICIAL TICKET PRICING
+                </span>
+                <div className="text-5xl sm:text-6xl font-impact text-emerald-400 tracking-tight">
+                  ₹{event.ticket_price}/-
+                </div>
+              </div>
+              <div className="bg-emerald-950/90 border-2 border-emerald-500/60 text-emerald-200 font-tech text-xs sm:text-sm font-bold uppercase tracking-wider py-4 px-6 rounded-2xl shadow-lg text-center">
+                <span className="text-emerald-400 block text-[11px] mb-1.5">// WHAT IS INCLUDED:</span>
+                <span className="text-white text-base sm:text-lg font-black tracking-wide block">
+                  SEATING + SNACK + BEVERAGE
+                </span>
+              </div>
+            </div>
+
+            {/* Booking Rules Section */}
+            <div className="mt-14 max-w-3xl mx-auto space-y-6">
+              <div className="text-2xl sm:text-3xl font-impact text-white uppercase tracking-wider border-b-2 border-zinc-800 pb-5 mb-8 flex items-center justify-center gap-3">
+                <ShieldCheck className="text-red-500 shrink-0" size={32} />
+                <span>SEAT RESERVATION & BOOKING RULES</span>
+              </div>
+
+              <div className="space-y-6 font-tech">
+                {/* Rule 1: Red Highlight */}
+                <div className="bg-zinc-900 border-2 border-red-500/80 p-6 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center gap-5 text-left shadow-xl transition-all hover:scale-[1.01]">
+                  <span className="bg-red-600 text-white font-impact font-bold text-xs uppercase px-3.5 py-2 rounded-lg shrink-0 tracking-wider">
+                    MAX 4 SEATS
+                  </span>
+                  <span className="text-white text-sm sm:text-base font-medium leading-relaxed">
+                    You can select between <strong className="text-red-400 underline">1 and 4 seats</strong> per booking. Choose exact ticket quantity on the next screen.
+                  </span>
+                </div>
+
+                {/* Rule 2: Yellow Highlight */}
+                <div className="bg-zinc-900 border-2 border-yellow-500/80 p-6 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center gap-5 text-left shadow-xl transition-all hover:scale-[1.01]">
+                  <span className="bg-yellow-500 text-black font-impact font-bold text-xs uppercase px-3.5 py-2 rounded-lg shrink-0 tracking-wider">
+                    ADJACENT SEATS
+                  </span>
+                  <span className="text-white text-sm sm:text-base font-medium leading-relaxed">
+                    Multiple seats must be <strong className="text-yellow-400 underline">consecutive and adjacent</strong> within the same row to ensure your group sits together.
+                  </span>
+                </div>
+
+                {/* Rule 3: Green Highlight */}
+                <div className="bg-zinc-900 border-2 border-emerald-500/80 p-6 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center gap-5 text-left shadow-xl transition-all hover:scale-[1.01]">
+                  <span className="bg-emerald-600 text-white font-impact font-bold text-xs uppercase px-3.5 py-2 rounded-lg shrink-0 tracking-wider">
+                    10-MIN TIMER
+                  </span>
+                  <span className="text-white text-sm sm:text-base font-medium leading-relaxed">
+                    Once seats are locked on the map, complete your UPI payment and <strong className="text-emerald-400 underline">upload the screenshot within 10 minutes</strong>.
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Centered CTA Button */}
+            <div className="mt-14 w-full flex justify-center items-center pt-4">
               <button 
-                className="btn-brutalist mx-auto block w-full max-w-lg py-5 px-10 text-center justify-center text-lg md:text-xl font-impact tracking-widest uppercase bg-red-600 hover:bg-red-500 text-white border-red-500 shadow-2xl transition-all hover:scale-105 cursor-pointer"
+                type="button"
+                className="btn-brutalist mx-auto block w-full max-w-xl py-5 px-10 text-center justify-center text-lg sm:text-2xl font-impact tracking-widest uppercase bg-red-600 hover:bg-red-500 text-white border-red-500 shadow-2xl transition-all hover:scale-105 cursor-pointer rounded-2xl"
                 onClick={() => setStep('seatcount')}
               >
                 <RollingText text="PROCEED TO SEAT SELECTION →" stagger={true} />
@@ -338,72 +346,106 @@ export default function BookingFlow({ onReturnHome }) {
           PAGE 1.5: DEDICATED SEAT COUNT QUANTITY PICKER (BEFORE MAP)
           ========================================================================= */}
       {step === 'seatcount' && (
-        <div className="grid-container py-8">
-          <div className="max-w-3xl mx-auto bg-zinc-950 border-2 border-zinc-800 p-8 md:p-14 rounded-3xl shadow-2xl my-6 text-center w-full">
+        <div className="grid-container py-8 booking-step-transition">
+          <div className="max-w-4xl mx-auto bg-zinc-950 border-2 border-zinc-800 p-6 sm:p-10 md:p-14 rounded-3xl shadow-2xl my-6 text-center w-full space-y-line">
             
-            <div className="inline-block bg-red-950/80 border border-red-500/60 text-red-400 font-tech font-bold text-xs md:text-sm px-4 py-1.5 rounded-lg uppercase tracking-widest mb-4 shadow">
-              // STEP 01 — SELECT TICKET QUANTITY
+            <div className="inline-block bg-red-600 text-white font-tech font-bold text-xs sm:text-sm px-5 py-2 rounded-full uppercase tracking-widest mb-6 shadow">
+              // STEP 01 — SELECT TICKET QUANTITY //
             </div>
             
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-impact text-white uppercase tracking-tight my-2">
+            <h2 className="text-3xl sm:text-5xl md:text-6xl font-impact text-white uppercase tracking-tight my-4 leading-none">
               HOW MANY SEATS DO YOU WANT TO BOOK?
             </h2>
             
-            <p className="text-gray-300 font-tech text-sm md:text-base max-w-xl mx-auto mb-8">
-              Choose between 1 and 5 seats for the FIFA World Cup Final screening at Varun INOX, Beach Road, Vizag.
+            <p className="text-gray-300 font-tech text-sm sm:text-base max-w-xl mx-auto mb-8">
+              Choose between 1 and 4 seats for the FIFA World Cup Final screening at Varun INOX, Beach Road, Vizag.
             </p>
 
-            {/* Massive Quantity Selector Box */}
-            <div className="bg-black border-2 border-red-500/80 p-8 md:p-12 rounded-2xl max-w-xl mx-auto shadow-2xl flex flex-col items-center justify-center my-8">
-              <span className="text-red-400 font-tech font-bold text-sm md:text-base tracking-widest uppercase mb-6 block">
-                // NUMBER OF TICKETS (MAX 5 SEATS)
+            {/* Quick-Pick Direct Number Buttons (1, 2, 3, 4) */}
+            <div className="my-10 space-y-4">
+              <span className="text-gray-400 font-tech font-bold text-xs sm:text-sm tracking-widest uppercase mb-4 block">
+                // TAP TO QUICK-SELECT QUANTITY (MAX 4 SEATS):
+              </span>
+              <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
+                {[1, 2, 3, 4].map((num) => {
+                  const isActive = targetSeatCount === num;
+                  return (
+                    <button
+                      key={num}
+                      type="button"
+                      onClick={() => setTargetSeatCount(num)}
+                      className={`w-18 h-18 sm:w-24 sm:h-24 md:w-28 md:h-28 font-impact text-4xl sm:text-5xl md:text-6xl rounded-2xl border-2 transition-all flex flex-col items-center justify-center cursor-pointer ${
+                        isActive
+                          ? 'bg-red-600 text-white border-white scale-110 shadow-2xl shadow-red-500/50 ring-2 sm:ring-4 ring-white z-10'
+                          : 'bg-zinc-900 text-gray-400 border-zinc-700 hover:border-red-500 hover:text-white hover:scale-105'
+                      }`}
+                    >
+                      <span>{num}</span>
+                      <span className="text-[11px] sm:text-xs font-tech font-bold uppercase mt-0.5 tracking-wider">
+                        {num === 1 ? 'Seat' : 'Seats'}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Massive Quantity Selector Box with + / - */}
+            <div className="bg-black border-2 border-zinc-800 p-6 sm:p-8 rounded-2xl max-w-xl mx-auto shadow-2xl flex flex-col items-center justify-center my-8 space-y-6">
+              <span className="text-red-400 font-tech font-bold text-xs sm:text-sm tracking-widest uppercase mb-4 block">
+                // OR USE STEPPER CONTROLS (MAX 4 SEATS)
               </span>
 
-              <div className="flex items-center justify-center gap-6 md:gap-10">
+              <div className="flex items-center justify-center gap-6 sm:gap-10">
                 <button 
                   type="button" 
                   onClick={() => setTargetSeatCount(Math.max(1, targetSeatCount - 1))}
                   disabled={targetSeatCount <= 1}
-                  className="w-20 h-20 md:w-24 md:h-24 flex items-center justify-center bg-zinc-800 hover:bg-red-600 disabled:opacity-20 text-white font-bold text-4xl md:text-5xl rounded-2xl border-2 border-zinc-600 transition-all cursor-pointer shadow-xl select-none"
+                  className="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center bg-zinc-800 hover:bg-red-600 disabled:opacity-20 text-white font-bold text-3xl sm:text-4xl rounded-2xl border-2 border-zinc-600 transition-all cursor-pointer shadow-xl select-none"
                 >
                   -
                 </button>
 
-                <div className="w-36 md:w-44 py-5 bg-zinc-950 border-2 border-zinc-700 rounded-2xl text-center shadow-inner">
-                  <span className="font-impact text-6xl md:text-7xl text-white block leading-none">
+                <div className="w-32 sm:w-44 py-4 bg-zinc-950 border-2 border-red-500 rounded-2xl text-center shadow-inner">
+                  <span className="font-impact text-5xl sm:text-6xl text-white block leading-none">
                     {targetSeatCount}
                   </span>
-                  <span className="font-tech text-xs text-emerald-400 font-bold uppercase block mt-2">
+                  <span className="font-tech text-xs text-emerald-400 font-bold uppercase block mt-1.5">
                     {targetSeatCount === 1 ? '1 SEAT' : `${targetSeatCount} SEATS`} SELECTED
                   </span>
                 </div>
 
                 <button 
                   type="button" 
-                  onClick={() => setTargetSeatCount(Math.min(5, targetSeatCount + 1))}
-                  disabled={targetSeatCount >= 5}
-                  className="w-20 h-20 md:w-24 md:h-24 flex items-center justify-center bg-zinc-800 hover:bg-red-600 disabled:opacity-20 text-white font-bold text-4xl md:text-5xl rounded-2xl border-2 border-zinc-600 transition-all cursor-pointer shadow-xl select-none"
+                  onClick={() => setTargetSeatCount(Math.min(4, targetSeatCount + 1))}
+                  disabled={targetSeatCount >= 4}
+                  className="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center bg-zinc-800 hover:bg-red-600 disabled:opacity-20 text-white font-bold text-3xl sm:text-4xl rounded-2xl border-2 border-zinc-600 transition-all cursor-pointer shadow-xl select-none"
                 >
                   +
                 </button>
               </div>
 
-              <div className="mt-8 pt-6 border-t border-zinc-800 w-full text-center">
+              {/* Highlighted Total Payable Banner inside counter box */}
+              <div className="mt-6 pt-5 border-t border-zinc-800 w-full text-center space-y-2">
                 <span className="text-xs text-gray-400 font-tech block uppercase tracking-wider">// ESTIMATED TOTAL PAYABLE</span>
-                <span className="font-impact text-3xl md:text-4xl text-emerald-400 block mt-1">₹{targetSeatCount * event.ticket_price}/-</span>
-                <span className="text-[11px] text-gray-400 block mt-0.5 font-bold tracking-wider">(INCLUDES: SEATING + SNACK + BEVERAGE)</span>
+                <div className="font-impact text-4xl sm:text-5xl text-emerald-400 block mt-1 tracking-tight">
+                  ₹{targetSeatCount * event.ticket_price}/-
+                </div>
+                <span className="bg-emerald-950/80 border border-emerald-500/50 text-emerald-300 font-tech text-xs px-3 py-1 rounded-md inline-block mt-2 font-bold tracking-wider uppercase">
+                  INCLUDES: SEATING + SNACK + BEVERAGE
+                </span>
               </div>
             </div>
 
             {/* Centered Transition CTA Button to Seat Map */}
-            <div className="mt-10 w-full flex flex-col items-center justify-center gap-4">
+            <div className="mt-12 w-full flex flex-col items-center justify-center gap-5 pt-4">
               <button 
                 type="button"
                 onClick={() => {
                   setSelectedSeats([]);
                   setStep('seatmap');
                 }}
-                className="btn-brutalist mx-auto block w-full max-w-xl py-5 px-10 text-center justify-center text-lg md:text-xl font-impact tracking-widest uppercase bg-red-600 hover:bg-red-500 text-white border-red-500 shadow-2xl transition-all hover:scale-105 cursor-pointer"
+                className="btn-brutalist mx-auto block w-full max-w-xl py-5 px-10 text-center justify-center text-lg sm:text-2xl font-impact tracking-widest uppercase bg-red-600 hover:bg-red-500 text-white border-red-500 shadow-2xl transition-all hover:scale-105 cursor-pointer rounded-2xl"
               >
                 <RollingText text={`CONTINUE TO PICK ${targetSeatCount} ${targetSeatCount === 1 ? 'SEAT' : 'SEATS'} ON MAP →`} stagger={true} />
               </button>
@@ -411,7 +453,7 @@ export default function BookingFlow({ onReturnHome }) {
               <button 
                 type="button"
                 onClick={() => setStep('overview')}
-                className="text-xs text-gray-400 hover:text-white underline font-tech inline-block cursor-pointer py-2"
+                className="text-xs sm:text-sm text-gray-400 hover:text-white underline font-tech inline-block cursor-pointer py-2"
               >
                 ← BACK TO OVERVIEW & RULES
               </button>
@@ -425,8 +467,8 @@ export default function BookingFlow({ onReturnHome }) {
           PAGE 2: INTERACTIVE BOOKMYSHOW-STYLE CINEMA SEAT MAP (INOX VARUN'S MALL)
           ========================================================================= */}
       {step === 'seatmap' && (
-        <div className="grid-container py-6">
-          <div className="seatmap-container w-full max-w-6xl mx-auto">
+        <div className="grid-container py-6 booking-step-transition">
+          <div className="seatmap-container w-full max-w-6xl mx-auto space-y-6">
             
             {ruleError && (
               <div className="rule-warning-banner animate-bounce w-full max-w-4xl mx-auto mb-6">
@@ -463,12 +505,24 @@ export default function BookingFlow({ onReturnHome }) {
               </div>
             </div>
 
-            {/* Legend */}
-            <div className="seatmap-legend mb-6">
-              <div className="legend-item"><div className="legend-box legend-available" /><span>AVAILABLE (₹{event.ticket_price})</span></div>
-              <div className="legend-item"><div className="legend-box legend-selected" /><span>SELECTED</span></div>
-              <div className="legend-item"><div className="legend-box legend-held" /><span>HELD</span></div>
-              <div className="legend-item"><div className="legend-box legend-booked" /><span>BOOKED</span></div>
+            {/* High-Contrast Legend */}
+            <div className="bg-zinc-950 border-2 border-zinc-800 py-4 px-6 rounded-2xl flex flex-wrap items-center justify-center gap-6 shadow-xl mx-auto mb-8 font-tech text-xs sm:text-sm font-bold">
+              <div className="flex items-center gap-2">
+                <div className="w-5 h-5 rounded bg-zinc-800 border-2 border-zinc-600" />
+                <span className="text-gray-300">AVAILABLE (₹{event.ticket_price})</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-5 h-5 rounded bg-red-600 border-2 border-white shadow-lg shadow-red-500/60" />
+                <span className="text-white font-black">SELECTED</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-5 h-5 rounded bg-amber-500 border border-amber-300 opacity-60" />
+                <span className="text-amber-300">HELD / RESERVED</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-5 h-5 rounded bg-zinc-950 border border-zinc-800 opacity-40 flex items-center justify-center text-[10px] text-zinc-600">✕</div>
+                <span className="text-zinc-500">BOOKED / SOLD</span>
+              </div>
             </div>
 
             {/* Seat Rows Grid (Rows K down to A matching physical diagram exactly) */}
@@ -479,10 +533,10 @@ export default function BookingFlow({ onReturnHome }) {
                   .sort((a, b) => b.seat_number - a.seat_number);
 
                 return (
-                  <div key={rowLabel} className="seatmap-row flex items-center justify-center gap-2 my-1">
-                    <span className="row-label-text font-bold text-xs w-6 text-center text-red-500 bg-zinc-900 border border-zinc-800 py-1 shrink-0">{rowLabel}</span>
+                  <div key={rowLabel} className="seatmap-row flex items-center justify-center gap-2 sm:gap-2.5 my-1.5">
+                    <span className="row-label-text font-impact text-sm sm:text-base w-7 sm:w-8 text-center text-red-500 bg-zinc-900 border-2 border-zinc-800 py-1 rounded shrink-0 shadow">{rowLabel}</span>
                     
-                    <div className="seats-in-row flex items-center gap-1.5 flex-wrap justify-center">
+                    <div className="seats-in-row flex items-center gap-1.5 sm:gap-2 flex-wrap justify-center">
                       {rowSeats.map((seat) => {
                         const isSelected = selectedSeats.includes(seat.label);
                         const statusClass = isSelected ? 'SELECTED' : seat.status;
@@ -494,7 +548,13 @@ export default function BookingFlow({ onReturnHome }) {
                           <React.Fragment key={seat.id}>
                             <button
                               type="button"
-                              className={`seat-btn seat-${statusClass} w-8 h-8 text-[11px] font-bold rounded-sm border transition-all flex items-center justify-center shrink-0 ${isSelected ? 'bg-white text-black border-white scale-110 shadow-lg shadow-white/30' : seat.status === 'AVAILABLE' ? 'bg-zinc-800 text-gray-300 border-zinc-700 hover:border-red-500 hover:text-white' : 'bg-zinc-950 text-zinc-600 border-zinc-900 cursor-not-allowed opacity-50'}`}
+                              className={`seat-btn seat-${statusClass} w-9 h-9 sm:w-10 sm:h-10 text-xs sm:text-sm font-bold rounded-md border-2 transition-all flex items-center justify-center shrink-0 ${
+                                isSelected 
+                                  ? 'bg-red-600 text-white font-black border-white scale-125 shadow-xl shadow-red-500/80 ring-2 ring-white z-10' 
+                                  : seat.status === 'AVAILABLE' 
+                                  ? 'bg-zinc-800 text-gray-200 border-zinc-600 hover:border-red-500 hover:bg-zinc-700 hover:text-white hover:scale-105 shadow-sm' 
+                                  : 'bg-zinc-950 text-zinc-600 border-zinc-900 cursor-not-allowed opacity-40'
+                              }`}
                               onClick={() => handleSeatClick(seat)}
                               title={`${seat.label} — ${seat.status === 'AVAILABLE' ? `₹${event.ticket_price || 1}` : seat.status}`}
                             >
@@ -576,8 +636,8 @@ export default function BookingFlow({ onReturnHome }) {
           PAGE 3: CONTACT DETAILS & ATOMIC RESERVATION LOCK (STREAMLINED)
           ========================================================================= */}
       {step === 'contact' && (
-        <div className="grid-container py-8">
-          <div className="max-w-4xl mx-auto bg-zinc-900 border-2 border-zinc-800 p-8 md:p-12 rounded-2xl shadow-2xl w-full">
+        <div className="grid-container py-8 booking-step-transition">
+          <div className="max-w-4xl mx-auto bg-zinc-900 border-2 border-zinc-800 p-8 md:p-12 rounded-2xl shadow-2xl w-full space-y-line">
             <div className="text-center mb-8">
               <span className="font-tech text-red-500 text-xs font-bold tracking-widest uppercase">// 02 — MANDATORY ATTENDEE INFO</span>
               <h2 className="text-3xl md:text-5xl font-impact text-white uppercase tracking-tight mt-1">RESERVE SEATS & START TIMER</h2>
@@ -695,7 +755,7 @@ export default function BookingFlow({ onReturnHome }) {
               </button>
             </div>
           ) : (
-            <div className="max-w-5xl mx-auto bg-zinc-950 border-2 border-zinc-800 p-8 md:p-12 rounded-3xl shadow-2xl my-8 font-tech w-full">
+            <div className="max-w-5xl mx-auto bg-zinc-950 border-2 border-zinc-800 p-8 md:p-12 rounded-3xl shadow-2xl my-8 font-tech w-full booking-step-transition space-y-line">
               
               <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-center w-full">
                 
@@ -743,7 +803,7 @@ export default function BookingFlow({ onReturnHome }) {
                           navigator.clipboard.writeText('steveoguri07-2@okicici');
                           alert('UPI ID copied to clipboard!');
                         }} 
-                        className="text-purple-300 hover:text-white transition-colors bg-purple-950/80 border border-purple-500/50 py-1.5 px-3 rounded.lg text-xs font-tech font-bold uppercase cursor-pointer"
+                        className="text-purple-300 hover:text-white transition-colors bg-purple-950/80 border border-purple-500/50 py-1.5 px-3 rounded-lg text-xs font-tech font-bold uppercase cursor-pointer"
                       >
                         COPY
                       </button>
@@ -764,13 +824,17 @@ export default function BookingFlow({ onReturnHome }) {
                     </div>
                   </div>
 
-                  {/* 3. Mandatory Transaction Screenshot Upload */}
-                  <div>
-                    <label className="text-xs text-white font-bold uppercase block mb-2 tracking-wider flex items-center justify-between">
-                      <span>3. MANDATORY TRANSACTION SCREENSHOT *</span>
-                      <span className="text-xs text-red-500 font-mono bg-red-950/60 border border-red-500/40 px-2 py-0.5 rounded">[REQUIRED]</span>
+                  {/* 3. Mandatory Transaction Screenshot Upload (HIGH VISIBILITY) */}
+                  <div className="pt-2">
+                    <label className="text-sm text-yellow-400 font-impact tracking-wider uppercase block mb-3 flex items-center justify-between">
+                      <span className="flex items-center gap-2">
+                        <span className="bg-red-600 text-white px-2.5 py-0.5 rounded text-xs">STEP 3</span>
+                        <span>MANDATORY PAYMENT SCREENSHOT UPLOAD *</span>
+                      </span>
+                      <span className="text-xs text-red-400 font-mono bg-red-950 border border-red-500 px-2.5 py-1 rounded font-bold animate-pulse">[REQUIRED TO UNLOCK TICKETS]</span>
                     </label>
-                    <div className="bg-black border-2 border-dashed border-zinc-700 hover:border-red-500 rounded-xl p-6 text-center cursor-pointer transition-all">
+                    
+                    <div className={`rounded-2xl p-6 sm:p-8 text-center cursor-pointer transition-all ${screenshotUrl ? 'screenshot-upload-success' : 'screenshot-upload-dropzone'}`}>
                       <input 
                         type="file" 
                         accept="image/*" 
@@ -779,15 +843,23 @@ export default function BookingFlow({ onReturnHome }) {
                         className="hidden" 
                         onChange={handleFileUpload}
                       />
-                      <label htmlFor="screenshot-input" className="cursor-pointer block">
-                        <Upload size={28} className="mx-auto text-red-500 mb-2" />
-                        <span className="text-sm text-gray-200 block font-bold truncate">
-                          {isCompressing ? 'COMPRESSING & PROCESSING...' : screenshotName ? `ATTACHED: ${screenshotName}` : '[ CLICK OR DROP PAYMENT SCREENSHOT TO UPLOAD ]'}
+                      <label htmlFor="screenshot-input" className="cursor-pointer block w-full">
+                        {!screenshotUrl && (
+                          <div className="bg-yellow-400 text-black font-impact text-xs sm:text-sm px-5 py-2 rounded-full uppercase tracking-widest mb-4 inline-block shadow-lg animate-bounce">
+                            CLICK HERE OR DROP PAYMENT SCREENSHOT
+                          </div>
+                        )}
+                        <Upload size={38} className={`mx-auto mb-3 ${screenshotUrl ? 'text-emerald-400' : 'text-yellow-400'}`} />
+                        <span className="text-base sm:text-lg text-white block font-impact tracking-wide truncate mb-1">
+                          {isCompressing ? 'COMPRESSING & PROCESSING...' : screenshotName ? `SUCCESSFULLY ATTACHED: ${screenshotName}` : 'TAP TO SELECT SCREENSHOT FILE'}
+                        </span>
+                        <span className="text-xs text-gray-300 font-tech block max-w-md mx-auto">
+                          {screenshotUrl ? 'Click again if you wish to replace the attached screenshot.' : 'Mandatory verification step — Your official screening pass & QR code will be generated immediately after upload.'}
                         </span>
                       </label>
                       {screenshotUrl && (
-                        <div className="mt-4 bg-zinc-900 p-2 rounded-lg border border-zinc-700 inline-block">
-                          <img src={screenshotUrl} alt="Screenshot Preview" className="max-h-32 mx-auto rounded object-contain block" />
+                        <div className="mt-4 bg-black/80 p-3 rounded-xl border-2 border-emerald-500 inline-block shadow-2xl">
+                          <img src={screenshotUrl} alt="Screenshot Preview" className="max-h-36 mx-auto rounded object-contain block" />
                         </div>
                       )}
                     </div>
