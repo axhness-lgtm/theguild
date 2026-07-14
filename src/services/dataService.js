@@ -19,7 +19,7 @@ export const UPCOMING_SCREENINGS = [
     atmosphere: 'High-speed Spa-Francorchamps heritage screening at Brew N Cue. Live telemetry timing screens, surround F1 engine acoustics, and intimate 40-seat racing community.'
   },
 
-  // WORLD CUP - GRAND FINALE (VARUN INOX, BEACH ROAD, VIZAG)
+  // WORLD CUP - GRAND FINALE (PVR INOX, BEACH ROAD, VIZAG)
   {
     id: 'wc-final-2026',
     category: 'world_cup',
@@ -27,7 +27,7 @@ export const UPCOMING_SCREENINGS = [
     competition: 'FIFA WORLD CUP // GRAND FINALE',
     date: '20TH JULY',
     time: '00:30 AM ONWARDS',
-    venue: 'VARUN INOX, BEACH ROAD, VIZAG',
+    venue: 'PVR INOX, BEACH ROAD, VIZAG',
     status: 'LIVE INOX BOOKING',
     isLive: true,
     ticket_price: 459,

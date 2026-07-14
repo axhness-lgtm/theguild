@@ -53,7 +53,7 @@ function getInitialTicketingState() {
     event: {
       id: 'fifa-wc-final-2026',
       name: 'FIFA WORLD CUP FINAL // LIVE SCREENING',
-      venue: 'VARUN INOX, BEACH ROAD, VIZAG',
+      venue: 'PVR INOX, BEACH ROAD, VIZAG',
       date: '20TH JULY',
       time: '00:30 AM ONWARDS',
       ticket_price: 459,
@@ -79,7 +79,7 @@ function getLocalStore() {
     const parsed = JSON.parse(data);
     if (parsed && parsed.event) {
       parsed.event.ticket_price = 459;
-      parsed.event.venue = 'VARUN INOX, BEACH ROAD, VIZAG';
+      parsed.event.venue = 'PVR INOX, BEACH ROAD, VIZAG';
       parsed.event.date = '20TH JULY';
       parsed.event.time = '00:30 AM ONWARDS';
     }

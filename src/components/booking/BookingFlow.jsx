@@ -218,7 +218,7 @@ export default function BookingFlow({ onReturnHome }) {
           <div className="h-left">
             <span className="booking-step-badge">
               <Ticket size={14} />
-              <span>VARUN INOX, BEACH ROAD, VIZAG</span>
+              <span>PVR INOX, BEACH ROAD, VIZAG</span>
             </span>
             <h1 className="booking-event-title font-impact">FIFA WORLD CUP FINAL</h1>
             <p className="booking-venue-sub font-tech font-bold text-emerald-400">20TH JULY | 00:30 AM ONWARDS — ₹{event.ticket_price} (SEATING + SNACK + BEVERAGE)</p>
@@ -262,7 +262,7 @@ export default function BookingFlow({ onReturnHome }) {
             {/* Prominent Highlights: Venue & Date/Time */}
             <div className="my-8 space-y-4">
               <div className="text-2xl sm:text-4xl font-impact text-yellow-400 uppercase tracking-wide">
-                VARUN INOX, BEACH ROAD, VIZAG
+                PVR INOX, BEACH ROAD, VIZAG
               </div>
               <div className="text-xl sm:text-3xl font-impact text-emerald-400 uppercase tracking-wider">
                 20TH JULY | 00:30 AM ONWARDS
@@ -358,7 +358,7 @@ export default function BookingFlow({ onReturnHome }) {
             </h2>
             
             <p className="text-gray-300 font-tech text-sm sm:text-base max-w-xl mx-auto mb-8">
-              Choose between 1 and 4 seats for the FIFA World Cup Final screening at Varun INOX, Beach Road, Vizag.
+              Choose between 1 and 4 seats for the FIFA World Cup Final screening at PVR INOX, Beach Road, Vizag.
             </p>
 
             {/* Quick-Pick Direct Number Buttons (1, 2, 3, 4) */}
@@ -501,7 +501,7 @@ export default function BookingFlow({ onReturnHome }) {
               </div>
               <div className="cinema-screen-wrap">
                 <div className="cinema-screen-bar" />
-                <span className="cinema-screen-label font-tech text-xs text-gray-400">// VARUN INOX, BEACH ROAD, VIZAG // ALL SIGHTLINES UNBLOCKABLE //</span>
+                <span className="cinema-screen-label font-tech text-xs text-gray-400">// PVR INOX, BEACH ROAD, VIZAG // ALL SIGHTLINES UNBLOCKABLE //</span>
               </div>
             </div>
 
