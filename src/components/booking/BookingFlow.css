@@ -260,38 +260,48 @@
   user-select: none;
 }
 
-/* Statuses */
+/* Exact Status Colors Required: Free=Green, Booked=Red, Held=Yellow, Selected=White */
 .seat-AVAILABLE {
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-strong);
-  color: var(--text-primary);
+  background: #059669 !important;
+  border: 2px solid #34D399 !important;
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+  opacity: 1 !important;
 }
 .seat-AVAILABLE:hover {
-  border-color: #FFFFFF;
-  transform: translateY(-2px);
+  background: #10B981 !important;
+  border-color: #FFFFFF !important;
+  transform: translateY(-2px) scale(1.15) !important;
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.8) !important;
+  z-index: 25 !important;
 }
 
 .seat-HELD {
-  background: rgba(217, 119, 6, 0.18);
-  border: 1px solid #D97706;
-  color: #FBBF24;
-  cursor: not-allowed;
+  background: #D97706 !important;
+  border: 2px solid #FBBF24 !important;
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+  cursor: not-allowed !important;
+  opacity: 0.95 !important;
 }
 
 .seat-BOOKED {
-  background: #18181B;
-  border: 1px solid #27272A;
-  color: #525252;
-  cursor: not-allowed;
+  background: #DC2626 !important;
+  border: 2px solid #EF4444 !important;
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+  cursor: not-allowed !important;
+  opacity: 0.9 !important;
 }
 
 .seat-SELECTED {
-  background: #FFFFFF;
-  border: 1px solid #FFFFFF;
-  color: #000000;
-  font-weight: 800;
-  transform: scale(1.08);
-  box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+  background: #FFFFFF !important;
+  border: 2px solid #34D399 !important;
+  color: #000000 !important;
+  font-weight: 900 !important;
+  transform: scale(1.25) !important;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.9) !important;
+  z-index: 30 !important;
 }
 
 /* Bottom Selection Summary Bar */

@@ -435,73 +435,29 @@ export default function BookingFlow({ onReturnHome }) {
             )}
 
             {/* Target Seat Count Header Bar (Clean & Spaced) */}
-            <div className="w-full max-w-4xl mx-auto mb-6 sm:mb-8 bg-zinc-950 border-2 border-zinc-800 py-3.5 px-3 sm:px-6 md:px-8 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 font-tech shadow-xl">
-              <div className="text-center sm:text-left">
-                <span className="text-[11px] sm:text-xs text-red-400 font-bold block uppercase tracking-wider">// STEP 02 — PICK EXACT SEATS ON MAP</span>
-                <span className="text-sm sm:text-base md:text-lg text-white font-impact tracking-wide block mt-0.5">
-                  PLEASE SELECT EXACTLY {targetSeatCount} {targetSeatCount === 1 ? 'SEAT' : 'SEATS'} ({selectedSeats.length} / {targetSeatCount} SELECTED)
+            {/* Minimal Compact Horizontal Legend + Screen Bar (All extra noisy text removed) */}
+            <div className="w-full max-w-4xl mx-auto mb-6 bg-zinc-950 border-2 border-zinc-800 p-3 sm:p-4 rounded-2xl flex flex-wrap items-center justify-between gap-3 font-tech shadow-xl text-xs sm:text-sm font-bold">
+              <div className="flex flex-wrap items-center gap-3 sm:gap-6 mx-auto md:mx-0">
+                <span className="flex items-center gap-1.5 text-emerald-400">
+                  <span className="w-4 h-4 rounded bg-emerald-600 border border-emerald-400 inline-block"></span>
+                  AVAILABLE (₹{event.ticket_price || 499})
+                </span>
+                <span className="flex items-center gap-1.5 text-white">
+                  <span className="w-4 h-4 rounded bg-white border border-gray-300 inline-block shadow"></span>
+                  SELECTED
+                </span>
+                <span className="flex items-center gap-1.5 text-yellow-400">
+                  <span className="w-4 h-4 rounded bg-yellow-600 border border-yellow-400 inline-block"></span>
+                  HELD
+                </span>
+                <span className="flex items-center gap-1.5 text-red-400">
+                  <span className="w-4 h-4 rounded bg-red-600 border border-red-400 inline-block"></span>
+                  BOOKED
                 </span>
               </div>
-              <button 
-                type="button" 
-                onClick={() => setStep('seatcount')} 
-                className="btn-brutalist-outline py-2 px-4 sm:py-2.5 sm:px-5 text-[11px] sm:text-xs bg-zinc-900 hover:bg-zinc-800 text-gray-300 hover:text-white border-zinc-700 font-bold tracking-wider uppercase cursor-pointer shrink-0"
-              >
-                CHANGE COUNT ({targetSeatCount})
-              </button>
-            </div>
-
-            {/* Cinema Screen Bar with ALL EYES THIS WAY */}
-            <div className="text-center mb-6 sm:mb-8">
-              <div className="font-impact text-lg sm:text-xl md:text-3xl text-yellow-400 tracking-[0.2em] sm:tracking-[0.3em] uppercase font-bold animate-pulse mb-3">
-                // ALL EYES THIS WAY ↓ //
+              <div className="mx-auto md:mx-0 bg-zinc-900 border border-zinc-700 px-3 py-1 rounded text-gray-300 text-[11px] sm:text-xs tracking-widest uppercase">
+                CINEMA SCREEN ↓
               </div>
-              <div className="cinema-screen-wrap">
-                <div className="cinema-screen-bar" />
-                <span className="cinema-screen-label font-tech text-[10px] sm:text-xs text-gray-400 block px-2">// PVR INOX, BEACH ROAD, VIZAG // ALL SIGHTLINES UNBLOCKABLE //</span>
-              </div>
-            </div>
-
-            {/* High-Contrast Interactive Legend with Replica Seat Illustrations */}
-            <div className="bg-zinc-950 border-2 border-zinc-800 p-3 sm:p-5 rounded-xl sm:rounded-2xl flex flex-wrap items-center justify-center gap-2 sm:gap-4 shadow-2xl mx-auto mb-6 sm:mb-8 font-tech text-xs sm:text-sm font-bold w-full max-w-4xl">
-              
-              {/* Available */}
-              <div className="flex items-center gap-1.5 sm:gap-3 bg-black/80 border border-zinc-800 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl shrink-0 whitespace-nowrap">
-                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-md bg-zinc-800 border-2 border-zinc-500 text-white font-bold flex items-center justify-center text-[11px] sm:text-xs shrink-0 shadow">
-                  A1
-                </div>
-                <span className="text-gray-200 tracking-wide font-impact text-xs sm:text-sm">AVAILABLE (₹{event.ticket_price})</span>
-              </div>
-
-              {/* Selected */}
-              <div className="flex items-center gap-1.5 sm:gap-3 bg-red-950/40 border border-red-600/60 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl shrink-0 whitespace-nowrap">
-                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-md bg-red-600 border-2 border-white text-white font-black flex items-center justify-center text-[11px] sm:text-xs shrink-0 shadow-lg shadow-red-500/80 ring-1 ring-white">
-                  ✓
-                </div>
-                <span className="text-white font-impact tracking-wide text-xs sm:text-sm">SELECTED</span>
-              </div>
-
-              {/* Held / Reserved */}
-              <div className="flex items-center gap-1.5 sm:gap-3 bg-amber-950/40 border border-amber-600/50 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl shrink-0 whitespace-nowrap">
-                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-md bg-amber-500/20 border-2 border-amber-500 text-amber-400 font-bold flex items-center justify-center text-[11px] sm:text-xs shrink-0">
-                  🔒
-                </div>
-                <span className="text-amber-300 font-impact tracking-wide text-xs sm:text-sm">HELD / RESERVED</span>
-              </div>
-
-              {/* Booked / Sold */}
-              <div className="flex items-center gap-1.5 sm:gap-3 bg-zinc-900/60 border border-zinc-800 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl shrink-0 whitespace-nowrap">
-                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-md bg-zinc-950 border border-zinc-800 text-zinc-500 font-bold flex items-center justify-center text-[11px] sm:text-xs shrink-0 opacity-60">
-                  ✕
-                </div>
-                <span className="text-zinc-500 font-impact tracking-wide text-xs sm:text-sm">BOOKED / SOLD</span>
-              </div>
-
-            </div>
-
-            {/* Mobile Scale-Out Banner */}
-            <div className="w-full max-w-4xl mx-auto bg-zinc-900 text-gray-300 font-tech text-xs sm:text-sm text-center py-2 px-3 rounded-xl mb-4 shadow border border-zinc-800 flex items-center justify-center gap-2">
-              <span>📱 ALL SEATS (1 TO 16) FULLY SCALED TO FIT SCREEN END-TO-END — TAP TO SELECT SEAT ↓</span>
             </div>
 
             {/* Seat Rows Grid (Rows K down to A matching physical diagram exactly) */}
@@ -530,13 +486,15 @@ export default function BookingFlow({ onReturnHome }) {
                                 type="button"
                                 className={`seat-btn seat-${statusClass} flex-1 sm:flex-initial min-w-[14px] max-w-[19px] sm:min-w-[40px] sm:max-w-[40px] h-[21px] sm:h-10 text-[8px] sm:text-sm font-bold rounded-[3px] sm:rounded-md border sm:border-2 transition-all flex items-center justify-center shrink p-0 leading-none ${
                                   isSelected 
-                                    ? 'bg-red-600 text-white font-black border-white scale-125 shadow-xl ring-1 sm:ring-2 ring-white z-10' 
+                                    ? 'bg-white text-black font-black border-emerald-400 scale-125 shadow-2xl ring-1 sm:ring-2 ring-white z-20' 
                                     : seat.status === 'AVAILABLE' 
-                                    ? 'bg-zinc-800 text-gray-200 border-zinc-600 hover:border-red-500 hover:bg-zinc-700 hover:text-white hover:scale-105 shadow-sm' 
-                                    : 'bg-zinc-950 text-zinc-600 border-zinc-900 cursor-not-allowed opacity-40'
+                                    ? 'bg-emerald-600 text-white border-emerald-400 hover:bg-emerald-500 hover:scale-110 shadow-sm' 
+                                    : seat.status === 'HELD'
+                                    ? 'bg-yellow-600 text-white border-yellow-400 cursor-not-allowed opacity-95'
+                                    : 'bg-red-600 text-white border-red-500 cursor-not-allowed opacity-90'
                                 }`}
                                 onClick={() => handleSeatClick(seat)}
-                                title={`${seat.label} — ${seat.status === 'AVAILABLE' ? `₹${event.ticket_price || 1}` : seat.status}`}
+                                title={`${seat.label} — ${seat.status === 'AVAILABLE' ? `₹${event.ticket_price || 499}` : seat.status}`}
                               >
                                 {seat.seat_number}
                               </button>
