@@ -355,65 +355,79 @@ export default function BookingFlow({ onReturnHome }) {
           PAGE 1.5: BOOKMYSHOW-STYLE SEAT QUANTITY MODAL (WITHOUT ILLUSTRATION)
           ========================================================================= */}
       {step === 'seatcount' && (
-        <div className="grid-container py-12 booking-step-transition flex items-center justify-center min-h-[75vh]">
-          <div className="max-w-4xl w-full mx-auto bg-zinc-950 border-4 border-zinc-800 p-6 sm:p-12 rounded-3xl shadow-2xl my-6 text-center font-tech relative animate-fade-in">
+        <div className="grid-container py-12 sm:py-20 booking-step-transition flex items-center justify-center min-h-[85vh]">
+          <div className="max-w-5xl w-full mx-auto bg-zinc-950 border-4 sm:border-8 border-zinc-800 p-6 sm:p-14 rounded-[3.5rem] shadow-2xl my-6 text-center font-tech relative animate-fade-in">
             
-            <h3 className="text-3xl sm:text-5xl font-impact font-bold text-white mb-8 uppercase tracking-tight">
+            <h3 className="text-4xl sm:text-7xl font-impact font-bold text-white mb-10 uppercase tracking-tight leading-none">
               HOW MANY SEATS?
             </h3>
             
-            {/* Massive Prominent Quantity Buttons (+200% Size with Green Transition) */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-8 my-10 max-w-3xl mx-auto">
-              {[1, 2, 3, 4].map((num) => {
+            {/* Gigantic Stacked Toggle Pill Cards (Inspired by the Tennis Pill/Toggle Design) */}
+            <div className="space-y-6 sm:space-y-8 my-12 max-w-4xl mx-auto">
+              {[1, 2, 3, 4].map((num, idx) => {
                 const isActive = targetSeatCount === num;
+                const priceForNum = num * (event.ticket_price || 499);
+                const isEven = idx % 2 === 1; // 0 (1 seat) left, 1 (2 seats) right, 2 (3 seats) left, 3 (4 seats) right
+
                 return (
-                  <button
+                  <div
                     key={num}
-                    type="button"
                     onClick={() => setTargetSeatCount(num)}
-                    className={`py-10 sm:py-16 px-4 rounded-3xl font-impact transition-all duration-300 flex flex-col items-center justify-center cursor-pointer border-4 shadow-2xl ${
+                    className={`w-full py-5 sm:py-8 px-6 sm:px-10 rounded-full font-impact transition-all duration-300 flex items-center justify-between gap-4 sm:gap-8 cursor-pointer border-4 sm:border-8 shadow-2xl ${
                       isActive
-                        ? 'bg-emerald-600 border-emerald-400 text-white font-black shadow-emerald-500/80 scale-105 ring-4 ring-white/40 z-10'
-                        : 'bg-zinc-900 border-zinc-700 text-gray-300 hover:bg-emerald-700 hover:border-emerald-400 hover:text-white hover:scale-105 shadow-xl'
-                    }`}
+                        ? 'bg-[#DCFF02] border-white text-black font-black shadow-[0_0_50px_rgba(220,255,2,0.7)] scale-105 z-10'
+                        : 'bg-zinc-900 border-zinc-700 text-white hover:border-emerald-400 hover:bg-zinc-800/90 hover:scale-[1.02] opacity-90'
+                    } ${isEven ? 'flex-row-reverse text-right' : 'flex-row text-left'}`}
                   >
-                    <span className="text-6xl sm:text-8xl font-black tracking-tight">{num}</span>
-                    <span className="text-sm sm:text-lg font-tech font-bold uppercase tracking-widest mt-3 opacity-95">
-                      {num === 1 ? 'SEAT' : 'SEATS'}
-                    </span>
-                  </button>
+                    {/* Circle Toggle Ball / Badge */}
+                    <div className={`w-20 h-20 sm:w-32 sm:h-32 rounded-full flex flex-col items-center justify-center shrink-0 border-4 sm:border-6 transition-all ${
+                      isActive 
+                        ? 'bg-black text-[#DCFF02] border-white shadow-2xl scale-110' 
+                        : 'bg-zinc-800 text-gray-300 border-zinc-600 group-hover:border-white'
+                    }`}>
+                      <span className="text-4xl sm:text-7xl font-black leading-none">{num}</span>
+                      <span className="text-[10px] sm:text-sm font-tech font-bold uppercase tracking-wider mt-1">
+                        {num === 1 ? 'SEAT' : 'SEATS'}
+                      </span>
+                    </div>
+
+                    {/* Pill Text Content */}
+                    <div className="flex-1 min-w-0">
+                      <div className="text-3xl sm:text-6xl md:text-7xl font-black tracking-tight leading-none uppercase truncate">
+                        {num} {num === 1 ? 'SEAT' : 'SEATS'} PASS
+                      </div>
+                      <div className={`text-base sm:text-2xl font-tech font-bold tracking-widest uppercase mt-2 ${isActive ? 'text-black/80 font-black' : 'text-emerald-400'}`}>
+                        ALL INCLUSIVE // ₹{priceForNum}/-
+                      </div>
+                    </div>
+                  </div>
                 );
               })}
             </div>
 
-            {/* Dynamic Multiplied Price Section (Huge Font Size) */}
-            <div className="mt-10 pt-8 border-t border-zinc-800/80 space-y-3">
-              <span className="text-xs sm:text-sm text-gray-300 font-bold uppercase tracking-widest block">
+            {/* Dynamic Multiplied Price Banner (Huge Font Size) */}
+            <div className="mt-12 pt-8 border-t-2 border-zinc-800 space-y-4">
+              <span className="text-sm sm:text-xl text-gray-300 font-bold uppercase tracking-widest block">
                 EXECUTIVE // EARLY BIRD PASS ({targetSeatCount} {targetSeatCount === 1 ? 'SEAT' : 'SEATS'} × ₹{event.ticket_price || 499})
               </span>
-              <div className="font-impact text-6xl sm:text-8xl text-emerald-400 bg-emerald-950/90 border-4 border-emerald-500 py-6 px-10 rounded-3xl shadow-2xl inline-block my-4 tracking-tight">
+              <div className="font-impact text-6xl sm:text-9xl text-emerald-400 bg-black border-4 sm:border-8 border-emerald-500 py-6 sm:py-8 px-10 sm:px-14 rounded-[3rem] shadow-[0_0_40px_rgba(16,185,129,0.4)] inline-block my-4 tracking-tight">
                 ₹{targetSeatCount * (event.ticket_price || 499)}/-
               </div>
-              <span className="text-xs sm:text-sm font-bold text-emerald-400 uppercase block tracking-wider mt-1">
-                AVAILABLE (LIMITED TIME) — ALL INCLUSIVE OF SEATING + SNACK + BEVERAGE
+              <span className="text-sm sm:text-lg font-bold text-emerald-400 uppercase block tracking-wider">
+                🍿 COMPLIMENTARY GOURMET SNACK & BEVERAGE INCLUDED FOR EVERY SEAT!
               </span>
             </div>
 
-            {/* Bestseller / Perks Banner */}
-            <div className="bg-zinc-900/90 border-2 border-zinc-800 py-3.5 px-5 rounded-2xl text-sm sm:text-base text-gray-200 font-medium flex items-center justify-center gap-2 mt-6 leading-snug shadow-lg max-w-2xl mx-auto">
-              <span>🍿 Book exact cinema seats + complimentary snack & beverage included!</span>
-            </div>
-
-            {/* Massive Action CTA Button (+200% Size) */}
+            {/* Massive Pill Action CTA Button (+300% Size) */}
             <button 
               type="button"
               onClick={() => {
                 setSelectedSeats([]);
                 setStep('seatmap');
               }}
-              className="w-full py-6 sm:py-8 bg-emerald-600 hover:bg-emerald-500 text-white font-impact font-bold text-2xl sm:text-4xl rounded-3xl shadow-2xl shadow-emerald-600/60 border-4 border-emerald-400 transition-all hover:scale-[1.02] cursor-pointer mt-8 uppercase tracking-wider block"
+              className="w-full py-8 sm:py-12 px-6 sm:px-10 bg-emerald-500 hover:bg-emerald-400 text-black font-impact font-black text-3xl sm:text-6xl rounded-full shadow-[0_0_60px_rgba(16,185,129,0.8)] border-6 sm:border-8 border-white transition-all duration-300 hover:scale-[1.03] cursor-pointer mt-12 uppercase tracking-wider block"
             >
-              SELECT SEATS ({targetSeatCount} FOR ₹{targetSeatCount * (event.ticket_price || 499)}) →
+              SELECT SEATS (₹{targetSeatCount * (event.ticket_price || 499)}) →
             </button>
 
           </div>
