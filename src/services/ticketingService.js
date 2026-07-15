@@ -193,14 +193,26 @@ export function cleanupExpiredReservations(store) {
 
 function getStatusPriority(status) {
   switch (status) {
-    case 'CONFIRMED': return 50;
+    case 'CONFIRMED':
+    case 'CANCELLED':
+    case 'EXPIRED':
+      return 100; // Terminal states always beat intermediate states
     case 'UNDER_REVIEW': return 40;
     case 'PENDING_PAYMENT': return 30;
     case 'HELD': return 20;
-    case 'CANCELLED': return 10;
-    case 'EXPIRED': return 5;
     default: return 0;
   }
+}
+
+function getLatestTimestamp(booking) {
+  if (booking && booking.timeline && booking.timeline.length > 0) {
+    const lastEntry = booking.timeline[booking.timeline.length - 1];
+    if (lastEntry && lastEntry.timestamp) {
+      return new Date(lastEntry.timestamp).getTime();
+    }
+  }
+  if (booking && booking.created_at) return new Date(booking.created_at).getTime();
+  return 0;
 }
 
 export const ticketingService = {
@@ -241,9 +253,11 @@ export const ticketingService = {
             let needsCloudMirror = false;
             const localPriority = getStatusPriority(localB.status);
             const cloudPriority = getStatusPriority(cloudB.status);
+            const localTime = getLatestTimestamp(localB);
+            const cloudTime = getLatestTimestamp(cloudB);
 
-            if (localPriority > cloudPriority) {
-              // Local status takes priority (e.g. Admin approved/confirmed locally or reassigned)
+            if (localPriority > cloudPriority || (localPriority === cloudPriority && localB.status !== cloudB.status && localTime >= cloudTime)) {
+              // Local status takes priority (e.g. Admin rejected/cancelled/confirmed locally or reassigned)
               cloudB.status = localB.status;
               cloudB.seats = localB.seats;
               cloudB.total_amount = localB.total_amount;
@@ -251,8 +265,9 @@ export const ticketingService = {
               cloudB.expires_at = localB.expires_at;
               if (localB.utr) cloudB.utr = localB.utr;
               if (localB.screenshot_url) cloudB.screenshot_url = localB.screenshot_url;
+              if (localB.paymentScreenshot) cloudB.paymentScreenshot = localB.paymentScreenshot;
               needsCloudMirror = true;
-            } else if (cloudPriority > localPriority) {
+            } else if (cloudPriority > localPriority || (localPriority === cloudPriority && localB.status !== cloudB.status && cloudTime > localTime)) {
               // Cloud status takes priority (e.g. approved on another admin device)
               // Keep cloudB status
             } else {
