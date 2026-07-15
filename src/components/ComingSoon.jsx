@@ -11,13 +11,11 @@ export default function ComingSoon({ onAdminAccess }) {
       {/* Header Bar */}
       <header className="coming-soon-header">
         <div className="coming-soon-logo-wrap">
-          <div className="coming-soon-logo-mark" />
-          <span className="coming-soon-logo-text">THE GUILD // VIZAG</span>
-        </div>
-
-        <div className="coming-soon-status-badge">
-          <span className="coming-soon-pulse-dot" />
-          <span>// STATUS: DEPLOYING LIVE AUDITORIUM EXPERIENCE //</span>
+          <img 
+            src="/logo.png" 
+            alt="THE GUILD" 
+            style={{ maxHeight: '52px', width: 'auto', objectFit: 'contain', display: 'block' }} 
+          />
         </div>
       </header>
 
@@ -56,20 +54,9 @@ export default function ComingSoon({ onAdminAccess }) {
       </main>
 
       {/* Footer Bar */}
-      <footer className="coming-soon-footer">
+      <footer className="coming-soon-footer" style={{ justifyContent: 'center', textAlign: 'center' }}>
         <div>
           <span>© {new Date().getFullYear()} THE GUILD VIZAG. ALL RIGHTS RESERVED. // DESIGNED FOR THE FANS</span>
-        </div>
-
-        <div>
-          <button 
-            type="button" 
-            onClick={onAdminAccess} 
-            className="coming-soon-admin-link"
-            title="Access Restricted Founder Control Room"
-          >
-            [ // FOUNDER PORTAL LOCK ]
-          </button>
         </div>
       </footer>
     </div>
