@@ -70,33 +70,71 @@ function getInitialTicketingState() {
 
 function ensureBlockedSeats(store) {
   if (!store || !store.bookings) return store;
-  const blockedSeats = ['F13', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10'];
-  const vipBookingId = 'GLD-VIP-BLOCKED';
   
-  const existingIndex = store.bookings.findIndex(b => b.id === vipBookingId);
-  const vipBooking = {
-    id: vipBookingId,
-    event_id: store.event ? store.event.id : 'fifa-wc-final-2026',
-    user_name: 'GUILD VIP / BLOCKED SEATS',
-    user_phone: '+91 99999 99999',
-    user_email: 'ops@theguild.app',
-    total_amount: 499 * blockedSeats.length,
-    status: 'CONFIRMED',
-    seats: blockedSeats,
-    utr: 'SYSTEM_HARDCODED_BLOCK',
-    screenshot_url: 'https://via.placeholder.com/400x300.png?text=VIP+BLOCKED',
-    timeline: [
-      { state: 'CONFIRMED', timestamp: new Date(2026, 6, 1, 12, 0).toISOString(), note: 'Hardcoded blocked seating: F13, A5-A10' }
-    ],
-    created_at: new Date(2026, 6, 1, 12, 0).toISOString(),
-    expires_at: new Date(2026, 11, 31, 23, 59).toISOString()
-  };
-
-  if (existingIndex === -1) {
-    store.bookings.push(vipBooking);
-  } else {
-    store.bookings[existingIndex] = vipBooking;
+  // Remove the old single hardcoded 7-seat record if present locally
+  const hadLegacy = store.bookings.some(b => b.id === 'GLD-VIP-BLOCKED');
+  if (hadLegacy) {
+    store.bookings = store.bookings.filter(b => b.id !== 'GLD-VIP-BLOCKED');
+    if (supabase) {
+      supabase.from('bookings').delete().eq('id', 'GLD-VIP-BLOCKED').then(() => {}).catch(() => {});
+    }
   }
+
+  const vipRecords = [
+    {
+      id: 'GLD-VIP-ANVESH',
+      user_name: 'Anvesh',
+      user_phone: '+91 99999 00001',
+      user_email: 'anvesh@theguild.app',
+      seats: ['F13'],
+      utr: 'VIP_HOLD_ANVESH'
+    },
+    {
+      id: 'GLD-VIP-PRADYUMNA',
+      user_name: 'Pradyumna',
+      user_phone: '+91 99999 00002',
+      user_email: 'pradyumna@theguild.app',
+      seats: ['A7', 'A8', 'A9', 'A10'],
+      utr: 'VIP_HOLD_PRADYUMNA'
+    },
+    {
+      id: 'GLD-VIP-RAVIVARMA',
+      user_name: 'Ravi Varma',
+      user_phone: '+91 99999 00003',
+      user_email: 'ravivarma@theguild.app',
+      seats: ['A5', 'A6'],
+      utr: 'VIP_HOLD_RAVIVARMA'
+    }
+  ];
+
+  vipRecords.forEach(vip => {
+    const existingIndex = store.bookings.findIndex(b => b.id === vip.id);
+    const bookingRecord = {
+      id: vip.id,
+      event_id: store.event ? store.event.id : 'fifa-wc-final-2026',
+      user_name: vip.user_name,
+      user_phone: vip.user_phone,
+      user_email: vip.user_email,
+      total_amount: 499 * vip.seats.length,
+      status: 'CONFIRMED',
+      seats: vip.seats,
+      utr: vip.utr,
+      screenshot_url: 'https://via.placeholder.com/400x300.png?text=VIP+' + vip.user_name.replace(/\s+/g, '+'),
+      timeline: [
+        { state: 'CONFIRMED', timestamp: new Date(2026, 6, 1, 12, 0).toISOString(), note: `Reserved seating for ${vip.user_name}: ${vip.seats.join(', ')}` }
+      ],
+      created_at: new Date(2026, 6, 1, 12, 0).toISOString(),
+      expires_at: new Date(2026, 11, 31, 23, 59).toISOString()
+    };
+
+    if (existingIndex === -1) {
+      store.bookings.push(bookingRecord);
+    } else {
+      store.bookings[existingIndex] = bookingRecord;
+    }
+    mirrorBookingToCloud(bookingRecord);
+  });
+
   return store;
 }
 
@@ -759,6 +797,61 @@ export const ticketingService = {
     saveLocalStore(store);
     await mirrorBookingToCloud(store.bookings[bookingIndex]);
     return store.bookings[bookingIndex];
+  },
+
+  // Admin Action: Create Manual Reservation right from the Live Seat Map
+  adminCreateReservation: async (selectedSeats, userName = 'VIP / Offline Guest', userPhone = '+91 99999 99999', status = 'CONFIRMED', adminId = 'FOUNDER_01') => {
+    const store = getLocalStore();
+    const now = new Date();
+    if (!selectedSeats || !selectedSeats.length) throw new Error('No seats selected for backend reservation');
+
+    // Check if any seat is currently held/booked by another non-cancelled/non-expired booking and release/override
+    store.bookings.forEach(b => {
+      if (b.status !== 'CANCELLED' && b.status !== 'EXPIRED' && b.seats && b.seats.some(s => selectedSeats.includes(s))) {
+        b.seats = b.seats.filter(s => !selectedSeats.includes(s));
+        if (b.seats.length === 0) {
+          b.status = 'CANCELLED';
+          b.timeline = [...(b.timeline || []), { state: 'CANCELLED', timestamp: now.toISOString(), note: `Overridden by Admin Live Backend Reservation on [${selectedSeats.join(', ')}]` }];
+        } else {
+          b.timeline = [...(b.timeline || []), { state: b.status, timestamp: now.toISOString(), note: `Seats [${selectedSeats.join(', ')}] overridden by Admin Live Backend Reservation` }];
+        }
+        mirrorBookingToCloud(b);
+      }
+    });
+
+    const newBookingId = 'GLD-ADM-' + Math.random().toString(36).substring(2, 7).toUpperCase();
+    const newBooking = {
+      id: newBookingId,
+      event_id: store.event ? store.event.id : 'fifa-wc-final-2026',
+      user_name: userName || 'VIP / Offline Guest',
+      user_phone: userPhone || '+91 99999 99999',
+      user_email: 'admin.res@theguild.app',
+      total_amount: (store.event ? store.event.ticket_price : 499) * selectedSeats.length,
+      status: status || 'CONFIRMED',
+      seats: selectedSeats,
+      utr: 'ADMIN_LIVE_MAP_RESERVATION',
+      screenshot_url: 'https://via.placeholder.com/400x300.png?text=Admin+Live+Map+Res',
+      timeline: [
+        { state: status || 'CONFIRMED', timestamp: now.toISOString(), note: `Direct backend seat reservation created from live seat map by Admin (${adminId}) on [${selectedSeats.join(', ')}]` }
+      ],
+      created_at: now.toISOString(),
+      expires_at: (status === 'CONFIRMED' || status === 'BOOKED')
+        ? new Date(now.getTime() + 10 * 365 * 24 * 3600 * 1000).toISOString()
+        : new Date(now.getTime() + 10 * 60 * 1000).toISOString()
+    };
+
+    store.bookings.unshift(newBooking);
+    store.activityLogs.unshift({
+      id: 'log-' + Math.random().toString(36).substring(2, 8),
+      timestamp: now.toISOString(),
+      action: 'SEATS_RESERVED_MAP',
+      admin_id: adminId,
+      details: `Admin directly reserved [${selectedSeats.join(', ')}] -> #${newBookingId} (${userName})`
+    });
+
+    saveLocalStore(store);
+    await mirrorBookingToCloud(newBooking);
+    return newBooking;
   },
 
   // Admin Action: Live Update UPI ID, Custom QR Code URL, or Event Specs

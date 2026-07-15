@@ -33,24 +33,6 @@ export default function ComingSoon({ onAdminAccess }) {
         <p className="coming-soon-sub">
           We are currently preparing Vizag's premier stadium-seating screening experience for the upcoming FIFA World Cup Finals & Formula 1 Grand Prix. All reservations, ticketing pipelines, and unblockable sightline seat mappings are locked and actively tracked.
         </p>
-
-        {/* Technical Specs Highlights */}
-        <div className="coming-soon-specs-grid">
-          <div className="coming-soon-spec-item">
-            <span className="coming-soon-spec-label">// AUDITORIUM CAPACITY</span>
-            <div className="coming-soon-spec-val">147 STADIUM SEATS</div>
-          </div>
-
-          <div className="coming-soon-spec-item">
-            <span className="coming-soon-spec-label">// SOUND & PROJECTION</span>
-            <div className="coming-soon-spec-val">DOLBY ATMOS 4K LASER</div>
-          </div>
-
-          <div className="coming-soon-spec-item">
-            <span className="coming-soon-spec-label">// VENUE & LOCATION</span>
-            <div className="coming-soon-spec-val">INOX BEACH ROAD, VZAG</div>
-          </div>
-        </div>
       </main>
 
       {/* Footer Bar */}

@@ -22,6 +22,11 @@ export default function AdminTicketingPortal({ onSwitchToSignups }) {
   const [reassignSeatsInput, setReassignSeatsInput] = useState('');
   const [autoConfirmReassign, setAutoConfirmReassign] = useState(true);
 
+  const [adminSelectedMapSeats, setAdminSelectedMapSeats] = useState([]);
+  const [quickResGuestName, setQuickResGuestName] = useState('VIP / Offline Guest');
+  const [quickResPhone, setQuickResPhone] = useState('+91 99999 99999');
+  const [quickResStatus, setQuickResStatus] = useState('CONFIRMED');
+
   const [isSyncing, setIsSyncing] = useState(false);
 
   const reloadData = async () => {
@@ -106,6 +111,19 @@ export default function AdminTicketingPortal({ onSwitchToSignups }) {
       alert('Seats successfully assigned and locked!');
     } catch (err) {
       alert(`Assignment Error: ${err.message}`);
+    }
+  };
+
+  const handleQuickMapReserve = async (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (adminSelectedMapSeats.length === 0) return alert('Please click at least one AVAILABLE seat on the map below first.');
+    try {
+      await ticketingService.adminCreateReservation(adminSelectedMapSeats, quickResGuestName, quickResPhone, quickResStatus);
+      setAdminSelectedMapSeats([]);
+      alert(`Successfully reserved ${adminSelectedMapSeats.length} seats directly right from the backend!`);
+      reloadData();
+    } catch (err) {
+      alert(`Backend Reservation Error: ${err.message}`);
     }
   };
 
@@ -475,18 +493,86 @@ export default function AdminTicketingPortal({ onSwitchToSignups }) {
         )}
 
         {/* =========================================================================
-            TAB 2: LIVE INTERACTIVE ADMIN SEAT MAP (CLICK SEAT TO INSPECT)
+            TAB 2: LIVE INTERACTIVE ADMIN SEAT MAP (CLICK SEAT TO INSPECT OR BOOK/RESERVE)
             ========================================================================= */}
         {activeTab === 'seatmap' && (
           <div className="admin-seatmap-panel">
-            <div className="text-center mb-8">
-              <span className="font-tech text-xs text-gray-400">// LIVE INOX AUDITORIUM 03 OCCUPANCY MATRIX // CLICK ANY OCCUPIED SEAT TO INSPECT BOOKING</span>
+            <div className="text-center mb-6">
+              <span className="font-tech text-xs text-gray-400">// LIVE INOX AUDITORIUM 03 OCCUPANCY MATRIX // CLICK OCCUPIED SEATS TO INSPECT OR AVAILABLE SEATS TO RESERVE</span>
+            </div>
+
+            {/* Backend Live Seat Reservation Bar */}
+            <div className="bg-zinc-950 border border-red-500/40 p-4 mb-6 rounded-sm text-left">
+              <div className="flex items-center justify-between flex-wrap gap-2 mb-3">
+                <div>
+                  <span className="font-impact text-white tracking-wide text-base block">// LIVE BACKEND SEAT RESERVATION CONTROLLER</span>
+                  <span className="font-tech text-xs text-gray-400">Click ANY AVAILABLE seat directly on the grid below (`A1, A2, B5...`) to select and instantly reserve/lock it from the backend.</span>
+                </div>
+                {adminSelectedMapSeats.length > 0 && (
+                  <button 
+                    type="button" 
+                    onClick={() => setAdminSelectedMapSeats([])}
+                    className="text-xs font-tech text-gray-400 hover:text-white underline"
+                  >
+                    Clear Selection ({adminSelectedMapSeats.length})
+                  </button>
+                )}
+              </div>
+
+              {adminSelectedMapSeats.length === 0 ? (
+                <div className="bg-zinc-900/60 border border-zinc-800 p-3 text-center font-tech text-xs text-zinc-400">
+                  ⚡ 0 seats currently selected. Click on AVAILABLE seats on the seat map grid below (`A1, A2...`) to activate quick backend reservation.
+                </div>
+              ) : (
+                <form onSubmit={handleQuickMapReserve} className="grid grid-cols-1 md:grid-cols-4 gap-3 items-end bg-zinc-900/80 p-3 border border-zinc-800">
+                  <div>
+                    <label className="block text-[10px] font-tech text-red-400 mb-1">SELECTED SEATS ({adminSelectedMapSeats.length})</label>
+                    <div className="font-mono text-sm font-bold text-white bg-black/60 px-2.5 py-1.5 border border-zinc-700 truncate" title={adminSelectedMapSeats.join(', ')}>
+                      {adminSelectedMapSeats.join(', ')}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-tech text-gray-400 mb-1">GUEST NAME</label>
+                    <input 
+                      type="text" 
+                      value={quickResGuestName}
+                      onChange={(e) => setQuickResGuestName(e.target.value)}
+                      required
+                      className="w-full bg-black border border-zinc-700 px-2.5 py-1.5 text-xs text-white focus:border-red-500 outline-none font-tech"
+                      placeholder="e.g. Offline Guest / VIP"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-tech text-gray-400 mb-1">PHONE NUMBER</label>
+                    <input 
+                      type="text" 
+                      value={quickResPhone}
+                      onChange={(e) => setQuickResPhone(e.target.value)}
+                      required
+                      className="w-full bg-black border border-zinc-700 px-2.5 py-1.5 text-xs text-white focus:border-red-500 outline-none font-tech"
+                      placeholder="e.g. +91 99999 99999"
+                    />
+                  </div>
+
+                  <div className="flex gap-2">
+                    <button 
+                      type="submit" 
+                      className="btn-brutalist flex-1 py-2 text-xs font-bold tracking-wider"
+                    >
+                      [ RESERVE SEATS NOW ]
+                    </button>
+                  </div>
+                </form>
+              )}
             </div>
 
             <div className="seatmap-legend mb-6">
               <div className="legend-item"><div className="legend-box legend-available" /><span>AVAILABLE</span></div>
               <div className="legend-item"><div className="legend-box legend-held" /><span>HELD / UNDER REVIEW</span></div>
               <div className="legend-item"><div className="legend-box legend-booked" /><span>BOOKED / CONFIRMED</span></div>
+              <div className="legend-item"><div className="legend-box bg-red-600 border-white" /><span>SELECTED TO BOOK</span></div>
             </div>
 
             <div className="seatmap-grid-wrap max-w-4xl mx-auto overflow-x-auto pb-6">
@@ -506,16 +592,26 @@ export default function AdminTicketingPortal({ onSwitchToSignups }) {
                           <React.Fragment key={seat.id}>
                             <button
                               type="button"
-                              className={`seat-btn seat-${seat.status} w-8 h-8 text-[11px] font-bold rounded-sm border transition-all flex items-center justify-center shrink-0 ${seat.status === 'AVAILABLE' ? 'bg-zinc-800 text-gray-300 border-zinc-700 hover:border-red-500 hover:text-white' : 'bg-zinc-950 text-zinc-600 border-zinc-900 cursor-pointer opacity-80'}`}
+                              className={`seat-btn seat-${seat.status} w-8 h-8 text-[11px] font-bold rounded-sm border transition-all flex items-center justify-center shrink-0 ${
+                                adminSelectedMapSeats.includes(seat.label)
+                                  ? 'bg-red-600 text-white border-white scale-110 shadow-lg shadow-red-600/50 z-10 font-black'
+                                  : seat.status === 'AVAILABLE' 
+                                    ? 'bg-zinc-800 text-gray-300 border-zinc-700 hover:border-red-500 hover:text-white cursor-pointer' 
+                                    : 'bg-zinc-950 text-zinc-600 border-zinc-900 cursor-pointer opacity-80'
+                              }`}
                               onClick={() => {
                                 if (seat.booking_id) {
                                   const b = bookings.find(book => book.id === seat.booking_id);
                                   if (b) setSelectedSeatBooking(b);
                                 } else {
-                                  alert(`Seat ${seat.label} is currently AVAILABLE (₹${event.ticket_price || 1}).`);
+                                  setAdminSelectedMapSeats(prev => 
+                                    prev.includes(seat.label) 
+                                      ? prev.filter(s => s !== seat.label) 
+                                      : [...prev, seat.label]
+                                  );
                                 }
                               }}
-                              title={`${seat.label} — ${seat.status} ${seat.booking_id ? `(#${seat.booking_id})` : ''}`}
+                              title={`${seat.label} — ${adminSelectedMapSeats.includes(seat.label) ? 'SELECTED' : seat.status} ${seat.booking_id ? `(#${seat.booking_id})` : ''}`}
                             >
                               {seat.seat_number}
                             </button>
