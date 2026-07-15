@@ -1,87 +1,77 @@
 import React from 'react';
-import { Lock, CreditCard, Armchair, Award, Smartphone, Star } from 'lucide-react';
-import LineReveal, { RevealItem } from './LineReveal';
 import './ComingSoon.css';
 
-const ROADMAP_ITEMS = [
-  {
-    icon: <Smartphone size={22} />,
-    title: 'MEMBER DASHBOARD',
-    status: 'IN DEVELOPMENT',
-    desc: 'Dedicated profile to track attended races, favorite clubs, and screening stats.'
-  },
-  {
-    icon: <Armchair size={22} />,
-    title: 'INTERACTIVE SEAT RESERVATIONS',
-    status: 'ARCHITECTURE READY',
-    desc: 'Select precise terrace tables or prime front-row lounge seating before arrival.'
-  },
-  {
-    icon: <CreditCard size={22} />,
-    title: 'RAZORPAY INTEGRATION',
-    status: 'TESTING',
-    desc: 'Seamless 1-tap UPI and card ticketing directly within your Guild wallet.'
-  },
-  {
-    icon: <Award size={22} />,
-    title: 'GUILD MEMBERSHIP & LOYALTY',
-    status: 'CONCEPT',
-    desc: 'Earn priority entry, complimentary craft drinks, and exclusive season pass badges.'
-  },
-  {
-    icon: <Star size={22} />,
-    title: 'PRIORITY BOOKING WINDOWS',
-    status: 'PLANNED',
-    desc: 'Tier-based 48-hour head starts before high-demand derby screenings go public.'
-  }
-];
-
-export default function ComingSoon() {
+export default function ComingSoon({ onAdminAccess }) {
   return (
-    <section id="coming-soon" className="roadmap-section" data-scroll-section>
-      <div className="grid-container roadmap-container">
-        
-        <div className="roadmap-header">
-          <div className="r-left">
-            <LineReveal delay={0.1} className="section-index font-tech">04 // VERSION 2.0 ROADMAP</LineReveal>
-            <LineReveal delay={0.2} className="section-title font-editorial" as="h2">COMING SOON TO THE GUILD</LineReveal>
-          </div>
-          <div className="r-right font-tech">
-            <RevealItem delay={0.3}>
-              <Lock size={16} />
-              <span>EXCLUSIVELY TEASED FOR MVP VALIDATION</span>
-            </RevealItem>
-          </div>
+    <div className="coming-soon-root">
+      {/* Background Atmosphere */}
+      <div className="coming-soon-bg-grid" />
+      <div className="coming-soon-bg-glow" />
+
+      {/* Header Bar */}
+      <header className="coming-soon-header">
+        <div className="coming-soon-logo-wrap">
+          <div className="coming-soon-logo-mark" />
+          <span className="coming-soon-logo-text">THE GUILD // VIZAG</span>
         </div>
 
-        <div className="roadmap-list">
-          {ROADMAP_ITEMS.map((item, idx) => (
-            <RevealItem 
-              key={idx} 
-              delay={idx * 0.1}
-              className="roadmap-row scroll-reveal-card"
-            >
-              <div className="row-meta font-tech">
-                <span className="row-idx">[ 0{idx + 1} ]</span>
-                <span className="row-status badge-status">{item.status}</span>
-              </div>
-              
-              <div className="row-main">
-                <div className="row-icon">{item.icon}</div>
-                <div className="row-text">
-                  <LineReveal delay={0.15} className="roadmap-title font-editorial" as="h3">{item.title}</LineReveal>
-                  <LineReveal delay={0.25} className="roadmap-desc" as="p">{item.desc}</LineReveal>
-                </div>
-              </div>
+        <div className="coming-soon-status-badge">
+          <span className="coming-soon-pulse-dot" />
+          <span>// STATUS: DEPLOYING LIVE AUDITORIUM EXPERIENCE //</span>
+        </div>
+      </header>
 
-              <div className="row-action font-tech">
-                <span>// LOCKED</span>
-              </div>
-            </RevealItem>
-          ))}
+      {/* Main Hero Section */}
+      <main className="coming-soon-main">
+        <div className="coming-soon-tag">
+          // INOX AUDITORIUM 03 // VIZAG, AP //
         </div>
 
-      </div>
-    </section>
+        <h1 className="coming-soon-headline">
+          THE LIVE CINEMA & SPORTS CLUB <br />
+          <span className="accent">COMING SOON</span>
+        </h1>
+
+        <p className="coming-soon-sub">
+          We are currently preparing Vizag's premier stadium-seating screening experience for the upcoming FIFA World Cup Finals & Formula 1 Grand Prix. All reservations, ticketing pipelines, and unblockable sightline seat mappings are locked and actively tracked.
+        </p>
+
+        {/* Technical Specs Highlights */}
+        <div className="coming-soon-specs-grid">
+          <div className="coming-soon-spec-item">
+            <span className="coming-soon-spec-label">// AUDITORIUM CAPACITY</span>
+            <div className="coming-soon-spec-val">147 STADIUM SEATS</div>
+          </div>
+
+          <div className="coming-soon-spec-item">
+            <span className="coming-soon-spec-label">// SOUND & PROJECTION</span>
+            <div className="coming-soon-spec-val">DOLBY ATMOS 4K LASER</div>
+          </div>
+
+          <div className="coming-soon-spec-item">
+            <span className="coming-soon-spec-label">// VENUE & LOCATION</span>
+            <div className="coming-soon-spec-val">INOX BEACH ROAD, VZAG</div>
+          </div>
+        </div>
+      </main>
+
+      {/* Footer Bar */}
+      <footer className="coming-soon-footer">
+        <div>
+          <span>© {new Date().getFullYear()} THE GUILD VIZAG. ALL RIGHTS RESERVED. // DESIGNED FOR THE FANS</span>
+        </div>
+
+        <div>
+          <button 
+            type="button" 
+            onClick={onAdminAccess} 
+            className="coming-soon-admin-link"
+            title="Access Restricted Founder Control Room"
+          >
+            [ // FOUNDER PORTAL LOCK ]
+          </button>
+        </div>
+      </footer>
+    </div>
   );
 }

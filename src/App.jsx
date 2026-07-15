@@ -9,6 +9,7 @@ import AdminLogin from './components/AdminLogin';
 import AdminDashboard from './components/AdminDashboard';
 import BookingFlow from './components/booking/BookingFlow';
 import AdminTicketingPortal from './components/admin/AdminTicketingPortal';
+import ComingSoon from './components/ComingSoon';
 import LoadingScreen from './components/LoadingScreen';
 import './index.css';
 import './components/ScrollReveal.css';
@@ -82,29 +83,17 @@ export default function App() {
     <div className="app-root">
       {isLoading && <LoadingScreen onComplete={() => setIsLoading(false)} />}
       
-      <Navbar 
-        activeView={activeView} 
-        setActiveView={handleSetView}
-        activeCategory={activeCategory}
-        setActiveCategory={handleSetCategory}
-      />
+      {activeView !== 'public' && (
+        <Navbar 
+          activeView={activeView} 
+          setActiveView={handleSetView}
+          activeCategory={activeCategory}
+          setActiveCategory={handleSetCategory}
+        />
+      )}
 
       {activeView === 'public' && (
-        <main>
-          <Hero 
-            activeCategory={activeCategory} 
-            setActiveView={handleSetView} 
-            onSelectEvent={(ev) => setSelectedEvent(ev)} 
-          />
-          <Marquee />
-          <Screenings 
-            activeCategory={activeCategory} 
-            setActiveCategory={handleSetCategory} 
-            setActiveView={handleSetView}
-            onSelectEvent={(ev) => setSelectedEvent(ev)} 
-          />
-          <Footer setActiveView={handleSetView} />
-        </main>
+        <ComingSoon onAdminAccess={() => handleSetView('admin-ticketing')} />
       )}
 
       {activeView === 'booking' && (
