@@ -141,6 +141,37 @@ export default function AdminTicketingPortal({ onSwitchToSignups }) {
     document.body.removeChild(link);
   };
 
+  // CSV Export specifically for Confirmed Attendees
+  const exportConfirmedCSV = () => {
+    const confirmed = bookings.filter(b => b.status === 'CONFIRMED');
+    if (confirmed.length === 0) {
+      alert('No confirmed bookings yet to export.');
+      return;
+    }
+    const headers = ['Booking ID', 'Full Name', 'Phone Number', 'Email Address', 'Assigned Seats', 'Seat Count', 'Total Amount Paid (₹)', 'Verified UTR Number', 'Payment Screenshot URL', 'Booking Date'];
+    const rows = confirmed.map(b => [
+      b.id,
+      `"${(b.user_name || '').replace(/"/g, '""')}"`,
+      `"${(b.user_phone || '').replace(/"/g, '""')}"`,
+      `"${(b.user_email || '').replace(/"/g, '""')}"`,
+      `"${Array.isArray(b.seats) ? b.seats.join(', ') : b.seats}"`,
+      Array.isArray(b.seats) ? b.seats.length : 0,
+      b.total_amount || 0,
+      `"${(b.utr || 'N/A').replace(/"/g, '""')}"`,
+      `"${(b.screenshot_url || b.paymentScreenshot || 'N/A').replace(/"/g, '""')}"`,
+      `"${new Date(b.created_at).toLocaleString().replace(/"/g, '""')}"`
+    ]);
+
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `theguild_confirmed_attendees_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   // Excel Operational Roster Export (CSV formatted specifically for gate entry & seat verification)
   const exportExcelRoster = () => {
     const headers = ['Row', 'Seat Label', 'Status', 'Attendee Name', 'Phone Number', 'Booking ID', 'Verified UTR'];
@@ -255,9 +286,13 @@ export default function AdminTicketingPortal({ onSwitchToSignups }) {
             <span className="text-sm text-gray-300">// OPERATIONAL DATA EXPORTS & GATE ROSTER TOOLS</span>
           </div>
           <div className="export-btn-group">
+            <button onClick={exportConfirmedCSV} className="action-btn-mini py-2 px-3 flex items-center gap-1.5 text-emerald-400 border-emerald-500/60 bg-emerald-950/40 hover:bg-emerald-900/60 font-bold shadow-lg">
+              <Download size={13} />
+              <span>EXPORT CONFIRMED CSV ({bookings.filter(b => b.status === 'CONFIRMED').length})</span>
+            </button>
             <button onClick={exportCSV} className="action-btn-mini py-2 px-3 flex items-center gap-1.5">
               <Download size={13} />
-              <span>EXPORT CSV</span>
+              <span>EXPORT ALL CSV ({bookings.length})</span>
             </button>
             <button onClick={exportExcelRoster} className="action-btn-mini py-2 px-3 flex items-center gap-1.5">
               <FileSpreadsheet size={13} />
@@ -265,7 +300,7 @@ export default function AdminTicketingPortal({ onSwitchToSignups }) {
             </button>
             <button onClick={copyWhatsAppList} className="action-btn-mini py-2 px-3 flex items-center gap-1.5 text-emerald-400 border-emerald-500/40">
               <Share2 size={13} />
-              <span>WHATSAPP ATTENDEE LIST</span>
+              <span>WHATSAPP LIST</span>
             </button>
           </div>
         </div>

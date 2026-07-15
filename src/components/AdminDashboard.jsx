@@ -60,6 +60,34 @@ export default function AdminDashboard({ onLogout }) {
     document.body.removeChild(link);
   };
 
+  const handleExportConfirmedCSV = () => {
+    const confirmedList = submissions.filter(s => s.status.toLowerCase() === 'confirmed' || s.status.toLowerCase() === 'contacted');
+    if (confirmedList.length === 0) {
+      alert('No confirmed/contacted submissions found.');
+      return;
+    }
+    const headers = ['ID', 'Name', 'Phone', 'Instagram', 'Sport', 'Selected Event', 'Submission Date', 'Status'];
+    const rows = confirmedList.map(s => [
+      s.id,
+      `"${s.name.replace(/"/g, '""')}"`,
+      `"${s.phone}"`,
+      `"${s.instagram}"`,
+      s.sportCategory.toUpperCase(),
+      `"${s.selectedEvent.replace(/"/g, '""')}"`,
+      new Date(s.submissionDate).toLocaleString(),
+      s.status
+    ]);
+
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `the_guild_confirmed_leads_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   // Filter and Sort Logic
   const filteredList = submissions
     .filter(s => {
@@ -97,9 +125,13 @@ export default function AdminDashboard({ onLogout }) {
               <RefreshCw size={14} className={loading ? 'spin' : ''} />
               <span>REFRESH</span>
             </button>
+            <button className="btn-brutalist export-btn border-emerald-500/60 text-emerald-400 bg-emerald-950/40 hover:bg-emerald-900/60" onClick={handleExportConfirmedCSV}>
+              <Download size={14} />
+              <span>EXPORT CONFIRMED ({submissions.filter(s => s.status.toLowerCase() === 'confirmed' || s.status.toLowerCase() === 'contacted').length})</span>
+            </button>
             <button className="btn-brutalist export-btn" onClick={handleExportCSV}>
               <Download size={14} />
-              <span>EXPORT CSV ({filteredList.length})</span>
+              <span>EXPORT ALL CSV ({filteredList.length})</span>
             </button>
             <button className="btn-logout" onClick={onLogout}>
               [ LOCK & EXIT ]
