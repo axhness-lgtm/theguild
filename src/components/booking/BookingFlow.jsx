@@ -465,19 +465,24 @@ export default function BookingFlow({ onReturnHome }) {
               </div>
             </div>
 
+            {/* Mobile Horizontal Scroll Hint */}
+            <div className="sm:hidden w-full text-center bg-zinc-900 border border-zinc-700 py-2.5 px-3 rounded-xl mb-3 flex items-center justify-center gap-1.5 text-yellow-400 font-tech text-[11px] font-bold shadow-lg animate-pulse">
+              <span>← SWIPE / SCROLL HORIZONTALLY TO PICK SEATS FROM END TO END →</span>
+            </div>
+
             {/* Seat Rows Grid (Rows K down to A matching physical diagram exactly) */}
-            <div className="seatmap-grid-wrap overflow-hidden sm:overflow-x-auto pb-6 w-full max-w-full">
-              <div className="seatmap-inner-track w-full max-w-full sm:min-w-max mx-auto px-0.5 sm:px-8 flex flex-col items-center">
+            <div className="seatmap-grid-wrap overflow-x-auto pb-6 w-full max-w-full" style={{ WebkitOverflowScrolling: 'touch' }}>
+              <div className="seatmap-inner-track min-w-max mx-auto px-4 sm:px-8 flex flex-col items-center">
                 {['K','J','I','H','G','F','E','D','C','B','A'].map((rowLabel) => {
                   const rowSeats = seats
                     .filter(s => s.row_label === rowLabel)
                     .sort((a, b) => b.seat_number - a.seat_number);
 
                   return (
-                    <div key={rowLabel} className="seatmap-row flex items-center justify-between sm:justify-center gap-[1.5px] sm:gap-2 my-1 sm:my-1.5 w-full sm:w-auto">
-                      <span className="row-label-text font-impact text-[9px] sm:text-base w-3.5 sm:w-8 text-center text-red-500 bg-zinc-900 border border-zinc-800 py-0.5 sm:py-1 rounded shrink-0 shadow">{rowLabel}</span>
+                    <div key={rowLabel} className="seatmap-row flex items-center justify-between sm:justify-center gap-1.5 sm:gap-2 my-1 sm:my-1.5 w-auto">
+                      <span className="row-label-text font-impact text-[9.5px] sm:text-base w-4 sm:w-8 text-center text-red-500 bg-zinc-900 border border-zinc-800 py-0.5 sm:py-1 rounded shrink-0 shadow">{rowLabel}</span>
                       
-                      <div className="seats-in-row flex items-center justify-center gap-[1.5px] sm:gap-2 flex-1 sm:flex-initial min-w-0 max-w-full overflow-hidden sm:overflow-visible px-0.5">
+                      <div className="seats-in-row flex items-center justify-center gap-1 sm:gap-2 overflow-visible px-1">
                         {rowSeats.map((seat) => {
                           const isSelected = selectedSeats.includes(seat.label);
                           const statusClass = isSelected ? 'SELECTED' : seat.status;
@@ -489,7 +494,7 @@ export default function BookingFlow({ onReturnHome }) {
                             <React.Fragment key={seat.id}>
                               <button
                                 type="button"
-                                className={`seat-btn seat-${statusClass} flex-1 sm:flex-initial min-w-[14px] max-w-[19px] sm:min-w-[40px] sm:max-w-[40px] h-[21px] sm:h-10 text-[8px] sm:text-sm font-bold rounded-[3px] sm:rounded-md border sm:border-2 transition-all flex items-center justify-center shrink p-0 leading-none ${
+                                className={`seat-btn seat-${statusClass} min-w-[26px] max-w-[26px] sm:min-w-[40px] sm:max-w-[40px] h-[26px] sm:h-10 text-[9.5px] sm:text-sm font-bold rounded-[4px] sm:rounded-md border sm:border-2 transition-all flex items-center justify-center shrink-0 p-0 leading-none ${
                                   isSelected 
                                     ? 'bg-white text-black font-black border-emerald-400 scale-125 shadow-2xl ring-1 sm:ring-2 ring-white z-20' 
                                     : seat.status === 'AVAILABLE' 
@@ -706,25 +711,26 @@ export default function BookingFlow({ onReturnHome }) {
               </button>
             </div>
           ) : (
-            <div className="max-w-5xl mx-auto bg-zinc-950 border-2 border-zinc-800 p-8 md:p-12 rounded-3xl shadow-2xl my-8 font-tech w-full booking-step-transition space-y-line">
+            <div className="max-w-5xl mx-auto bg-zinc-950 border-2 border-zinc-800 p-4 sm:p-8 md:p-12 rounded-3xl shadow-2xl my-8 font-tech w-full booking-step-transition space-y-line overflow-hidden">
               
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-center w-full">
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-12 items-center w-full max-w-full">
                 
-                {/* Left Column: Static UPI QR Code ONLY (Smaller & compact in mobile and PC) */}
-                <div className="md:col-span-3 flex flex-col items-center justify-center bg-zinc-900 border border-zinc-800 p-2.5 sm:p-4 rounded-xl text-center shadow-xl w-full mx-auto max-w-[170px] sm:max-w-[200px] md:max-w-none">
-                  <span className="text-red-500 font-bold text-[9px] sm:text-[11px] tracking-widest uppercase mb-1.5 block">
+                {/* Left Column: Static UPI QR Code ONLY (Smaller by 60% in mobile and bounded within 2 screen edges) */}
+                <div className="md:col-span-3 flex flex-col items-center justify-center bg-zinc-900 border border-zinc-800 p-2 sm:p-4 rounded-xl text-center shadow-xl w-full max-w-[125px] sm:max-w-[170px] md:max-w-none mx-auto overflow-hidden">
+                  <span className="text-red-500 font-bold text-[8.5px] sm:text-[11px] tracking-widest uppercase mb-1 block truncate w-full">
                     // OFFICIAL SCANNER QR
                   </span>
                   
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-white p-1 sm:p-1.5 rounded-lg shadow-inner border-2 border-zinc-200 mx-auto flex items-center justify-center">
+                  <div className="w-14 h-14 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-white p-1 rounded-lg shadow-inner border border-zinc-200 mx-auto flex items-center justify-center overflow-hidden shrink-0" style={{ width: '56px', height: '56px', maxWidth: '100%', maxHeight: '100%' }}>
                     <img 
                       src="/guildqr.png" 
                       alt="Official Guild UPI QR Code" 
-                      className="w-full h-full object-contain block mx-auto"
+                      className="object-contain block mx-auto shrink-0"
+                      style={{ width: '100%', height: '100%', maxWidth: '48px', maxHeight: '48px', objectFit: 'contain' }}
                     />
                   </div>
                   
-                  <span className="text-[8.5px] sm:text-[10px] text-gray-400 font-bold mt-1.5 tracking-wider uppercase block">
+                  <span className="text-[8px] sm:text-[10px] text-gray-400 font-bold mt-1 tracking-wider uppercase block truncate w-full">
                     GPay // PhonePe // Paytm // CRED
                   </span>
                 </div>
