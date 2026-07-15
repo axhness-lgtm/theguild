@@ -21,9 +21,6 @@ export default function ComingSoon({ onAdminAccess }) {
 
       {/* Main Hero Section */}
       <main className="coming-soon-main">
-        <div className="coming-soon-tag">
-          // INOX AUDITORIUM 03 // VIZAG, AP //
-        </div>
 
         <h1 className="coming-soon-headline">
           THE LIVE CINEMA & SPORTS CLUB <br />
