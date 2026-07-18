@@ -19,22 +19,6 @@ export const UPCOMING_SCREENINGS = [
     atmosphere: 'High-speed Spa-Francorchamps heritage screening at Brew N Cue. Live telemetry timing screens, surround F1 engine acoustics, and intimate 40-seat racing community.'
   },
 
-  // WORLD CUP - GRAND FINALE (PVR INOX, BEACH ROAD, VIZAG)
-  {
-    id: 'wc-final-2026',
-    category: 'world_cup',
-    name: 'FIFA WORLD CUP FINAL // LIVE SCREENING',
-    competition: 'FIFA WORLD CUP // GRAND FINALE',
-    date: '20TH JULY',
-    time: '00:30 AM ONWARDS',
-    venue: 'PVR INOX, BEACH ROAD, VIZAG',
-    status: 'LIVE INOX BOOKING',
-    isLive: true,
-    ticket_price: 499,
-    vip_price: 499,
-    capacity: '147 Seats Cinema Hangar',
-    atmosphere: 'The ultimate football showdown in Visakhapatnam\'s largest private cinema hangar. BookMyShow style seat reservation, 4K HDR stadium feed, and stadium acoustic volume.'
-  }
 ];
 
 const LOCAL_STORAGE_KEY = 'guild_interest_submissions_v1';

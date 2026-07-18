@@ -20,16 +20,23 @@
   justify-content: space-between;
 }
 
-.footer-logo {
-  font-size: clamp(2.5rem, 5vw, 4.5rem);
-  color: var(--text-primary);
+.footer-logo-container {
+  display: flex;
+  align-items: center;
 }
 
-.footer-manifesto {
-  font-size: 1.4rem;
-  color: var(--text-secondary);
+.footer-brand-logo {
+  max-width: 180px;
+  height: auto;
+  object-fit: contain;
+}
+
+.font-sports-italic {
+  font-family: 'Exo 2', sans-serif;
+  font-style: italic;
+  font-weight: 600;
   letter-spacing: 0.05em;
-  margin-top: 1.5rem;
+  text-transform: none;
 }
 
 .f-links {

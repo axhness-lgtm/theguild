@@ -7,9 +7,6 @@ import Footer from './components/Footer';
 import EventModal from './components/EventModal';
 import AdminLogin from './components/AdminLogin';
 import AdminDashboard from './components/AdminDashboard';
-import BookingFlow from './components/booking/BookingFlow';
-import AdminTicketingPortal from './components/admin/AdminTicketingPortal';
-import ComingSoon from './components/ComingSoon';
 import LoadingScreen from './components/LoadingScreen';
 import './index.css';
 import './components/ScrollReveal.css';
@@ -20,7 +17,7 @@ export default function App() {
   useScrollReveal();
   const [isLoading, setIsLoading] = useState(true);
   const [activeView, setActiveView] = useState('public');
-  const [activeCategory, setActiveCategory] = useState('world_cup');
+  const [activeCategory, setActiveCategory] = useState('football');
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
 
@@ -28,15 +25,15 @@ export default function App() {
     const checkRoute = () => {
       const path = window.location.pathname.toLowerCase();
       if (path === '/founder' || path === '/admin') {
-        setActiveView('admin-ticketing');
+        setActiveView('admin');
       } else if (path === '/formula1' || path === '/f1') {
         setActiveCategory('f1');
         setActiveView('public');
       } else {
-        setActiveCategory('world_cup');
+        setActiveCategory('football');
         setActiveView('public');
         if (path === '/' || path === '') {
-          window.history.replaceState({}, '', '/worldcup');
+          window.history.replaceState({}, '', '/football');
         }
       }
     };
@@ -51,9 +48,9 @@ export default function App() {
       if (window.location.pathname.toLowerCase() !== '/formula1') {
         window.history.pushState({}, '', '/formula1');
       }
-    } else if (cat === 'world_cup') {
-      if (window.location.pathname.toLowerCase() !== '/worldcup') {
-        window.history.pushState({}, '', '/worldcup');
+    } else if (cat === 'football') {
+      if (window.location.pathname.toLowerCase() !== '/football') {
+        window.history.pushState({}, '', '/football');
       }
     }
   };
@@ -62,10 +59,10 @@ export default function App() {
     if (view === 'public') {
       const path = window.location.pathname.toLowerCase();
       if (path === '/founder' || path === '/admin' || path === '/') {
-        const targetUrl = activeCategory === 'f1' ? '/formula1' : '/worldcup';
+        const targetUrl = activeCategory === 'f1' ? '/formula1' : '/football';
         window.history.pushState({}, '', targetUrl);
       }
-    } else if (view === 'admin' || view === 'admin-ticketing') {
+    } else if (view === 'admin') {
       const path = window.location.pathname.toLowerCase();
       if (path !== '/founder' && path !== '/admin') {
         window.history.pushState({}, '', '/founder');
@@ -83,50 +80,40 @@ export default function App() {
     <div className="app-root">
       {isLoading && <LoadingScreen onComplete={() => setIsLoading(false)} />}
       
-      {activeView !== 'public' && (
-        <Navbar 
-          activeView={activeView} 
-          setActiveView={handleSetView}
-          activeCategory={activeCategory}
-          setActiveCategory={handleSetCategory}
-        />
-      )}
+      <Navbar 
+        activeView={activeView} 
+        setActiveView={handleSetView}
+        activeCategory={activeCategory}
+        setActiveCategory={handleSetCategory}
+      />
 
       {activeView === 'public' && (
-        <ComingSoon onAdminAccess={() => handleSetView('admin-ticketing')} />
-      )}
-
-      {activeView === 'booking' && (
         <main>
-          <BookingFlow onReturnHome={() => handleSetView('public')} />
+          <Hero 
+            activeCategory={activeCategory} 
+            setActiveView={handleSetView} 
+            onSelectEvent={(ev) => setSelectedEvent(ev)} 
+          />
+          <Marquee />
+          <Screenings 
+            activeCategory={activeCategory} 
+            setActiveCategory={handleSetCategory} 
+            setActiveView={handleSetView}
+            onSelectEvent={(ev) => setSelectedEvent(ev)} 
+          />
+          <Footer setActiveView={handleSetView} />
         </main>
       )}
 
-      {(activeView === 'admin' || activeView === 'admin-ticketing') && (
+      {activeView === 'admin' && (
         <main>
           {!isAdminLoggedIn ? (
             <AdminLogin 
               onLogin={() => setIsAdminLoggedIn(true)} 
               onExit={() => handleSetView('public')} 
             />
-          ) : activeView === 'admin-ticketing' ? (
-            <AdminTicketingPortal onSwitchToSignups={() => handleSetView('admin')} />
           ) : (
             <div className="admin-wrapper-inner">
-              <div className="grid-container pt-6">
-                <div className="bg-zinc-900 border border-zinc-800 p-4 mb-4 flex justify-between items-center font-tech text-xs">
-                  <div>
-                    <span className="text-gray-400">// SWITCH OPERATIONAL PORTALS: </span>
-                    <strong className="text-white ml-2">GENERAL INTEREST SIGNUPS (CURRENT)</strong>
-                  </div>
-                  <button 
-                    onClick={() => handleSetView('admin-ticketing')}
-                    className="btn-brutalist py-2 px-4 text-xs"
-                  >
-                    ENTER INOX TICKETING CONTROL ROOM (147 SEATS) →
-                  </button>
-                </div>
-              </div>
               <AdminDashboard onLogout={handleAdminLogout} />
             </div>
           )}

@@ -12,45 +12,46 @@ const InstagramIcon = () => (
 
 export default function Footer({ setActiveView }) {
   return (
-    <footer className="footer-section" data-scroll-section>
+    <footer className="footer-section font-sports-italic" data-scroll-section>
       <div className="grid-container footer-container">
         
         <div className="footer-top">
           <div className="f-brand">
-            <LineReveal delay={0.1} className="footer-logo font-editorial" as="h2">THE GUILD</LineReveal>
-            <LineReveal delay={0.25} className="footer-manifesto font-editorial" as="p">BUILT FOR FANS.</LineReveal>
+            <RevealItem delay={0.1} className="footer-logo-container">
+              <img src="/logo.png" alt="THE GUILD" className="footer-brand-logo" />
+            </RevealItem>
           </div>
 
-          <div className="f-links font-tech">
+          <div className="f-links">
             <RevealItem delay={0.3} className="link-group">
-              <span className="lg-title">LOCATION</span>
+              <span className="lg-title">Location</span>
               <span className="lg-val">
                 <MapPin size={13} style={{display:'inline', marginRight:4}}/> 
-                VISAKHAPATNAM, INDIA
+                Visakhapatnam, India
               </span>
             </RevealItem>
 
             <RevealItem delay={0.38} className="link-group">
-              <span className="lg-title">SOCIAL CHANNEL</span>
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="lg-link">
+              <span className="lg-title">Social Channel</span>
+              <a href="https://www.instagram.com/theguild.vizag/" target="_blank" rel="noopener noreferrer" className="lg-link">
                 <InstagramIcon /> 
-                <RollingText text="@THEGUILD.VZAG" stagger={true} />
+                <RollingText text="@theguild.vizag" stagger={true} />
               </a>
             </RevealItem>
 
             <RevealItem delay={0.46} className="link-group">
-              <span className="lg-title">DIRECT INQUIRY</span>
-              <a href="mailto:hello@theguildvzag.com" className="lg-link">
+              <span className="lg-title">Direct Inquiry</span>
+              <a href="mailto:theguild.vizag@gmail.com" className="lg-link">
                 <Mail size={13} style={{display:'inline', marginRight:4}}/> 
-                <RollingText text="HELLO@THEGUILDVZAG.COM" stagger={true} />
+                <RollingText text="theguild.vizag@gmail.com" stagger={true} />
               </a>
             </RevealItem>
           </div>
         </div>
 
-        <div className="footer-bottom font-tech">
+        <div className="footer-bottom">
           <div className="b-left">
-            <LineReveal delay={0.5}>© {new Date().getFullYear()} THE GUILD // VISAKHAPATNAM. ALL RIGHTS RESERVED.</LineReveal>
+            <LineReveal delay={0.5}>© {new Date().getFullYear()} The Guild // Visakhapatnam. All Rights Reserved.</LineReveal>
           </div>
         </div>
 

@@ -94,7 +94,7 @@ export default function EventModal({ event, onClose }) {
         <div className="modal-header">
           <div className="modal-tag font-tech flex items-center gap-2">
             <span className="text-red-500 border border-red-500/40 bg-red-950/30 px-2 py-0.5 rounded text-[11px] font-bold">
-              [ FORMULA 1 RACE REGISTRATION CENTER ]
+              [ {initialCategory === 'f1' ? 'FORMULA 1 RACE REGISTRATION CENTER' : 'FOOTBALL MATCH REGISTRATION CENTER'} ]
             </span>
             <span className="text-gray-400">
               {step === 1 ? '// STEP 01: ATTENDEE REGISTRATION' : 

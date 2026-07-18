@@ -10,7 +10,7 @@ export default function Navbar({ activeView, setActiveView, activeCategory = 'f1
           className="navbar-brand swipe-reveal-right flex items-center justify-start" 
           onClick={() => {
             setActiveView('public');
-            if (setActiveCategory) setActiveCategory('world_cup');
+            if (setActiveCategory) setActiveCategory('football');
           }}
           role="button"
           tabIndex={0}
@@ -33,12 +33,12 @@ export default function Navbar({ activeView, setActiveView, activeCategory = 'f1
             <button 
               type="button"
               style={{ backgroundColor: 'transparent', background: 'transparent', border: 'none', boxShadow: 'none', outline: 'none', cursor: 'pointer' }}
-              className={`nav-link transition-all px-1.5 sm:px-3 py-1 text-xs sm:text-sm md:text-base tracking-wider md:tracking-widest font-black shrink-0 ${activeCategory === 'world_cup' ? 'text-red-500 scale-105' : 'text-gray-300 hover:text-white'}`}
+              className={`nav-link transition-all px-1.5 sm:px-3 py-1 text-xs sm:text-sm md:text-base tracking-wider md:tracking-widest font-black shrink-0 ${activeCategory === 'football' ? 'text-red-500 scale-105' : 'text-gray-300 hover:text-white'}`}
               onClick={() => {
-                if (setActiveCategory) setActiveCategory('world_cup');
+                if (setActiveCategory) setActiveCategory('football');
               }}
             >
-              <RollingText text="[ WORLD CUP ]" />
+              <RollingText text="[ FOOTBALL ]" />
             </button>
           </nav>
         ) : activeView === 'booking' ? (
