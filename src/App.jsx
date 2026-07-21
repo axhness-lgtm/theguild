@@ -17,7 +17,7 @@ export default function App() {
   useScrollReveal();
   const [isLoading, setIsLoading] = useState(true);
   const [activeView, setActiveView] = useState('public');
-  const [activeCategory, setActiveCategory] = useState('football');
+  const [activeCategory, setActiveCategory] = useState('f1');
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
 
@@ -26,14 +26,14 @@ export default function App() {
       const path = window.location.pathname.toLowerCase();
       if (path === '/founder' || path === '/admin') {
         setActiveView('admin');
-      } else if (path === '/formula1' || path === '/f1') {
-        setActiveCategory('f1');
-        setActiveView('public');
-      } else {
+      } else if (path === '/football') {
         setActiveCategory('football');
         setActiveView('public');
+      } else {
+        setActiveCategory('f1');
+        setActiveView('public');
         if (path === '/' || path === '') {
-          window.history.replaceState({}, '', '/football');
+          window.history.replaceState({}, '', '/formula1');
         }
       }
     };
